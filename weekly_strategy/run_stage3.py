@@ -105,19 +105,32 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--refresh-dossiers", action="store_true",
                         help="Force-refresh all dossiers (re-pull companyfacts).")
     parser.add_argument(
-        "--position-count", type=int, default=20,
-        help="Longs and shorts per side. Default 20 -- wider book for daily "
-             "data collection so news/reddit sentiment can drop weak names "
-             "without leaving the book thin. Drop to 5 for a tighter trading-ready book.",
+        "--position-count", type=int, default=10,
+        help="Final selection size per side (post-rerank if --rerank-after-enrich). "
+             "Default 10 -- top 5 shown prominently, next 5 folded.",
     )
-    parser.add_argument("--max-per-sector", type=int, default=5,
-                        help="Cap positions per GICS sector (default 5; with "
-                             "position_count=20 across ~7 sectors this needs headroom).")
+    parser.add_argument("--max-per-sector", type=int, default=4,
+                        help="Cap positions per GICS sector (default 4; with "
+                             "position_count=10 across ~6 sectors this needs headroom).")
     parser.add_argument(
         "--focus-list-size", type=int, default=30,
-        help="Top-K longs / bottom-K shorts pulled into the focus list before "
-             "selection applies constraints. Default 30 -- should always be "
-             "comfortably larger than --position-count to give selection room.",
+        help="Top-K longs / bottom-K shorts pulled into the focus list. "
+             "Default 30 -- with both sides this is the enrichment pool of 60 "
+             "unique tickers (~$0.50/day equiv).",
+    )
+    parser.add_argument(
+        "--top-shown", type=int, default=5,
+        help="Number of positions per side rendered as full cards in the report. "
+             "The remainder are folded into a collapsible 'Show N more' section. "
+             "Default 5.",
+    )
+    parser.add_argument(
+        "--no-rerank-after-enrich", action="store_true",
+        help="Disable the two-stage rerank. By default, after enriching the "
+             "focus list with news + reddit, the system re-normalizes those "
+             "bundles (now including news sentiment) and re-selects positions. "
+             "Pass this flag to keep the original ranking and use news/reddit "
+             "as display-only.",
     )
     parser.add_argument("--news-days", type=int, default=7)
     parser.add_argument("--price-days", type=int, default=365)
@@ -222,18 +235,24 @@ def main(argv: list[str] | None = None) -> int:
     # want news + reddit context on the ~10 selected positions for the report.
     # Costs ~$0.30/day and ~5 min, but produces a meaningfully richer per-position
     # reasoning card.
-    # Dedupe -- with tiny universes a name can land on both sides; we only
-    # want to enrich it once.
-    selected_tickers_for_enrich = list(dict.fromkeys(
-        p.ticker for p in (portfolio.longs + portfolio.shorts)
-    ))
+    # Two-stage: enrich the FOCUS LIST (not just final selection) so news +
+    # reddit can shape the final rank. Pool = top-K longs + bottom-K shorts.
+    # With focus_list_size=30 that's up to 60 unique names.
+    if args.skip_enrich_selected:
+        enrich_pool: list[str] = []
+    else:
+        enrich_pool = list(dict.fromkeys(
+            [it.ticker for it in focus.long_candidates]
+            + [it.ticker for it in focus.short_candidates]
+        ))
+
+    news_score_by_ticker: dict[str, float] = {}
     selected_reddit_scores: dict = {}
-    if (not args.skip_enrich_selected) and selected_tickers_for_enrich:
-        print(f"[stage3] enriching {len(selected_tickers_for_enrich)} selected positions "
+    if enrich_pool:
+        print(f"[stage3] enriching focus list ({len(enrich_pool)} unique tickers) "
               f"with news + reddit...")
         since_dt = datetime.combine(week_ending, datetime.min.time()) - timedelta(days=args.news_days)
-        for tk in selected_tickers_for_enrich:
-            # News: fetch + insert + score (idempotent on rerun)
+        for tk in enrich_pool:
             try:
                 info = fetchers.get_basic_info(tk)
                 items = fetchers.fetch_news(tk, days=args.news_days)
@@ -242,11 +261,11 @@ def main(argv: list[str] | None = None) -> int:
                 ns = news_sentiment.score_news(
                     tk, since=since_dt, company_name=info.get("name"),
                 )
+                news_score_by_ticker[tk] = ns.sentiment_score
                 print(f"   [{tk}] news: {ns.n_classified}/{ns.n_total} classified, "
                       f"sent={ns.sentiment_score:+.2f}")
             except Exception as e:
                 print(f"   [{tk}] news enrich FAILED: {e}")
-            # Reddit: fetch + score (no DB schema for RedditScore; we hold it in memory)
             try:
                 posts = fetchers.fetch_reddit_recent(tk, hours=args.reddit_hours)
                 if posts:
@@ -257,6 +276,47 @@ def main(argv: list[str] | None = None) -> int:
                 selected_reddit_scores[tk] = reddit_sentiment.score_reddit_snapshot(snap)
             except Exception as e:
                 print(f"   [{tk}] reddit enrich FAILED: {e}")
+
+    # Step 2: re-rank within the enriched pool with news + reddit included.
+    if news_score_by_ticker and not args.no_rerank_after_enrich:
+        print(f"[stage3] re-ranking {len(enrich_pool)} enriched names "
+              f"with news + reddit in composite...")
+        enriched_bundles: dict = {}
+        for tk in enrich_pool:
+            if tk not in bundles:
+                continue
+            updates: dict = {}
+            if tk in news_score_by_ticker:
+                updates["news_sentiment_score"] = news_score_by_ticker[tk]
+            if tk in selected_reddit_scores:
+                rs = selected_reddit_scores[tk]
+                updates["reddit_sentiment"] = rs.llm_sentiment
+                updates["reddit_is_crowded"] = rs.is_crowded
+            enriched_bundles[tk] = bundles[tk].model_copy(update=updates)
+
+        # Re-normalize within the enriched subset only -- otherwise non-enriched
+        # tickers (z_news=0 by fallback) dilute the news signal.
+        enriched_bundles = batch_scoring.normalize_scores(
+            enriched_bundles, regime=macro_ctx.macro_regime,
+        )
+
+        focus = selection.build_focus_list(
+            enriched_bundles,
+            week_ending=week_ending,
+            top_k_longs=args.position_count,
+            top_k_shorts=args.position_count,
+            sector_lookup=sector_lookup,
+            beta_lookup=beta_lookup,
+        )
+        portfolio = selection.select_positions(
+            focus,
+            week_ending=week_ending,
+            position_count=args.position_count,
+            max_per_sector=args.max_per_sector,
+            held_long_tickers=prev_longs,
+            held_short_tickers=prev_shorts,
+        )
+        bundles = enriched_bundles
 
     # --- 8. Conviction (Sonnet, one call per selected position) ---
     checks: dict = {}
@@ -317,6 +377,7 @@ def main(argv: list[str] | None = None) -> int:
         dossiers=selected_dossiers,
         news_items_by_ticker=news_for_positions,
         reddit_scores=selected_reddit_scores,
+        top_shown=args.top_shown,
     )
     path = portfolio_mod.save_portfolio_markdown(portfolio, md)
     html_path = portfolio_mod.save_portfolio_html(portfolio, md)

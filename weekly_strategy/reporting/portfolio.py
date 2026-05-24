@@ -272,6 +272,7 @@ def render_portfolio_markdown(
     dossiers: dict[str, "Dossier"] | None = None,  # for per-position reasoning
     news_items_by_ticker: dict[str, list["NewsItem"]] | None = None,  # for news themes
     reddit_scores: dict[str, "RedditScore"] | None = None,             # for per-position reddit
+    top_shown: int = 5,    # show top-N per side prominently; fold the rest
 ) -> str:
     """Compose the full portfolio Markdown.
 
@@ -292,13 +293,13 @@ def render_portfolio_markdown(
         "Longs", portfolio.longs, convictions, bundles,
         dossiers=dossiers, sector_snap=sector_snap,
         news_items_by_ticker=news_items_by_ticker,
-        reddit_scores=reddit_scores,
+        reddit_scores=reddit_scores, top_shown=top_shown,
     ))
     parts.append(_render_positions(
         "Shorts", portfolio.shorts, convictions, bundles,
         dossiers=dossiers, sector_snap=sector_snap,
         news_items_by_ticker=news_items_by_ticker,
-        reddit_scores=reddit_scores,
+        reddit_scores=reddit_scores, top_shown=top_shown,
     ))
     parts.append(_render_changes(portfolio, previous_longs, previous_shorts))
     parts.append(_render_portfolio_metrics(portfolio))
@@ -533,6 +534,56 @@ a:hover {{ text-decoration: underline; }}
   font-size: 0.85em;
 }}
 .chips.inline {{ display: inline-flex; }}
+
+/* === Folded "Others" section === */
+details.position-fold {{
+  background: #fff;
+  border: 1px solid #d6dce5;
+  border-radius: 6px;
+  margin: 1em 0;
+  padding: 0.55em 0.9em;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}}
+details.position-fold summary {{
+  cursor: pointer;
+  font-weight: 600;
+  color: #2a5fa0;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}}
+details.position-fold summary::before {{
+  content: "▶";
+  font-size: 0.7em;
+  color: #6c7a93;
+  transition: transform 0.15s ease;
+  display: inline-block;
+}}
+details.position-fold[open] summary::before {{
+  transform: rotate(90deg);
+}}
+details.position-fold[open] summary {{
+  border-bottom: 1px solid #e0e4ea;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.6em;
+}}
+details.position-fold.long summary {{ color: #1f8a5c; }}
+details.position-fold.short summary {{ color: #c14242; }}
+.fold-body {{ padding-top: 0.25em; }}
+.fold-body .position {{
+  margin: 0.6em 0;
+  padding: 0.7em 1em 0.55em;
+  border-left-width: 4px;
+}}
+.fold-body .position-headline {{
+  font-size: 0.92em;
+  padding-bottom: 0.4em;
+  margin-bottom: 0.4em;
+}}
+.fold-body .position-head .ticker {{ font-size: 1.15em; }}
+.fold-body .position-stats {{ margin: 0.3em 0 0.55em; }}
 .news-tag {{
   display: inline-block;
   padding: 0 0.4em;
@@ -673,8 +724,14 @@ def _render_positions(
     sector_snap: SectorSnapshot | None = None,
     news_items_by_ticker: dict[str, list[NewsItem]] | None = None,
     reddit_scores: dict[str, RedditScore] | None = None,
+    top_shown: int = 5,
 ) -> str:
-    """Render a side (longs or shorts) as HTML cards with reasoning."""
+    """Render a side (longs or shorts) as HTML cards with reasoning.
+
+    Top ``top_shown`` positions render as expanded cards; the remainder go
+    inside a folded ``<details>`` block so the report stays scannable while
+    keeping the full data available for inspection.
+    """
     if not positions:
         return f"## {label}\n\n_(none selected)_"
     dossiers = dossiers or {}
@@ -683,88 +740,135 @@ def _render_positions(
     side_class = "long" if label.lower().startswith("long") else "short"
     badge = "LONG" if side_class == "long" else "SHORT"
 
-    out: list[str] = [f"## {label} ({len(positions)})", ""]
-    for i, p in enumerate(positions, 1):
-        bundle = bundles.get(p.ticker) if bundles else None
-        dossier = dossiers.get(p.ticker)
-        news_items = news_items_by_ticker.get(p.ticker)
-        reddit_score = reddit_scores.get(p.ticker)
-        reasoning = _explain_position(
-            p, bundle, dossier, sector_snap, news_items, reddit_score,
-        )
+    top = positions[:top_shown]
+    rest = positions[top_shown:]
+    label_singular = label.rstrip("s").lower()  # "long" or "short"
 
-        composite_disp = (
-            f"{p.composite_z:.2f}" if p.composite_z is not None
-            else (f"{p.composite_score:.2f}" if p.composite_score is not None else "n/a")
-        )
-        beta_str = _fmt_beta(p.beta)
-        weight_pct = (p.weight or 0) * 100
-        check = convictions.get(p.ticker)
+    if rest:
+        header = f"## {label} (top {len(top)} of {len(positions)})"
+    else:
+        header = f"## {label} ({len(positions)})"
+    out: list[str] = [header, ""]
 
-        out.append(f"<div class='position {side_class}'>")
+    # Top-K full cards.
+    for i, p in enumerate(top, 1):
+        out.append(_format_position_card(
+            p, i, side_class, badge,
+            bundles, convictions, dossiers, sector_snap,
+            news_items_by_ticker, reddit_scores, compact=False,
+        ))
+        out.append("")
+
+    # Rest folded.
+    if rest:
         out.append(
-            f"<div class='position-head'>"
-            f"<span class='side-badge {side_class}'>{badge}</span>"
-            f"<span class='rank'>#{i}</span>"
-            f"<span class='ticker'>{p.ticker}</span>"
-            f"<span class='meta'>{p.sector or '?'} · β {beta_str} · weight {weight_pct:.1f}%</span>"
-            f"</div>"
+            f"<details class='position-fold {side_class}'>"
+            f"<summary>Show {len(rest)} more {label_singular} "
+            f"candidate{'s' if len(rest) != 1 else ''} (ranks "
+            f"{top_shown + 1}-{len(positions)})</summary>"
+        )
+        out.append("<div class='fold-body'>")
+        for i, p in enumerate(rest, top_shown + 1):
+            out.append(_format_position_card(
+                p, i, side_class, badge,
+                bundles, convictions, dossiers, sector_snap,
+                news_items_by_ticker, reddit_scores, compact=True,
+            ))
+        out.append("</div></details>")
+
+    return "\n".join(out)
+
+
+def _format_position_card(
+    p: PortfolioPosition,
+    i: int,
+    side_class: str,
+    badge: str,
+    bundles: dict[str, StockScoreBundle],
+    convictions: dict[str, ConvictionCheck],
+    dossiers: dict[str, Dossier],
+    sector_snap: SectorSnapshot | None,
+    news_items_by_ticker: dict[str, list[NewsItem]],
+    reddit_scores: dict[str, RedditScore],
+    *,
+    compact: bool,
+) -> str:
+    """One position card. ``compact`` shows the headline + scores + chips
+    only; the full version adds the reasoning + news + reddit blocks."""
+    bundle = bundles.get(p.ticker) if bundles else None
+    dossier = dossiers.get(p.ticker)
+    news_items = news_items_by_ticker.get(p.ticker)
+    reddit_score = reddit_scores.get(p.ticker)
+    reasoning = _explain_position(
+        p, bundle, dossier, sector_snap, news_items, reddit_score,
+    )
+    composite_disp = (
+        f"{p.composite_z:.2f}" if p.composite_z is not None
+        else (f"{p.composite_score:.2f}" if p.composite_score is not None else "n/a")
+    )
+    beta_str = _fmt_beta(p.beta)
+    weight_pct = (p.weight or 0) * 100
+    check = convictions.get(p.ticker)
+
+    klass = f"position {side_class}" + (" compact" if compact else "")
+    out: list[str] = [f"<div class='{klass}'>"]
+    out.append(
+        f"<div class='position-head'>"
+        f"<span class='side-badge {side_class}'>{badge}</span>"
+        f"<span class='rank'>#{i}</span>"
+        f"<span class='ticker'>{p.ticker}</span>"
+        f"<span class='meta'>{p.sector or '?'} · β {beta_str} · weight {weight_pct:.1f}%</span>"
+        f"</div>"
+    )
+    out.append(f"<div class='position-headline'>{reasoning['headline']}</div>")
+
+    stat_bits = [
+        f"<span class='stat'><span class='lbl'>composite</span>"
+        f"<span class='val'>{composite_disp}</span></span>",
+        f"<span class='stat'><span class='lbl'>selection</span>"
+        f"<span class='val'>{p.selection_reason}</span></span>",
+    ]
+    if check is not None:
+        stat_bits.append(
+            f"<span class='stat'><span class='lbl'>conviction</span>"
+            f"<span class='val conviction-{check.confidence.lower()}'>{check.confidence}</span></span>"
+        )
+    out.append("<div class='position-stats'>" + "".join(stat_bits) + "</div>")
+
+    # Drivers always shown (even in compact -- one line, high info density).
+    if reasoning["drivers"]:
+        out.append("<div class='reasoning-block'><div class='label'>Why this rank</div><ul>")
+        for line in reasoning["drivers"]:
+            out.append(f"<li>{line}</li>")
+        out.append("</ul></div>")
+
+    # Fundamentals chips: shown in compact too, they're tiny.
+    if reasoning["fundamentals"]:
+        chips = "".join(
+            f"<span class='chip'>{b}</span>" for b in reasoning["fundamentals"]
         )
         out.append(
-            f"<div class='position-headline'>{reasoning['headline']}</div>"
+            f"<div class='reasoning-block'><div class='label'>Fundamentals</div>"
+            f"<div class='chips'>{chips}</div></div>"
         )
 
-        # Numeric stat strip
-        stat_bits = [
-            f"<span class='stat'><span class='lbl'>composite</span>"
-            f"<span class='val'>{composite_disp}</span></span>",
-            f"<span class='stat'><span class='lbl'>selection</span>"
-            f"<span class='val'>{p.selection_reason}</span></span>",
-        ]
-        if check is not None:
-            stat_bits.append(
-                f"<span class='stat'><span class='lbl'>conviction</span>"
-                f"<span class='val conviction-{check.confidence.lower()}'>{check.confidence}</span></span>"
-            )
-        out.append("<div class='position-stats'>" + "".join(stat_bits) + "</div>")
-
-        # Drivers + context
-        if reasoning["drivers"]:
-            out.append("<div class='reasoning-block'><div class='label'>Why this rank</div><ul>")
-            for line in reasoning["drivers"]:
-                out.append(f"<li>{line}</li>")
-            out.append("</ul></div>")
+    # Full-only sections.
+    if not compact:
         if reasoning["context"]:
             out.append("<div class='reasoning-block'><div class='label'>Context</div><ul>")
             for line in reasoning["context"]:
                 out.append(f"<li>{line}</li>")
             out.append("</ul></div>")
-
-        # Fundamentals chips
-        if reasoning["fundamentals"]:
-            chips = "".join(
-                f"<span class='chip'>{b}</span>" for b in reasoning["fundamentals"]
-            )
-            out.append(
-                f"<div class='reasoning-block'><div class='label'>Fundamentals</div>"
-                f"<div class='chips'>{chips}</div></div>"
-            )
-
-        # News (only when material items exist for this ticker)
         if reasoning["news_summary"]:
             out.append(
                 f"<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div>"
                 f"<div class='news-list'>{reasoning['news_summary']}</div></div>"
             )
-
-        # Reddit sentiment (only when enrichment ran and mention_count > 0)
         if reasoning["sentiment_summary"]:
             out.append(
                 f"<div class='reasoning-block'><div class='label'>Reddit chatter (24h)</div>"
                 f"<div class='reddit-summary'>{reasoning['sentiment_summary']}</div></div>"
             )
-
-        # Conviction LLM thesis (if available)
         if check is not None and (check.thesis or check.risks or check.flags):
             out.append("<div class='reasoning-block llm'><div class='label'>LLM conviction</div>")
             if check.thesis:
@@ -781,8 +885,7 @@ def _render_positions(
                 out.append("</ul>")
             out.append("</div>")
 
-        out.append("</div>")  # /.position
-        out.append("")
+    out.append("</div>")
     return "\n".join(out)
 
 

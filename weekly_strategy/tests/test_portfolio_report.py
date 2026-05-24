@@ -204,6 +204,51 @@ def test_render_html_handles_tables():
     assert "<td>1</td>" in html
 
 
+def test_folds_extra_positions_into_details_block():
+    # 7 longs; default top_shown=5 -> 5 visible + 2 folded
+    from weekly_strategy.data.schemas import Portfolio, PortfolioPosition
+    p = Portfolio(
+        week_ending=date(2026, 5, 24),
+        longs=[
+            PortfolioPosition(ticker=f"L{i}", direction="long", sector="Technology",
+                              composite_z=2.0 - i*0.1, beta=1.0, weight=0.05)
+            for i in range(7)
+        ],
+        shorts=[
+            PortfolioPosition(ticker=f"S{i}", direction="short", sector="Energy",
+                              composite_z=-2.0 + i*0.1, beta=0.5, weight=0.05)
+            for i in range(2)
+        ],
+    )
+    md = port.render_portfolio_markdown(p, top_shown=5)
+    # Header now indicates partial display.
+    assert "## Longs (top 5 of 7)" in md
+    # All 7 longs still rendered (5 top + 2 in fold).
+    for i in range(7):
+        assert f">L{i}<" in md
+    # Fold marker present for longs only (shorts have 2 -- fit in top_shown).
+    assert "<details class='position-fold long'>" in md
+    assert "Show 2 more long candidates" in md
+    assert "<details class='position-fold short'>" not in md
+    # Compact cards in fold get the .compact class.
+    assert "position long compact" in md
+
+
+def test_top_shown_param_respects_smaller_count():
+    from weekly_strategy.data.schemas import Portfolio, PortfolioPosition
+    p = Portfolio(
+        week_ending=date(2026, 5, 24),
+        longs=[
+            PortfolioPosition(ticker=f"L{i}", direction="long", sector="Technology",
+                              composite_z=2.0, beta=1.0, weight=0.05)
+            for i in range(10)
+        ],
+    )
+    md = port.render_portfolio_markdown(p, top_shown=3)
+    assert "## Longs (top 3 of 10)" in md
+    assert "Show 7 more long candidates" in md
+
+
 def test_save_portfolio_html_writes_sibling(tmp_path, monkeypatch):
     import importlib
     import weekly_strategy.config.settings as settings_mod
