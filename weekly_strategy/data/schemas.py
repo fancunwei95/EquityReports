@@ -143,6 +143,62 @@ _FIN_COND_VALUES = ("easing", "stable", "tightening", "unknown")
 _CYCLE_PHASE_VALUES = ("early", "mid", "late", "recession", "unknown")
 
 
+class FocusListItem(BaseModel):
+    """One name in the weekly focus list (Step 3.5)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    composite_score: float | None = None
+    composite_z: float | None = None
+    quality_score: float | None = None
+    valuation_score: float | None = None
+    momentum_score: float | None = None
+    sector: str | None = None
+    beta: float | None = None
+    rank: int | None = None
+    # Why this name made the outlier bucket, if applicable.
+    outlier_reason: str | None = None
+
+
+class FocusList(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    week_ending: date
+    long_candidates: list[FocusListItem] = Field(default_factory=list)
+    short_candidates: list[FocusListItem] = Field(default_factory=list)
+    outliers: list[FocusListItem] = Field(default_factory=list)
+
+
+class PortfolioPosition(BaseModel):
+    """A selected name in the weekly book (Step 3.6)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    direction: str             # "long" | "short"
+    composite_score: float | None = None
+    composite_z: float | None = None
+    sector: str | None = None
+    beta: float | None = None
+    weight: float = 0.20       # fraction of basket (5 equal-weight = 0.20)
+    selection_reason: str = "rank"  # "rank" | "thematic" | "turnover_dampening"
+
+
+class Portfolio(BaseModel):
+    """The weekly L/S book."""
+
+    model_config = ConfigDict(frozen=True)
+
+    week_ending: date
+    longs: list[PortfolioPosition] = Field(default_factory=list)
+    shorts: list[PortfolioPosition] = Field(default_factory=list)
+    long_basket_beta: float | None = None
+    short_basket_beta: float | None = None
+    net_beta: float | None = None
+    rejected: list[dict] = Field(default_factory=list)  # {ticker, side, reason}
+
+
 class UniverseEntry(BaseModel):
     """A single name in the Stage 3 universe, with the metadata that put it there."""
 
