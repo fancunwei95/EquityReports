@@ -38,6 +38,18 @@ python -m weekly_strategy.run_stage3 \
 Cost: ~0$/day (no Sonnet calls when --skip-macro and --skip-conviction).
 Runtime: ~30s once dossiers are built.
 
+### Auto-push to the public dashboard
+
+The daemon auto-commits `docs/` (today's `{date}.{md,html}` + the
+regenerated `performance.json`) and pushes to origin after every
+successful run. Skipped silently if nothing in `docs/` changed.
+Push failures are logged but never crash the loop -- the next morning
+retries. Pass `--no-auto-push` to disable.
+
+The public dashboard at
+https://fancunwei95.github.io/202605_equityReports/ updates within a
+minute of each push.
+
 The full loop (news cascade + reddit + cross-stock + conviction):
 
 ```
