@@ -28,7 +28,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from weekly_strategy.config import settings
-from weekly_strategy.data import fetchers, storage
+from weekly_strategy.data import fetchers, predictions, storage
 from weekly_strategy.data.schemas import Dossier, Universe, UniverseEntry
 from weekly_strategy.dossier import builder as dossier_builder
 from weekly_strategy.dossier import universe as universe_mod
@@ -87,15 +87,9 @@ def _ensure_dossiers(universe: Universe, *, force_refresh: bool = False, log=pri
         log(f"[stage3] {len(res.failed)} dossier(s) failed; continuing")
 
 
-def _load_previous_book() -> tuple[set[str], set[str]]:
-    """Pull the most recent portfolio_*.md sibling JSON if we wrote one.
-
-    Stage 3 doesn't yet emit a JSON twin -- so for v1 we just return
-    empty sets and the report's "first run" path triggers. The hook is
-    here so a follow-up commit can wire JSON persistence and turnover
-    dampening will start working.
-    """
-    return set(), set()
+def _load_previous_book(as_of: date) -> tuple[set[str], set[str]]:
+    """Most-recent persisted portfolio prior to ``as_of``, for turnover dampening."""
+    return predictions.load_previous_book(as_of)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -194,7 +188,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     # --- 7. Selection (with constraints + optional turnover dampening) ---
-    prev_longs, prev_shorts = _load_previous_book()
+    prev_longs, prev_shorts = _load_previous_book(week_ending)
     portfolio = selection.select_positions(
         focus,
         week_ending=week_ending,
@@ -249,7 +243,19 @@ def main(argv: list[str] | None = None) -> int:
         previous_shorts=prev_shorts,
     )
     path = portfolio_mod.save_portfolio_markdown(portfolio, md)
-    print(f"[stage3] saved -> {path}")
+    print(f"[stage3] saved report -> {path}")
+
+    # --- 10. Persist daily prediction snapshot (Stage 5 calibration substrate) ---
+    snap_dir = predictions.save_daily_snapshot(
+        as_of=week_ending,
+        bundles=bundles,
+        portfolio=portfolio,
+        macro_regime=macro_ctx.macro_regime,
+        sector_snap=macro_ctx.sector_snap,
+        universe_tickers=universe.tickers,
+    )
+    print(f"[stage3] saved snapshot -> {snap_dir}")
+
     _print_summary(score_res, portfolio, checks)
 
     return 0 if score_res.bundles else 1

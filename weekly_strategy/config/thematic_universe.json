@@ -1,0 +1,37 @@
+{
+  "_comment": "Thematic 100-stock kickoff universe (2026). Curated across the user's chosen buckets: AI infra, memory, chips/semi, data center, energy, nuclear, electricity, communication, SaaS. Bypasses construct_universe()'s sector quotas -- this universe IS the working set. Bootstrap via `python -m weekly_strategy.scripts.bootstrap_thematic_universe`.",
+  "quarter": "2026Q2",
+  "buckets": {
+    "AI infra / chips / semis": [
+      "NVDA", "AMD", "AVGO", "TSM", "ASML", "AMAT", "LRCX", "KLAC", "ARM",
+      "MRVL", "MU", "INTC", "QCOM", "TXN", "ADI", "MCHP", "ON", "MPWR",
+      "NXPI", "GFS", "ANET", "TER"
+    ],
+    "Hyperscalers / mega-cap AI buyers": [
+      "MSFT", "GOOGL", "AMZN", "META", "ORCL", "AAPL"
+    ],
+    "Memory / Storage hardware": [
+      "STX", "WDC", "PSTG", "NTAP", "SMCI"
+    ],
+    "Data Center physical + servers": [
+      "EQIX", "DLR", "VRT", "DELL", "HPE", "CIEN", "CSCO", "CRWV"
+    ],
+    "Energy (oil/gas + midstream)": [
+      "XOM", "CVX", "COP", "EOG", "OXY", "PSX", "MPC", "VLO", "SLB", "WMB"
+    ],
+    "Nuclear + uranium": [
+      "CEG", "VST", "TLN", "NEE", "CCJ", "BWXT", "SMR", "OKLO"
+    ],
+    "Electricity utilities (AI-compute exposed)": [
+      "SO", "DUK", "AEP", "D", "XEL", "ETR", "AES", "PEG"
+    ],
+    "Communication / telecom / optical": [
+      "T", "VZ", "TMUS", "CMCSA", "CHTR", "JNPR", "ERIC", "CRDO"
+    ],
+    "SaaS / cloud software": [
+      "CRM", "NOW", "ADBE", "INTU", "WDAY", "DDOG", "SNOW", "MDB", "NET",
+      "CRWD", "ZS", "PANW", "FTNT", "OKTA", "TEAM", "HUBS", "S", "ESTC",
+      "PATH", "AI", "ZM", "PLTR", "SHOP", "DT", "CFLT"
+    ]
+  }
+}
