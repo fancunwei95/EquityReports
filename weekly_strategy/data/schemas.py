@@ -138,6 +138,50 @@ _FED_POSTURE_VALUES = (
 )
 
 
+_RATE_REGIME_VALUES = ("cutting", "on_hold", "hiking_or_holding", "tightening_market", "easing_market", "unknown")
+_FIN_COND_VALUES = ("easing", "stable", "tightening", "unknown")
+_CYCLE_PHASE_VALUES = ("early", "mid", "late", "recession", "unknown")
+
+
+class MacroRegime(BaseModel):
+    """Stage 2 regime label.
+
+    ``rate_regime`` and ``financial_conditions`` are deterministic functions
+    of the MacroSnapshot + FedPosture inputs. ``cycle_phase`` and
+    ``narrative`` come from a single LLM synthesis call.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    week_ending: date
+    rate_regime: str = "unknown"
+    financial_conditions: str = "unknown"
+    cycle_phase: str = "unknown"
+    narrative: str | None = None
+    risks: list[str] = Field(default_factory=list)
+
+    @classmethod
+    def coerce_llm(
+        cls,
+        *,
+        week_ending: date,
+        rate_regime: str,
+        financial_conditions: str,
+        raw: dict,
+    ) -> "MacroRegime":
+        cp = str(raw.get("cycle_phase", "")).lower()
+        return cls(
+            week_ending=week_ending,
+            rate_regime=rate_regime if rate_regime in _RATE_REGIME_VALUES else "unknown",
+            financial_conditions=(
+                financial_conditions if financial_conditions in _FIN_COND_VALUES else "unknown"
+            ),
+            cycle_phase=cp if cp in _CYCLE_PHASE_VALUES else "unknown",
+            narrative=(raw.get("narrative") or None),
+            risks=_string_list(raw.get("risks")),
+        )
+
+
 class SectorMetrics(BaseModel):
     """Per-sector momentum + volume profile vs SPY."""
 

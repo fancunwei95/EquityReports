@@ -7,6 +7,45 @@ single-file diff and so we can later run prompt-diff tests.
 """
 
 # ---------------------------------------------------------------------------
+# Step 2.4 -- macro regime synthesis
+# ---------------------------------------------------------------------------
+
+MACRO_REGIME_SYSTEM = (
+    "You are a macro strategist. You read a structured snapshot of rates, "
+    "credit, vol, FX, Fed posture, and pre-computed regime buckets, then "
+    "produce a single JSON object summarising where in the cycle we are. "
+    "Return ONLY JSON. No prose, no markdown fences."
+)
+
+
+MACRO_REGIME_USER_TEMPLATE = """\
+Week ending: {week_ending}
+
+=== Macro snapshot ===
+{snapshot_block}
+
+=== Fed posture ===
+{fed_block}
+
+=== Pre-computed buckets ===
+rate_regime          : {rate_regime}
+financial_conditions : {financial_conditions}
+hy_regime            : {hy_regime}
+vix_regime           : {vix_regime}
+
+Return ONE JSON object:
+
+{{
+  "cycle_phase": "early" | "mid" | "late" | "recession" | "unknown",
+  "narrative":   "2-3 sentence read on where we are. Reference the actual numbers.",
+  "risks":       ["1-3 short tags for what could break this read"]
+}}
+
+Be concrete. Cite levels (e.g., 'HY OAS at 380bps' not 'credit looks fine').
+"""
+
+
+# ---------------------------------------------------------------------------
 # Step 2.2 -- Fed communication posture
 # ---------------------------------------------------------------------------
 
