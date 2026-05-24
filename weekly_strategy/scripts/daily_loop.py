@@ -110,6 +110,53 @@ def _python_bin() -> str:
     return sys.executable
 
 
+def auto_commit_and_push(run_date: date, logger: logging.Logger) -> int:
+    """Stage docs/, commit if changed, push to origin. Returns 0 on success.
+
+    Only touches docs/ so accidental changes elsewhere don't sneak in. If
+    docs/ is unchanged (e.g., re-run on same day with identical output),
+    skips the commit silently. Errors are logged but never raised -- the
+    daemon must survive a git push failure (e.g., transient network blip,
+    remote-ahead conflict) and produce the report for the next slot.
+    """
+    cwd = str(REPO_ROOT)
+    try:
+        subprocess.run(
+            ["git", "add", "docs/"], cwd=cwd,
+            check=True, capture_output=True, text=True,
+        )
+        diff = subprocess.run(
+            ["git", "diff", "--cached", "--name-only", "docs/"],
+            cwd=cwd, check=True, capture_output=True, text=True,
+        )
+        if not diff.stdout.strip():
+            logger.info("auto-push: docs/ unchanged, skipping commit")
+            return 0
+        n_files = len(diff.stdout.strip().splitlines())
+        msg = f"report {run_date.isoformat()}"
+        subprocess.run(
+            ["git", "commit", "-m", msg], cwd=cwd,
+            check=True, capture_output=True, text=True,
+        )
+        push = subprocess.run(
+            ["git", "push"], cwd=cwd,
+            check=True, capture_output=True, text=True,
+        )
+        logger.info(f"auto-push: pushed '{msg}' ({n_files} file(s) staged)")
+        return 0
+    except subprocess.CalledProcessError as e:
+        # Combine stdout + stderr -- git sometimes reports errors on stdout.
+        out = (e.stdout or "") + (e.stderr or "")
+        logger.error(
+            f"auto-push: `{' '.join(e.cmd)}` exited {e.returncode}\n"
+            f"output: {out.strip()[:1000]}"
+        )
+        return e.returncode
+    except Exception as e:
+        logger.exception(f"auto-push: unexpected error: {e}")
+        return 1
+
+
 def run_once(*, run_date: date, mode: str, logger: logging.Logger) -> int:
     """Invoke run_stage3 as a subprocess. Returns the process return code."""
     flags = MODE_FLAGS.get(mode)
@@ -169,6 +216,13 @@ def main(argv: list[str] | None = None) -> int:
         "--once", action="store_true",
         help="Run once immediately and exit (smoke test).",
     )
+    parser.add_argument(
+        "--no-auto-push", action="store_true",
+        help="Skip the auto-commit + push of docs/ after each run. "
+             "Default: stage docs/, commit if changed, push to origin -- "
+             "so the public dashboard at "
+             "https://fancunwei95.github.io/202605_equityReports/ updates daily.",
+    )
     args = parser.parse_args(argv)
 
     if args.time_utc and args.time_et:
@@ -185,8 +239,13 @@ def main(argv: list[str] | None = None) -> int:
         tz_label = f"{hh:02d}:{mm:02d} UTC"
 
     if args.once:
-        logger.info("--once: running immediately, mode=%s", args.mode)
-        return run_once(run_date=date.today(), mode=args.mode, logger=logger)
+        logger.info("--once: running immediately, mode=%s, auto_push=%s",
+                    args.mode, not args.no_auto_push)
+        today = date.today()
+        rc = run_once(run_date=today, mode=args.mode, logger=logger)
+        if rc == 0 and not args.no_auto_push:
+            auto_commit_and_push(today, logger)
+        return rc
 
     logger.info(
         "daily loop started; time=%s, mode=%s, weekdays_only=%s, pid=%d",
@@ -226,6 +285,8 @@ def main(argv: list[str] | None = None) -> int:
         try:
             rc = run_once(run_date=run_date, mode=args.mode, logger=logger)
             logger.info("run for %s done (rc=%d)", run_date, rc)
+            if rc == 0 and not args.no_auto_push:
+                auto_commit_and_push(run_date, logger)
         except Exception:
             logger.exception("run crashed; loop continues")
 
