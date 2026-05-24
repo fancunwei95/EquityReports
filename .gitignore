@@ -25,8 +25,9 @@ daily_loop_logs/
 # daily_reports/ is TRACKED so the HTML book shows up on the personal git.
 # Re-add to gitignore if you'd rather keep generated reports out of history.
 
-# Editor / OS
+# Editor / OS / Jupyter
 .vscode/
 .idea/
 .DS_Store
 *.swp
+.ipynb_checkpoints/
