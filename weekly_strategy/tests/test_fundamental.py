@@ -166,6 +166,105 @@ def test_momentum_score_short_history_neutral():
 # ---------------------------------------------------------------------------
 
 
+def _regime(financial_conditions="easing", cycle_phase="mid",
+            rate_regime="cutting"):
+    from weekly_strategy.data.schemas import MacroRegime
+    return MacroRegime(
+        week_ending=date(2026, 5, 24),
+        rate_regime=rate_regime,
+        financial_conditions=financial_conditions,
+        cycle_phase=cycle_phase,
+        narrative="x",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Stage 2: macro_regime_score
+# ---------------------------------------------------------------------------
+
+
+def test_macro_regime_score_easing_mid_cycle_positive():
+    r = _regime(financial_conditions="easing", cycle_phase="mid",
+                rate_regime="cutting")
+    assert fnd.macro_regime_score(r) > 50  # easing + cutting bumps it up
+
+
+def test_macro_regime_score_recession_low():
+    r = _regime(financial_conditions="tightening", cycle_phase="recession")
+    assert fnd.macro_regime_score(r) < 30
+
+
+def test_macro_regime_score_none_is_neutral():
+    assert fnd.macro_regime_score(None) == 50.0
+
+
+# ---------------------------------------------------------------------------
+# Stage 2: composite_score
+# ---------------------------------------------------------------------------
+
+
+def _bundle(**overrides):
+    from weekly_strategy.data.schemas import StockScoreBundle
+    base = dict(
+        ticker="X", week_ending=date(2026, 5, 24),
+        quality_score=80, valuation_score=40, momentum_score=70,
+        news_sentiment_score=0.4, reddit_sentiment=0.0,
+        macro_regime_score=60, sector_score_value=70,
+    )
+    base.update(overrides)
+    return StockScoreBundle(**base)
+
+
+def test_composite_uses_risk_on_weights_in_easing():
+    b = _bundle()
+    r = _regime(financial_conditions="easing", cycle_phase="mid")
+    c = fnd.composite_score(b, r)
+    # Hand-check: 0.20*80 + 0.15*40 + 0.20*70 + 0.15*70 + 0.10*50 + 0.10*60 + 0.10*70
+    # = 16 + 6 + 14 + 10.5 + 5 + 6 + 7 = 64.5
+    assert c == pytest.approx(64.5, abs=0.5)
+
+
+def test_composite_uses_risk_off_weights_in_tightening():
+    b = _bundle()
+    r = _regime(financial_conditions="tightening", cycle_phase="late")
+    c = fnd.composite_score(b, r)
+    # 0.30*80 + 0.25*40 + 0.10*70 + 0.15*70 + 0.05*50 + 0.10*60 + 0.05*70
+    # = 24 + 10 + 7 + 10.5 + 2.5 + 6 + 3.5 = 63.5
+    assert c == pytest.approx(63.5, abs=0.5)
+
+
+def test_composite_includes_sector_in_score():
+    high_sector = _bundle(sector_score_value=100)
+    low_sector = _bundle(sector_score_value=0)
+    r = _regime()
+    assert fnd.composite_score(high_sector, r) > fnd.composite_score(low_sector, r)
+
+
+def test_build_score_bundle_populates_stage2_fields():
+    closes = [100 + i * 0.2 for i in range(130)]
+    px = _prices(closes)
+    d = _dossier(roic=0.15, operating_margin_current=0.20, fcf_yield=0.05)
+    r = _regime(financial_conditions="easing", cycle_phase="mid")
+    sector_info = {
+        "score": 75.0, "etf": "XLK", "sector_name": "Technology",
+        "rank": 2, "leaders_out_of": 11, "regime_fit": 70.0,
+        "momentum_component": 80.0, "rel_1m": 0.08, "in_favor": True,
+    }
+    bundle = fnd.build_score_bundle(
+        ticker="AAPL", week_ending=date(2026, 5, 24),
+        dossier=d, prices=px,
+        news_sentiment_score=0.4,
+        macro_regime=r, sector_score_info=sector_info,
+    )
+    assert bundle.macro_regime_score is not None
+    assert bundle.sector_score_value == 75.0
+    assert bundle.sector_etf == "XLK"
+    assert bundle.sector_rank == 2
+    assert bundle.sector_in_favor is True
+    assert bundle.composite_score is not None
+    assert 0 <= bundle.composite_score <= 100
+
+
 def test_build_score_bundle_carries_through_external_signals():
     d = _dossier(roic=0.15, operating_margin_current=0.20, fcf_yield=0.05)
     closes = [100 + i * 0.2 for i in range(130)]

@@ -386,6 +386,14 @@ class StockScoreBundle(BaseModel):
     reddit_sentiment: float | None = None      # [-1, +1] from RedditScore
     reddit_is_crowded: bool = False
 
+    # Stage 2 additions -- macro / sector overlays. None when Stage 1 only.
+    macro_regime_score: float | None = None    # 0-100 universe-level
+    sector_score_value: float | None = None    # 0-100 per stock
+    sector_etf: str | None = None              # which ETF was used
+    sector_rank: int | None = None             # 1 = best sector this week
+    sector_in_favor: bool = False              # regime fit >= 60
+    composite_score: float | None = None       # weighted final 0-100
+
 
 class Dossier(BaseModel):
     """Per-ticker fundamental snapshot built from EDGAR + yfinance.

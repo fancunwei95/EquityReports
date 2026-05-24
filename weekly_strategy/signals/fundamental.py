@@ -23,7 +23,7 @@ from typing import Optional
 
 import pandas as pd
 
-from weekly_strategy.data.schemas import Dossier, StockScoreBundle
+from weekly_strategy.data.schemas import Dossier, MacroRegime, StockScoreBundle
 
 
 # ---------------------------------------------------------------------------
@@ -158,9 +158,18 @@ def build_score_bundle(
     news_noise_ratio: float | None = None,
     reddit_sentiment: float | None = None,
     reddit_is_crowded: bool = False,
+    # Stage 2 overlays. None preserves Stage 1 behavior.
+    macro_regime: MacroRegime | None = None,
+    sector_score_info: dict | None = None,
 ) -> StockScoreBundle:
     rets = compute_returns(prices)
-    return StockScoreBundle(
+    macro_score = macro_regime_score(macro_regime) if macro_regime is not None else None
+    sector_score_value = sector_score_info["score"] if sector_score_info else None
+    sector_etf = sector_score_info["etf"] if sector_score_info else None
+    sector_rank = sector_score_info.get("rank") if sector_score_info else None
+    sector_in_favor = bool(sector_score_info.get("in_favor")) if sector_score_info else False
+
+    bundle = StockScoreBundle(
         ticker=ticker.upper(),
         week_ending=week_ending,
         quality_score=quality_score(dossier),
@@ -173,4 +182,87 @@ def build_score_bundle(
         news_noise_ratio=news_noise_ratio,
         reddit_sentiment=reddit_sentiment,
         reddit_is_crowded=reddit_is_crowded,
+        macro_regime_score=macro_score,
+        sector_score_value=sector_score_value,
+        sector_etf=sector_etf,
+        sector_rank=sector_rank,
+        sector_in_favor=sector_in_favor,
+        composite_score=None,  # set below if we have enough inputs
     )
+    composite = composite_score(bundle, macro_regime) if macro_regime is not None else None
+    return bundle.model_copy(update={"composite_score": composite})
+
+
+# ---------------------------------------------------------------------------
+# Stage 2: macro regime score + composite
+# ---------------------------------------------------------------------------
+
+
+def macro_regime_score(regime: MacroRegime | None) -> float:
+    """Universe-level 0-100 view: higher = more supportive of equities.
+
+    Heuristic, not optimised. Backtest in Stage 5 should refine the deltas.
+    """
+    if regime is None:
+        return 50.0
+    score = 50.0
+    fc = regime.financial_conditions
+    if fc == "easing":
+        score += 10
+    elif fc == "tightening":
+        score -= 12
+
+    cp = regime.cycle_phase
+    if cp == "early":
+        score += 10
+    elif cp == "late":
+        score -= 5
+    elif cp == "recession":
+        score -= 20
+
+    # rate_regime: cutting is supportive; tightening_market is a tax
+    rr = regime.rate_regime
+    if rr in ("cutting", "easing_market"):
+        score += 5
+    elif rr == "tightening_market":
+        score -= 5
+
+    return _clamp(score)
+
+
+_RISK_OFF_WEIGHTS = {
+    "quality":   0.30, "valuation": 0.25, "momentum":  0.10,
+    "news":      0.15, "reddit":    0.05, "macro":     0.10, "sector": 0.05,
+}
+_RISK_ON_WEIGHTS = {
+    "quality":   0.20, "valuation": 0.15, "momentum":  0.20,
+    "news":      0.15, "reddit":    0.10, "macro":     0.10, "sector": 0.10,
+}
+
+
+def composite_score(
+    bundle: StockScoreBundle, regime: MacroRegime | None,
+) -> float:
+    """Weighted 0-100. Risk-off shifts weight to quality + valuation."""
+    risk_off = regime is not None and (
+        regime.financial_conditions == "tightening"
+        or regime.cycle_phase == "recession"
+    )
+    weights = _RISK_OFF_WEIGHTS if risk_off else _RISK_ON_WEIGHTS
+
+    # Map [-1, +1] sentiment to [0, 100] for sentiment-style components.
+    def sent_to_100(x: float | None) -> float:
+        if x is None:
+            return 50.0
+        return _clamp(50.0 + x * 50.0)
+
+    components = {
+        "quality":   bundle.quality_score,
+        "valuation": bundle.valuation_score,
+        "momentum":  bundle.momentum_score,
+        "news":      sent_to_100(bundle.news_sentiment_score),
+        "reddit":    sent_to_100(bundle.reddit_sentiment),
+        "macro":     bundle.macro_regime_score if bundle.macro_regime_score is not None else 50.0,
+        "sector":    bundle.sector_score_value if bundle.sector_score_value is not None else 50.0,
+    }
+    return sum(weights[k] * components[k] for k in weights)
