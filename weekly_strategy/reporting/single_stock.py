@@ -13,10 +13,15 @@ from typing import Iterable
 
 from weekly_strategy.config import settings
 from weekly_strategy.data.schemas import (
+    CrossStockImplications,
     Dossier,
+    FedPosture,
+    MacroRegime,
+    MacroSnapshot,
     NewsItem,
     NewsScore,
     RedditScore,
+    SectorSnapshot,
     StockScoreBundle,
     WeeklyThesis,
 )
@@ -30,6 +35,12 @@ def render_markdown(
     news_score: NewsScore | None = None,
     news_items: Iterable[NewsItem] | None = None,
     reddit_score: RedditScore | None = None,
+    # Stage 2 additions
+    macro_snapshot: MacroSnapshot | None = None,
+    macro_regime: MacroRegime | None = None,
+    fed_posture: FedPosture | None = None,
+    sector_snap: SectorSnapshot | None = None,
+    cross_stock: CrossStockImplications | None = None,
 ) -> str:
     """Render a single-stock weekly report as Markdown."""
     parts: list[str] = []
@@ -40,6 +51,12 @@ def render_markdown(
     parts.append(_render_quality_valuation(thesis))
     parts.append(_render_risks(thesis))
     parts.append(_render_watch_items(thesis))
+    if (macro_snapshot is not None or macro_regime is not None or fed_posture is not None):
+        parts.append(_render_macro_section(macro_snapshot, macro_regime, fed_posture))
+    if sector_snap is not None or scores.sector_etf is not None:
+        parts.append(_render_sector_section(scores, sector_snap))
+    if cross_stock is not None:
+        parts.append(_render_cross_stock_section(cross_stock))
     if news_score is not None and news_score.n_total > 0:
         parts.append(_render_news_section(news_score, news_items))
     if reddit_score is not None and reddit_score.mention_count > 0:
@@ -91,10 +108,16 @@ def _render_scores_table(scores: StockScoreBundle, dossier: Dossier) -> str:
         f"| Valuation  | {scores.valuation_score:5.1f} |",
         f"| Momentum   | {scores.momentum_score:5.1f} |",
     ]
+    if scores.sector_score_value is not None:
+        lines.append(f"| Sector     | {scores.sector_score_value:5.1f} |")
+    if scores.macro_regime_score is not None:
+        lines.append(f"| Macro      | {scores.macro_regime_score:5.1f} |")
     if scores.news_sentiment_score is not None:
         lines.append(f"| News sent. | {scores.news_sentiment_score:+5.2f} |")
     if scores.reddit_sentiment is not None:
         lines.append(f"| Reddit     | {scores.reddit_sentiment:+5.2f} |")
+    if scores.composite_score is not None:
+        lines.append(f"| **COMPOSITE** | **{scores.composite_score:5.1f}** |")
     lines.append("")
     lines.append(
         f"Trailing returns: 1m **{_pct(scores.return_1m)}** · "
@@ -102,6 +125,112 @@ def _render_scores_table(scores: StockScoreBundle, dossier: Dossier) -> str:
         f"Last close: **{_money(dossier.current_price, sign=False)}** · "
         f"Market cap: **{_money(dossier.market_cap)}**"
     )
+    return "\n".join(lines)
+
+
+def _render_macro_section(
+    snap: MacroSnapshot | None,
+    regime: MacroRegime | None,
+    fed: FedPosture | None,
+) -> str:
+    lines = ["## Macro context", ""]
+    if snap is not None:
+        rows: list[tuple[str, str]] = []
+        if snap.yield_10y is not None:
+            wow = snap.yield_10y_wow_change_bps
+            rows.append(("10y yield",
+                         f"{snap.yield_10y:.2f}%" +
+                         (f" ({wow:+.1f}bps wow)" if wow is not None else "")))
+        if snap.real_yield_10y is not None:
+            rows.append(("10y real yield", f"{snap.real_yield_10y:.2f}%"))
+        if snap.curve_2s10s_bps is not None:
+            inv = " *(inverted)*" if snap.curve_inverted else ""
+            rows.append(("Curve 2s10s", f"{snap.curve_2s10s_bps:.0f} bps{inv}"))
+        if snap.hy_oas_bps is not None:
+            rows.append(("HY OAS", f"{snap.hy_oas_bps:.0f} bps ({snap.hy_regime})"))
+        if snap.vix_level is not None:
+            rows.append(("VIX", f"{snap.vix_level:.1f} ({snap.vix_regime})"))
+        if snap.dxy_level is not None:
+            rows.append(("DXY", f"{snap.dxy_level:.2f}"))
+        if rows:
+            lines.append("| Metric | Value |")
+            lines.append("|---|---|")
+            for k, v in rows:
+                lines.append(f"| {k} | {v} |")
+            lines.append("")
+    if regime is not None:
+        lines.append(
+            f"Regime: **rate** `{regime.rate_regime}` · "
+            f"**conditions** `{regime.financial_conditions}` · "
+            f"**cycle** `{regime.cycle_phase}`"
+        )
+        if regime.narrative:
+            lines.append("")
+            lines.append(f"> {regime.narrative}")
+    if fed is not None and fed.n_items > 0:
+        lines.append("")
+        lines.append(f"**Fed posture** ({fed.n_items} items): `{fed.posture}`")
+        if fed.summary:
+            lines.append(fed.summary)
+        if fed.policy_hints:
+            lines.append("Hints: " + "; ".join(fed.policy_hints))
+    return "\n".join(lines)
+
+
+def _render_sector_section(
+    scores: StockScoreBundle, snap: SectorSnapshot | None,
+) -> str:
+    lines = ["## Sector context", ""]
+    if scores.sector_etf:
+        favor = "**favorable**" if scores.sector_in_favor else "**unfavorable**"
+        rank_str = f", rank **{scores.sector_rank}** of 11" if scores.sector_rank else ""
+        lines.append(f"Stock sector ETF: **{scores.sector_etf}**{rank_str}; "
+                     f"regime fit: {favor}.")
+    if snap is not None and scores.sector_etf:
+        m = snap.sectors.get(scores.sector_etf)
+        if m is not None:
+            parts = []
+            if m.return_1w is not None:
+                parts.append(f"1w {_pct(m.return_1w)}")
+            if m.return_1m is not None:
+                parts.append(f"1m {_pct(m.return_1m)}" +
+                             (f" (rel SPY {_pct(m.rel_1m)})" if m.rel_1m is not None else ""))
+            if m.return_3m is not None:
+                parts.append(f"3m {_pct(m.return_3m)}" +
+                             (f" (rel SPY {_pct(m.rel_3m)})" if m.rel_3m is not None else ""))
+            if parts:
+                lines.append("Returns: " + " · ".join(parts))
+            if m.volume_vs_20d is not None:
+                lines.append(f"Volume vs 20-day avg: **{m.volume_vs_20d:.2f}×**")
+        if snap.leadership_ranking:
+            lines.append("")
+            lines.append(
+                f"Market breadth: **{snap.breadth}**. "
+                f"Leaders: {', '.join(snap.leadership_ranking[:3])}. "
+                f"Laggards: {', '.join(snap.leadership_ranking[-3:])}."
+            )
+    return "\n".join(lines)
+
+
+def _render_cross_stock_section(cs: CrossStockImplications) -> str:
+    if not (cs.summary or cs.implications_for_sector or cs.implications_from_sector):
+        return ""
+    lines = ["## Cross-stock / sectoral read", ""]
+    if cs.summary:
+        lines.append(cs.summary)
+    if cs.implications_for_sector:
+        lines.append("")
+        lines.append("**This stock -> sector / peers:**")
+        for s in cs.implications_for_sector:
+            lines.append(f"- {s}")
+    if cs.implications_from_sector:
+        lines.append("")
+        lines.append("**Sector / macro -> this stock:**")
+        for s in cs.implications_from_sector:
+            lines.append(f"- {s}")
+    if cs.related_tickers:
+        lines.append("")
+        lines.append("Related tickers: " + ", ".join(f"`{t}`" for t in cs.related_tickers))
     return "\n".join(lines)
 
 

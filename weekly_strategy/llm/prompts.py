@@ -140,6 +140,15 @@ Week ending: {week_ending}
 === Score bundle (0-100; higher = more attractive long) ===
 {scores_block}
 
+=== Macro regime (universe-level this week) ===
+{macro_block}
+
+=== Sector context (the stock's own sector) ===
+{sector_block}
+
+=== Cross-stock / sectoral implications ===
+{cross_stock_block}
+
 === Top news items this week (with fundamental implications) ===
 {news_block}
 

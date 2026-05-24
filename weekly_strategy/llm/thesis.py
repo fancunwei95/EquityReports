@@ -16,10 +16,14 @@ from typing import Iterable
 import pandas as pd
 
 from weekly_strategy.data.schemas import (
+    CrossStockImplications,
     Dossier,
+    MacroRegime,
+    MacroSnapshot,
     NewsItem,
     NewsScore,
     RedditScore,
+    SectorSnapshot,
     StockScoreBundle,
     WeeklyThesis,
 )
@@ -41,6 +45,11 @@ def write_thesis(
     news_items: Iterable[NewsItem] | None = None,
     reddit_score: RedditScore | None = None,
     prices: pd.DataFrame | None = None,
+    # Stage 2 additions -- all optional so Stage 1 callers still work.
+    macro_snapshot: MacroSnapshot | None = None,
+    macro_regime: MacroRegime | None = None,
+    sector_snap: SectorSnapshot | None = None,
+    cross_stock: CrossStockImplications | None = None,
     model: str = client.MODEL_SONNET,
     company_name: str | None = None,
 ) -> WeeklyThesis:
@@ -54,6 +63,10 @@ def write_thesis(
         news_items=news_items,
         reddit_score=reddit_score,
         prices=prices,
+        macro_snapshot=macro_snapshot,
+        macro_regime=macro_regime,
+        sector_snap=sector_snap,
+        cross_stock=cross_stock,
         company_name=company_name,
     )
     parsed, resp = client.ask_json(
@@ -80,6 +93,10 @@ def _build_prompt(
     news_items: Iterable[NewsItem] | None,
     reddit_score: RedditScore | None,
     prices: pd.DataFrame | None,
+    macro_snapshot: MacroSnapshot | None,
+    macro_regime: MacroRegime | None,
+    sector_snap: SectorSnapshot | None,
+    cross_stock: CrossStockImplications | None,
     company_name: str | None,
 ) -> str:
     suffix = f" ({company_name})" if company_name else ""
@@ -89,10 +106,103 @@ def _build_prompt(
         week_ending=week_ending.isoformat(),
         dossier_block=_render_dossier(dossier),
         scores_block=_render_scores(scores),
+        macro_block=_render_macro_block(macro_snapshot, macro_regime),
+        sector_block=_render_sector_block(scores, sector_snap),
+        cross_stock_block=_render_cross_stock(cross_stock),
         news_block=_render_news(news_score, news_items),
         reddit_block=_render_reddit(reddit_score),
         price_block=_render_prices(prices, scores),
     )
+
+
+def _render_macro_block(
+    snap: MacroSnapshot | None, regime: MacroRegime | None,
+) -> str:
+    if snap is None and regime is None:
+        return "  (no macro data this run)"
+    lines: list[str] = []
+    if snap is not None:
+        if snap.yield_10y is not None:
+            wow = snap.yield_10y_wow_change_bps
+            lines.append(
+                f"  10y yield  : {snap.yield_10y:.2f}%"
+                + (f" ({wow:+.1f} bps wow)" if wow is not None else "")
+            )
+        if snap.real_yield_10y is not None:
+            lines.append(f"  10y real   : {snap.real_yield_10y:.2f}%")
+        if snap.curve_2s10s_bps is not None:
+            inv = " (inverted)" if snap.curve_inverted else ""
+            lines.append(f"  2s10s curve: {snap.curve_2s10s_bps:.0f} bps{inv}")
+        if snap.hy_oas_bps is not None:
+            lines.append(f"  HY OAS     : {snap.hy_oas_bps:.0f} bps ({snap.hy_regime})")
+        if snap.vix_level is not None:
+            wow = snap.vix_wow_change
+            lines.append(
+                f"  VIX        : {snap.vix_level:.1f} ({snap.vix_regime})"
+                + (f"  wow {wow:+.1f}" if wow is not None else "")
+            )
+        if snap.dxy_level is not None:
+            lines.append(f"  DXY        : {snap.dxy_level:.2f}")
+    if regime is not None:
+        lines.append(f"  rate_regime          : {regime.rate_regime}")
+        lines.append(f"  financial_conditions : {regime.financial_conditions}")
+        lines.append(f"  cycle_phase          : {regime.cycle_phase}")
+        if regime.narrative:
+            lines.append(f"  narrative: {regime.narrative}")
+    return "\n".join(lines) if lines else "  (no macro data this run)"
+
+
+def _render_sector_block(
+    scores: StockScoreBundle, snap: SectorSnapshot | None,
+) -> str:
+    if scores.sector_etf is None and snap is None:
+        return "  (no sector context this run)"
+    lines: list[str] = []
+    if scores.sector_etf:
+        in_favor = "favorable" if scores.sector_in_favor else "unfavorable"
+        lines.append(
+            f"  stock sector ETF: {scores.sector_etf}"
+            + (f"  rank {scores.sector_rank}" if scores.sector_rank else "")
+            + f"  ({in_favor} regime fit)"
+        )
+        if scores.sector_score_value is not None:
+            lines.append(f"  sector_score: {scores.sector_score_value:.1f}/100")
+    if snap is not None and snap.leadership_ranking:
+        m = snap.sectors.get(scores.sector_etf) if scores.sector_etf else None
+        if m is not None:
+            if m.rel_1m is not None or m.return_1m is not None:
+                lines.append(
+                    "  sector returns -- "
+                    f"1m {_pct(m.return_1m)} (vs SPY {_pct(m.rel_1m)})  "
+                    f"3m {_pct(m.return_3m)} (vs SPY {_pct(m.rel_3m)})"
+                )
+            if m.volume_vs_20d is not None:
+                lines.append(f"  sector volume vs 20d avg: {m.volume_vs_20d:.2f}x")
+        lines.append(
+            "  market breadth: " + snap.breadth
+            + "  |  leaders: " + ", ".join(snap.leadership_ranking[:3])
+            + "  |  laggards: " + ", ".join(snap.leadership_ranking[-3:])
+        )
+    return "\n".join(lines) if lines else "  (no sector context this run)"
+
+
+def _render_cross_stock(cs: CrossStockImplications | None) -> str:
+    if cs is None:
+        return "  (cross-stock pass not run)"
+    lines: list[str] = []
+    if cs.summary:
+        lines.append(f"  summary: {cs.summary}")
+    if cs.implications_for_sector:
+        lines.append("  this stock -> sector / peers:")
+        for s in cs.implications_for_sector:
+            lines.append(f"    - {s}")
+    if cs.implications_from_sector:
+        lines.append("  sector / macro -> this stock:")
+        for s in cs.implications_from_sector:
+            lines.append(f"    - {s}")
+    if cs.related_tickers:
+        lines.append("  related tickers: " + ", ".join(cs.related_tickers))
+    return "\n".join(lines) if lines else "  (no cross-stock implications this week)"
 
 
 def _render_dossier(d: Dossier) -> str:

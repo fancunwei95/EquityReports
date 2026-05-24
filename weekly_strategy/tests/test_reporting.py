@@ -141,6 +141,114 @@ def test_render_includes_reddit_when_present():
     assert "_AI hype_" in md
 
 
+def _macro_snap():
+    from weekly_strategy.data.schemas import MacroSnapshot
+    return MacroSnapshot(
+        week_ending=date(2026, 5, 24),
+        yield_10y=4.55, yield_10y_wow_change_bps=15.0,
+        yield_2y=4.70, real_yield_10y=2.10,
+        curve_2s10s_bps=-15.0, curve_inverted=True,
+        hy_oas_bps=380.0, hy_regime="normal",
+        vix_level=22.5, vix_wow_change=4.5, vix_regime="elevated",
+        dxy_level=103.02,
+    )
+
+
+def _regime():
+    from weekly_strategy.data.schemas import MacroRegime
+    return MacroRegime(
+        week_ending=date(2026, 5, 24),
+        rate_regime="hiking_or_holding",
+        financial_conditions="stable",
+        cycle_phase="late",
+        narrative="Late-cycle: HY OAS at 380bps, vol elevated.",
+        risks=["credit dislocation"],
+    )
+
+
+def _fed():
+    from weekly_strategy.data.schemas import FedPosture
+    return FedPosture(
+        week_ending=date(2026, 5, 24),
+        posture="SLIGHTLY_HAWKISH", n_items=3,
+        summary="Speakers signaled patience.",
+        policy_hints=["pause messaging", "watching CPI"],
+        key_speakers=["Powell", "Williams"],
+    )
+
+
+def _sector_snap():
+    from weekly_strategy.data.schemas import SectorMetrics, SectorSnapshot
+    return SectorSnapshot(
+        week_ending=date(2026, 5, 24),
+        sectors={
+            "XLK": SectorMetrics(etf="XLK", sector="Technology",
+                                 return_1w=0.023, return_1m=0.16, return_3m=0.20,
+                                 rel_1m=0.105, rel_3m=0.08, volume_vs_20d=1.26),
+        },
+        leadership_ranking=["XLK", "XLE", "XLV", "XLB", "XLY", "XLI", "XLU", "XLC", "XLP", "XLRE", "XLF"],
+        breadth="narrow",
+    )
+
+
+def _cross_stock():
+    from weekly_strategy.data.schemas import CrossStockImplications
+    return CrossStockImplications(
+        ticker="AAPL", week_ending=date(2026, 5, 24), sector_etf="XLK",
+        summary="Tech leadership is amplifying AAPL's individual story.",
+        implications_for_sector=["AAPL AI overhaul lifts XLK sentiment"],
+        implications_from_sector=["XLK +10.5pp rel vs SPY supports premium multiple"],
+        related_tickers=["GOOGL", "MSFT", "NVDA"],
+    )
+
+
+def test_render_includes_macro_section():
+    md = single_stock.render_markdown(
+        _thesis(), dossier=_dossier(), scores=_scores(),
+        macro_snapshot=_macro_snap(), macro_regime=_regime(), fed_posture=_fed(),
+    )
+    assert "## Macro context" in md
+    assert "4.55%" in md
+    assert "380 bps (normal)" in md
+    assert "elevated" in md
+    assert "inverted" in md
+    assert "SLIGHTLY_HAWKISH" in md
+    assert "Late-cycle" in md
+
+
+def test_render_includes_sector_section():
+    scores = _scores().model_copy(update={
+        "sector_score_value": 88.0, "sector_etf": "XLK",
+        "sector_rank": 1, "sector_in_favor": True,
+        "macro_regime_score": 60.0, "composite_score": 71.5,
+    })
+    md = single_stock.render_markdown(
+        _thesis(), dossier=_dossier(), scores=scores,
+        sector_snap=_sector_snap(),
+    )
+    assert "## Sector context" in md
+    assert "**XLK**" in md
+    assert "rank **1**" in md
+    assert "**favorable**" in md
+    assert "+10.50%" in md  # rel 1m
+    assert "1.26×" in md     # volume profile
+    assert "narrow" in md     # market breadth
+    # Composite score now appears in the scorecard.
+    assert "**COMPOSITE**" in md
+    assert "71.5" in md
+
+
+def test_render_includes_cross_stock_section():
+    md = single_stock.render_markdown(
+        _thesis(), dossier=_dossier(), scores=_scores(),
+        cross_stock=_cross_stock(),
+    )
+    assert "## Cross-stock / sectoral read" in md
+    assert "Tech leadership" in md
+    assert "AAPL AI overhaul lifts XLK sentiment" in md
+    assert "`GOOGL`" in md and "`NVDA`" in md
+
+
 def test_render_omits_optional_sections_when_empty():
     thin_thesis = WeeklyThesis(
         ticker="AAPL", week_ending=date(2026, 5, 24),
