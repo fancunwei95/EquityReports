@@ -105,35 +105,38 @@ weekly_strategy/
 └── run_stage1.py            # Orchestrator for single-stock weekly report
 ```
 
-### Step 1.2: Storage layer (SQLite)
+### Step 1.2: Storage layer (hybrid: parquet + SQLite + JSON)
 
-Tables for Stage 1:
+We use three backends, each chosen so the structure fits the access pattern. SQL is reserved for streams where `UNIQUE` constraint + time-window queries earn it; everything else stays as flat files that pandas can read directly.
+
+| Data | Backend | Path | Rationale |
+|---|---|---|---|
+| Prices | Parquet, one file per ticker | `data_cache/prices/{ticker}.parquet` | Append-mostly OHLCV time series; pandas-native; columnar reads. |
+| News items | SQLite | `data_cache/weekly.db` | `url UNIQUE` dedup on insert; time-window queries; grows large at Stage 3. |
+| Reddit posts | SQLite | `data_cache/weekly.db` | Same shape as news: `post_id UNIQUE`, time-window queries. |
+| Dossiers | JSON, one file per ticker | `dossier/data/{ticker}.json` | One blob per ticker, rewritten quarterly. |
+| Weekly reports | JSON, one file per (ticker, date) | `reports/{ticker}/{YYYY-MM-DD}.json` | Append-only artefacts; convenient to read by hand. |
+
+SQLite schema (only the two streams that benefit from it):
 
 ```sql
-CREATE TABLE prices (
-    ticker TEXT,
-    date DATE,
-    open REAL, high REAL, low REAL, close REAL, adj_close REAL,
-    volume INTEGER,
-    PRIMARY KEY (ticker, date)
-);
-
-CREATE TABLE news_items (
+CREATE TABLE IF NOT EXISTS news_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ticker TEXT,
+    ticker TEXT NOT NULL,
     title TEXT,
     source TEXT,
-    url TEXT UNIQUE,
+    url TEXT UNIQUE NOT NULL,
     published_at TIMESTAMP,
     snippet TEXT,
     fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_news_ticker_pub ON news_items(ticker, published_at);
 
-CREATE TABLE reddit_posts (
+CREATE TABLE IF NOT EXISTS reddit_posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ticker TEXT,
+    ticker TEXT NOT NULL,
     subreddit TEXT,
-    post_id TEXT UNIQUE,
+    post_id TEXT UNIQUE NOT NULL,
     title TEXT,
     score INTEGER,
     num_comments INTEGER,
@@ -141,23 +144,31 @@ CREATE TABLE reddit_posts (
     url TEXT,
     fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE TABLE dossiers (
-    ticker TEXT PRIMARY KEY,
-    data JSON,
-    updated_at TIMESTAMP
-);
-
-CREATE TABLE weekly_reports (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ticker TEXT,
-    report_date DATE,
-    report_data JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE INDEX IF NOT EXISTS idx_reddit_ticker_created ON reddit_posts(ticker, created_at);
 ```
 
-Use `sqlite3` (stdlib) or `sqlalchemy` if preferred. Keep it simple for v1.
+Use `sqlite3` (stdlib) — no SQLAlchemy. Inserts go through `INSERT OR IGNORE` so re-fetches are idempotent. Parquet reads/writes via `pandas` + `pyarrow`. JSON via stdlib.
+
+**Storage API (`weekly_strategy/data/storage.py`):**
+
+```python
+# Prices (parquet)
+def upsert_prices(ticker: str, df: pd.DataFrame) -> None
+def load_prices(ticker: str, since: date | None = None, until: date | None = None) -> pd.DataFrame
+
+# News / Reddit (SQLite)
+def init_db() -> None  # idempotent
+def insert_news(items: list[NewsItem]) -> int  # returns # newly inserted
+def insert_reddit(items: list[RedditPost]) -> int
+def get_news(ticker: str, since: datetime, until: datetime | None = None) -> list[NewsItem]
+def get_reddit(ticker: str, since: datetime, until: datetime | None = None) -> list[RedditPost]
+
+# Dossiers / reports (JSON)
+def save_dossier(ticker: str, data: dict) -> None
+def load_dossier(ticker: str) -> dict | None
+def save_weekly_report(ticker: str, report_date: date, data: dict) -> Path
+def list_weekly_reports(ticker: str) -> list[Path]
+```
 
 ### Step 1.3: Data fetchers
 

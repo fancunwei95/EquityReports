@@ -4,12 +4,17 @@
 # Data
 yfinance>=0.2.50
 pandas>=2.2,<2.3
+pyarrow>=17.0   # parquet backend for pandas
 requests>=2.32
 feedparser>=6.0.11
 fredapi>=0.5.2
 
 # Validation / config
 pydantic>=2.7,<3
+# Lets pydantic evaluate `X | None` and `list[str]` annotations on Python 3.9.
+# Without this, modern union/builtin-generic syntax inside pydantic models
+# raises TypeError at class-build time (PEP 604 / 585 are 3.10+).
+eval_type_backport>=0.2.0
 python-dotenv>=1.0.1
 
 # LLM
