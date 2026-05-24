@@ -127,6 +127,18 @@ def test_financial_conditions_unknown_when_no_data(regime_mod):
 # ---------------------------------------------------------------------------
 
 
+def test_classify_regime_propagates_snapshot_buckets(regime_mod, monkeypatch):
+    """Regression: regime_fit_for_etf reads regime.hy_regime / .vix_regime for the
+    XLE / VIX branches. Those must be copied off the snapshot at classify time."""
+    snap = _snap(hy_regime="wide", vix_regime="elevated")
+    _stub_llm(monkeypatch, regime_mod, {
+        "cycle_phase": "late", "narrative": "x", "risks": [],
+    })
+    out = regime_mod.classify_regime(snap, fed=_fed())
+    assert out.hy_regime == "wide"
+    assert out.vix_regime == "elevated"
+
+
 def test_classify_regime_full(regime_mod, monkeypatch):
     snap = _snap(
         yield_10y=4.5, yield_10y_wow_change_bps=12.0,

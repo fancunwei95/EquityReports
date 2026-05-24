@@ -124,6 +124,8 @@ def classify_regime(
             week_ending=snap.week_ending,
             rate_regime=rate,
             financial_conditions=finc,
+            hy_regime=snap.hy_regime,
+            vix_regime=snap.vix_regime,
             cycle_phase="unknown",
             narrative=None,
         )
@@ -137,6 +139,8 @@ def classify_regime(
         week_ending=snap.week_ending,
         rate_regime=rate,
         financial_conditions=finc,
+        hy_regime=snap.hy_regime,
+        vix_regime=snap.vix_regime,
         raw=parsed,
     )
 

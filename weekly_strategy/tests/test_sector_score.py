@@ -53,6 +53,7 @@ def _regime(rate="cutting", finc="easing", phase="mid",
     return MacroRegime(
         week_ending=date(2026, 5, 24),
         rate_regime=rate, financial_conditions=finc, cycle_phase=phase,
+        hy_regime=hy, vix_regime=vix,
         narrative=narrative,
     )
 
@@ -93,6 +94,15 @@ def test_defensive_etf_favored_in_risk_off(mod):
 def test_xlf_favored_when_rates_hiking(mod):
     assert mod.regime_fit_for_etf("XLF", _regime(rate="hiking_or_holding")) == 70.0
     assert mod.regime_fit_for_etf("XLF", _regime(rate="cutting")) == 35.0
+
+
+def test_xle_reads_hy_regime_from_macro_regime(mod):
+    """Regression: regime_fit_for_etf('XLE', ...) reads regime.hy_regime.
+    Catches the integration bug where hy_regime was on MacroSnapshot only."""
+    # HY tight + risk_on: commodity-rally setup -> 60
+    assert mod.regime_fit_for_etf("XLE", _regime(hy="tight")) == 60.0
+    # HY wide: defensive commodity hedge -> 65
+    assert mod.regime_fit_for_etf("XLE", _regime(hy="wide")) == 65.0
 
 
 def test_xlre_hurt_when_rates_rising(mod):

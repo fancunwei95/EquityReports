@@ -199,6 +199,10 @@ class MacroRegime(BaseModel):
     rate_regime: str = "unknown"
     financial_conditions: str = "unknown"
     cycle_phase: str = "unknown"
+    # Mirrored from the underlying MacroSnapshot so downstream code (e.g.,
+    # sector_score) doesn't need to thread both objects everywhere.
+    hy_regime: str = "unknown"
+    vix_regime: str = "unknown"
     narrative: str | None = None
     risks: list[str] = Field(default_factory=list)
 
@@ -209,6 +213,8 @@ class MacroRegime(BaseModel):
         week_ending: date,
         rate_regime: str,
         financial_conditions: str,
+        hy_regime: str = "unknown",
+        vix_regime: str = "unknown",
         raw: dict,
     ) -> "MacroRegime":
         cp = str(raw.get("cycle_phase", "")).lower()
@@ -218,6 +224,8 @@ class MacroRegime(BaseModel):
             financial_conditions=(
                 financial_conditions if financial_conditions in _FIN_COND_VALUES else "unknown"
             ),
+            hy_regime=hy_regime,
+            vix_regime=vix_regime,
             cycle_phase=cp if cp in _CYCLE_PHASE_VALUES else "unknown",
             narrative=(raw.get("narrative") or None),
             risks=_string_list(raw.get("risks")),
