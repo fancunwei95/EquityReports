@@ -19,7 +19,7 @@ from typing import Iterable, Iterator
 import pandas as pd
 
 from weekly_strategy.config import settings
-from weekly_strategy.data.schemas import NewsItem, RedditPost
+from weekly_strategy.data.schemas import NewsClassification, NewsItem, RedditPost
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -56,7 +56,8 @@ CREATE TABLE IF NOT EXISTS news_items (
     url TEXT UNIQUE NOT NULL,
     published_at TIMESTAMP,
     snippet TEXT,
-    fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    classification_json TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_news_ticker_pub ON news_items(ticker, published_at);
 
@@ -91,9 +92,20 @@ def _conn() -> Iterator[sqlite3.Connection]:
 
 
 def init_db() -> None:
-    """Create tables and indices if they don't exist. Idempotent."""
+    """Create tables and indices if they don't exist. Idempotent.
+
+    Also runs any column-additive migrations against existing databases
+    (SQLite has no ``ADD COLUMN IF NOT EXISTS``, so we PRAGMA-inspect).
+    """
     with _conn() as conn:
         conn.executescript(_SCHEMA)
+        _ensure_column(conn, "news_items", "classification_json", "TEXT")
+
+
+def _ensure_column(conn: sqlite3.Connection, table: str, column: str, decl: str) -> None:
+    cols = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+    if column not in cols:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
 
 
 def _iso(dt: datetime | None) -> str | None:
@@ -153,7 +165,10 @@ def get_news(
     since: datetime | None = None,
     until: datetime | None = None,
 ) -> list[NewsItem]:
-    sql = "SELECT ticker, title, source, url, published_at, snippet FROM news_items WHERE ticker = ?"
+    sql = (
+        "SELECT ticker, title, source, url, published_at, snippet, classification_json "
+        "FROM news_items WHERE ticker = ?"
+    )
     params: list[object] = [ticker.upper()]
     if since is not None:
         sql += " AND published_at >= ?"
@@ -172,9 +187,25 @@ def get_news(
             url=r["url"],
             published_at=_parse_dt(r["published_at"]),
             snippet=r["snippet"],
+            classification=(
+                NewsClassification.coerce(json.loads(r["classification_json"]))
+                if r["classification_json"]
+                else None
+            ),
         )
         for r in rows
     ]
+
+
+def update_news_classification(url: str, classification: NewsClassification) -> bool:
+    """Attach a classification to the row keyed by URL. Returns True if a row was updated."""
+    payload = classification.model_dump_json()
+    with _conn() as conn:
+        cur = conn.execute(
+            "UPDATE news_items SET classification_json = ? WHERE url = ?",
+            (payload, url),
+        )
+        return cur.rowcount > 0
 
 
 def get_reddit(

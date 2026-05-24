@@ -11,6 +11,50 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 
+_SENTIMENT_VALUES = ("POSITIVE", "NEUTRAL", "NEGATIVE")
+_MATERIALITY_VALUES = ("HIGH", "MEDIUM", "LOW")
+_THEME_VALUES = (
+    "earnings", "guidance", "product", "regulation", "litigation",
+    "M&A", "management", "macro", "competitive", "analyst",
+    "technical", "other",
+)
+
+
+class NewsClassification(BaseModel):
+    """LLM verdict on a single headline."""
+
+    model_config = ConfigDict(frozen=True)
+
+    sentiment: str   # one of _SENTIMENT_VALUES (validated via field_validator below)
+    materiality: str # one of _MATERIALITY_VALUES
+    theme: str       # one of _THEME_VALUES (defaults to 'other' on unknown)
+    rationale: str | None = None
+
+    @classmethod
+    def coerce(cls, raw: dict) -> "NewsClassification":
+        """Best-effort: clamp unknown values to safe defaults so a bad LLM
+        token doesn't poison a 200-item batch."""
+        s = str(raw.get("sentiment", "")).upper()
+        m = str(raw.get("materiality", "")).upper()
+        t = str(raw.get("theme", "")).lower()
+        return cls(
+            sentiment=s if s in _SENTIMENT_VALUES else "NEUTRAL",
+            materiality=m if m in _MATERIALITY_VALUES else "LOW",
+            theme=t if t in _THEME_VALUES else "other",
+            rationale=(raw.get("rationale") or None),
+        )
+
+    # Numeric mappings used by aggregation. Kept here so the mapping table
+    # has one definition, not one per consumer.
+    @property
+    def sentiment_value(self) -> int:
+        return {"POSITIVE": 1, "NEUTRAL": 0, "NEGATIVE": -1}[self.sentiment]
+
+    @property
+    def materiality_weight(self) -> float:
+        return {"HIGH": 1.0, "MEDIUM": 0.5, "LOW": 0.2}[self.materiality]
+
+
 class NewsItem(BaseModel):
     model_config = ConfigDict(frozen=True)
 
@@ -20,6 +64,8 @@ class NewsItem(BaseModel):
     url: str
     published_at: datetime | None = None
     snippet: str | None = None
+    # Populated by Step 1.5; None for un-classified items.
+    classification: NewsClassification | None = None
 
 
 class RedditPost(BaseModel):
@@ -90,6 +136,41 @@ class Dossier(BaseModel):
     # Metadata
     last_updated: datetime
     last_filing_date: date | None = None
+
+
+class ThemeCount(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    theme: str
+    count: int
+
+
+class TopItem(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    url: str
+    title: str | None = None
+    source: str | None = None
+    sentiment: str
+    materiality: str
+    contribution: float  # signed: sentiment_value * materiality_weight
+
+
+class NewsScore(BaseModel):
+    """Aggregated weekly news signal for a single ticker."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    window_start: datetime
+    window_end: datetime
+    n_total: int
+    n_classified: int
+    # Materiality-weighted average of sentiment values in [-1, +1].
+    sentiment_score: float
+    top_themes: list[ThemeCount] = Field(default_factory=list)
+    top_items: list[TopItem] = Field(default_factory=list)
+    # Share of items classified as LOW materiality. High noise_ratio means
+    # a "quiet week" of routine coverage.
+    noise_ratio: float
 
 
 class RedditSnapshot(BaseModel):
