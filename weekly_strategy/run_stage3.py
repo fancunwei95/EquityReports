@@ -266,7 +266,7 @@ def main(argv: list[str] | None = None) -> int:
         # Reuse news fetches: get_news from storage with the same window.
         news_items_by_ticker = {
             t: storage.get_news(
-                t, since=datetime.combine(week_ending, datetime.min.time()),
+                t, since=datetime.combine(week_ending - timedelta(days=args.news_days), datetime.min.time()),
             )
             for t in (
                 [p.ticker for p in portfolio.longs]
@@ -295,10 +295,11 @@ def main(argv: list[str] | None = None) -> int:
     selected_tickers = [p.ticker for p in portfolio.longs + portfolio.shorts]
     selected_dossiers = {t: dossier_cache[t] for t in selected_tickers if t in dossier_cache}
     news_for_positions = {}
+    news_window_start = datetime.combine(
+        week_ending - timedelta(days=args.news_days), datetime.min.time()
+    )
     for t in selected_tickers:
-        items = storage.get_news(
-            t, since=datetime.combine(week_ending, datetime.min.time()),
-        )
+        items = storage.get_news(t, since=news_window_start)
         if items:
             news_for_positions[t] = items
 

@@ -16,10 +16,23 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(REPO_ROOT / ".env")
 
 # --- Paths ---
-DATA_CACHE_DIR = PACKAGE_ROOT / "data_cache"
-REPORTS_DIR = PACKAGE_ROOT / "reports"           # per-ticker single-stock notes
-DAILY_REPORTS_DIR = REPO_ROOT / "daily_reports"  # portfolio report (one per day)
-DOSSIER_DIR = PACKAGE_ROOT / "dossier" / "data"
+# Writable data root. Set WEEKLY_STRATEGY_DATA_ROOT in .env (or the shell)
+# to redirect ALL caches + reports off the project tree -- useful when the
+# project lives on a flaky shared mount and you want writes to land on a
+# stable local disk. Default keeps the original in-tree layout for tests.
+DATA_ROOT_ENV = os.getenv("WEEKLY_STRATEGY_DATA_ROOT")
+if DATA_ROOT_ENV:
+    _DATA_ROOT = Path(DATA_ROOT_ENV).expanduser().resolve()
+    DATA_CACHE_DIR = _DATA_ROOT / "data_cache"
+    REPORTS_DIR = _DATA_ROOT / "reports"
+    DAILY_REPORTS_DIR = _DATA_ROOT / "daily_reports"
+    DOSSIER_DIR = _DATA_ROOT / "dossier_data"
+else:
+    DATA_CACHE_DIR = PACKAGE_ROOT / "data_cache"
+    REPORTS_DIR = PACKAGE_ROOT / "reports"           # per-ticker single-stock notes
+    DAILY_REPORTS_DIR = REPO_ROOT / "daily_reports"  # portfolio report (one per day)
+    DOSSIER_DIR = PACKAGE_ROOT / "dossier" / "data"
+
 TICKERS_FILE = PACKAGE_ROOT / "config" / "tickers.json"
 SQLITE_PATH = DATA_CACHE_DIR / "weekly.db"
 
