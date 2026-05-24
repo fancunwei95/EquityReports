@@ -225,6 +225,23 @@ class NewsScore(BaseModel):
     noise_ratio: float
 
 
+class RedditScore(BaseModel):
+    """Post-LLM scoring of a Reddit snapshot."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    window_hours: int = 24
+    mention_count: int = 0
+    mention_count_prior_window: int = 0
+    mention_delta_pct: float = 0.0
+    # LLM-derived sentiment in [-1, +1]. None when we didn't bother (low volume).
+    llm_sentiment: float | None = None
+    llm_themes: list[str] = Field(default_factory=list)
+    # Crowding heuristic: True if mention spike is unusual (delta > +100% or count > 50).
+    is_crowded: bool = False
+
+
 class RedditSnapshot(BaseModel):
     """Aggregated Reddit signal for a ticker over a rolling window.
 
