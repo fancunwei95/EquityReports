@@ -143,6 +143,36 @@ _FIN_COND_VALUES = ("easing", "stable", "tightening", "unknown")
 _CYCLE_PHASE_VALUES = ("early", "mid", "late", "recession", "unknown")
 
 
+_CONVICTION_VALUES = ("HIGH", "MEDIUM", "LOW")
+
+
+class ConvictionCheck(BaseModel):
+    """Step 3.7: per-position adversarial pass before locking the book."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    direction: str           # "long" | "short"
+    confidence: str = "MEDIUM"
+    thesis: str | None = None
+    risks: list[str] = Field(default_factory=list)
+    flags: list[str] = Field(default_factory=list)
+    cost_usd: float | None = None
+
+    @classmethod
+    def coerce(cls, *, ticker: str, direction: str, cost_usd: float, raw: dict) -> "ConvictionCheck":
+        c = str(raw.get("confidence", "")).upper()
+        return cls(
+            ticker=ticker.upper(),
+            direction=direction,
+            confidence=c if c in _CONVICTION_VALUES else "MEDIUM",
+            thesis=(raw.get("thesis") or None),
+            risks=_string_list(raw.get("risks"))[:3],
+            flags=_string_list(raw.get("flags"))[:5],
+            cost_usd=cost_usd,
+        )
+
+
 class FocusListItem(BaseModel):
     """One name in the weekly focus list (Step 3.5)."""
 

@@ -7,6 +7,56 @@ single-file diff and so we can later run prompt-diff tests.
 """
 
 # ---------------------------------------------------------------------------
+# Step 3.7 -- conviction check (adversarial pass on a selected position)
+# ---------------------------------------------------------------------------
+
+CONVICTION_SYSTEM = (
+    "You are an adversarial reviewer of a single L/S equity idea. Your job "
+    "is NOT to write a bullish-sounding pitch -- it is to verify the idea "
+    "is coherent with the data and to call out any contradictions. If you "
+    "cannot write a coherent thesis with the given inputs, return "
+    "confidence=LOW and explain why. Return ONLY a JSON object. No prose, "
+    "no markdown fences."
+)
+
+
+CONVICTION_USER_TEMPLATE = """\
+Direction: {direction} {ticker}{company_suffix}
+
+=== Score bundle ===
+{scores_block}
+
+=== Dossier snippet ===
+{dossier_block}
+
+=== Top news this week ===
+{news_block}
+
+=== Macro + sector context ===
+{macro_sector_block}
+
+Tasks:
+
+1. Write a 3-sentence thesis for why this is a {direction} this week.
+2. Identify the top 2 risks to this thesis.
+3. Rate your confidence: HIGH / MEDIUM / LOW.
+4. List any flags or contradictions in the data (empty list if none).
+
+If the data is internally contradictory, sparse, or the {direction} call
+doesn't actually fit the numbers, return confidence=LOW.
+
+Return ONE JSON object:
+
+{{
+  "thesis":     "3 sentences",
+  "risks":      ["risk 1", "risk 2"],
+  "confidence": "HIGH" | "MEDIUM" | "LOW",
+  "flags":      ["specific contradiction 1", ...]
+}}
+"""
+
+
+# ---------------------------------------------------------------------------
 # Step 2.5 -- cross-stock / sectoral implications
 # ---------------------------------------------------------------------------
 
