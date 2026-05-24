@@ -138,6 +138,40 @@ _FED_POSTURE_VALUES = (
 )
 
 
+class SectorMetrics(BaseModel):
+    """Per-sector momentum + volume profile vs SPY."""
+
+    model_config = ConfigDict(frozen=True)
+
+    etf: str
+    sector: str
+    return_1w: float | None = None
+    return_1m: float | None = None
+    return_3m: float | None = None
+    rel_1m: float | None = None       # sector_1m - spy_1m
+    rel_3m: float | None = None
+    volume_vs_20d: float | None = None  # last-5-day avg vol / trailing 20d avg
+
+
+class SectorSnapshot(BaseModel):
+    """Cross-sector snapshot built from XL* ETF flows."""
+
+    model_config = ConfigDict(frozen=True)
+
+    week_ending: date
+    sectors: dict[str, SectorMetrics] = Field(default_factory=dict)
+    leadership_ranking: list[str] = Field(default_factory=list)  # ETF tickers, best -> worst by rel_1m
+    breadth: str = "unknown"  # "broad" | "narrow" | "unknown"
+
+    def metrics_for_sector(self, sector_name: str) -> SectorMetrics | None:
+        """Lookup helper -- get_basic_info returns 'sector' as a string label."""
+        target = sector_name.lower().replace("&", "and") if sector_name else ""
+        for m in self.sectors.values():
+            if m.sector.lower().replace("&", "and") == target:
+                return m
+        return None
+
+
 class FedPosture(BaseModel):
     """LLM read of Fed communication this week."""
 
