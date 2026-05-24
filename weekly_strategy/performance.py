@@ -128,14 +128,14 @@ def record_portfolio_entry(
 ) -> dict | None:
     """Snapshot the top-N longs + shorts at portfolio creation.
 
-    Returns the entry record if a new one was recorded; ``None`` if this
-    entry_date is already on file (so re-running a same-day report doesn't
-    create duplicates).
+    Same-day re-runs REPLACE the entry (the latest run's selection wins).
+    Past entries are never modified. Returns the entry record always
+    (None only on degenerate inputs).
     """
     entry_date = portfolio.week_ending
     portfolios = _load_portfolios()
-    if any(p.get("entry_date") == entry_date.isoformat() for p in portfolios):
-        return None
+    # Drop any prior record for the same date; we'll re-record below.
+    portfolios = [p for p in portfolios if p.get("entry_date") != entry_date.isoformat()]
 
     longs = portfolio.longs[:top_n]
     shorts = portfolio.shorts[:top_n]

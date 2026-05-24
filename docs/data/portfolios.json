@@ -4,45 +4,45 @@
     "status": "open",
     "longs": [
       {
-        "ticker": "AMAT",
-        "sector": "Technology",
-        "composite_z": 1.85,
-        "entry_date_used": "2026-05-22",
-        "entry_close": 432.1600036621094,
-        "current_close": 432.1600036621094,
-        "current_return": 0.0
-      },
-      {
         "ticker": "LRCX",
         "sector": "Technology",
-        "composite_z": 1.8,
+        "composite_z": 71.4496405192236,
         "entry_date_used": "2026-05-22",
         "entry_close": 305.3500061035156,
         "current_close": 305.3500061035156,
         "current_return": 0.0
       },
       {
+        "ticker": "FTNT",
+        "sector": "Technology",
+        "composite_z": 70.96895248909405,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 133.92999267578125,
+        "current_close": 133.92999267578125,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "ANET",
+        "sector": "Technology",
+        "composite_z": 70.7978997446567,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 154.02999877929688,
+        "current_close": 154.02999877929688,
+        "current_return": 0.0
+      },
+      {
         "ticker": "ASML",
         "sector": "Technology",
-        "composite_z": 1.77,
+        "composite_z": 70.04314822287955,
         "entry_date_used": "2026-05-22",
         "entry_close": 1632.9000244140625,
         "current_close": 1632.9000244140625,
         "current_return": 0.0
       },
       {
-        "ticker": "XOM",
-        "sector": "Energy",
-        "composite_z": 1.43,
-        "entry_date_used": "2026-05-22",
-        "entry_close": 154.9199981689453,
-        "current_close": 154.9199981689453,
-        "current_return": 0.0
-      },
-      {
         "ticker": "EOG",
         "sector": "Energy",
-        "composite_z": 1.42,
+        "composite_z": 69.58971039136537,
         "entry_date_used": "2026-05-22",
         "entry_close": 141.22000122070312,
         "current_close": 141.22000122070312,
@@ -51,48 +51,48 @@
     ],
     "shorts": [
       {
-        "ticker": "OKLO",
+        "ticker": "XEL",
         "sector": "Utilities",
-        "composite_z": -1.17,
+        "composite_z": 19.10650476134201,
         "entry_date_used": "2026-05-22",
-        "entry_close": 65.87999725341797,
-        "current_close": 65.87999725341797,
+        "entry_close": 81.08000183105469,
+        "current_close": 81.08000183105469,
         "current_return": -0.0
       },
       {
         "ticker": "SMR",
         "sector": "Industrials",
-        "composite_z": -1.06,
+        "composite_z": 21.52771820255537,
         "entry_date_used": "2026-05-22",
         "entry_close": 11.399999618530273,
         "current_close": 11.399999618530273,
         "current_return": -0.0
       },
       {
-        "ticker": "AAPL",
-        "sector": "Technology",
-        "composite_z": -0.94,
-        "entry_date_used": "2026-05-22",
-        "entry_close": 308.82000732421875,
-        "current_close": 308.82000732421875,
-        "current_return": -0.0
-      },
-      {
-        "ticker": "CEG",
+        "ticker": "AES",
         "sector": "Utilities",
-        "composite_z": -0.93,
+        "composite_z": 24.52529484685459,
         "entry_date_used": "2026-05-22",
-        "entry_close": 294.07000732421875,
-        "current_close": 294.07000732421875,
+        "entry_close": 14.680000305175781,
+        "current_close": 14.680000305175781,
         "current_return": -0.0
       },
       {
-        "ticker": "AI",
-        "sector": "Technology",
-        "composite_z": -0.63,
+        "ticker": "PEG",
+        "sector": "Utilities",
+        "composite_z": 26.702988870837867,
         "entry_date_used": "2026-05-22",
-        "entry_close": 9.289999961853027,
-        "current_close": 9.289999961853027,
+        "entry_close": 79.51000213623047,
+        "current_close": 79.51000213623047,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "TLN",
+        "sector": "Utilities",
+        "composite_z": 27.49541233204016,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 372.45001220703125,
+        "current_close": 372.45001220703125,
         "current_return": -0.0
       }
     ],
