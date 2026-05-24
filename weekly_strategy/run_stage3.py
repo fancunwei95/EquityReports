@@ -230,6 +230,18 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     # --- 9. Render + save portfolio report ---
+    # Pull dossiers and any cached news items for the selected positions
+    # so per-position reasoning includes fundamentals + (when available) news.
+    selected_tickers = [p.ticker for p in portfolio.longs + portfolio.shorts]
+    selected_dossiers = {t: dossier_cache[t] for t in selected_tickers if t in dossier_cache}
+    news_for_positions = {}
+    for t in selected_tickers:
+        items = storage.get_news(
+            t, since=datetime.combine(week_ending, datetime.min.time()),
+        )
+        if items:
+            news_for_positions[t] = items
+
     md = portfolio_mod.render_portfolio_markdown(
         portfolio,
         bundles=bundles,
@@ -241,6 +253,8 @@ def main(argv: list[str] | None = None) -> int:
         sector_snap=macro_ctx.sector_snap,
         previous_longs=prev_longs,
         previous_shorts=prev_shorts,
+        dossiers=selected_dossiers,
+        news_items_by_ticker=news_for_positions,
     )
     path = portfolio_mod.save_portfolio_markdown(portfolio, md)
     html_path = portfolio_mod.save_portfolio_html(portfolio, md)

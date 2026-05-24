@@ -45,7 +45,10 @@ def test_renders_header_and_position_sections():
     assert "Week ending **2026-05-24**" in md
     assert "## Longs (2)" in md
     assert "## Shorts (2)" in md
-    assert "`AAPL`" in md and "`XYZ`" in md
+    # Position cards render as HTML inside the Markdown (passed through).
+    assert ">AAPL<" in md and ">XYZ<" in md
+    assert "class='position long'" in md
+    assert "class='position short'" in md
 
 
 def test_renders_market_context_when_inputs_present():
@@ -91,7 +94,9 @@ def test_renders_conviction_thesis_and_risks():
         ),
     }
     md = port.render_portfolio_markdown(p, convictions=checks)
-    assert "Conviction: **HIGH**" in md
+    # Conviction renders inside the new position-card HTML structure.
+    assert "conviction-high" in md  # CSS class
+    assert "HIGH" in md
     assert "Quality compounder" in md
     assert "valuation reset" in md
     assert "tension noted" in md  # data flags rendered

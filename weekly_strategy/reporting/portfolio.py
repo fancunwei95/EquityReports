@@ -15,15 +15,186 @@ from typing import Iterable
 from weekly_strategy.config import settings
 from weekly_strategy.data.schemas import (
     ConvictionCheck,
+    Dossier,
     FedPosture,
     FocusList,
     MacroRegime,
     MacroSnapshot,
+    NewsItem,
     Portfolio,
     PortfolioPosition,
     SectorSnapshot,
     StockScoreBundle,
 )
+
+
+# ---------------------------------------------------------------------------
+# Per-position deterministic reasoning
+# ---------------------------------------------------------------------------
+
+
+_Z_COMPONENT_LABEL = {
+    "z_quality":   "quality",
+    "z_valuation": "valuation",
+    "z_momentum":  "momentum",
+    "z_news_sentiment": "news sentiment",
+    "z_sector":    "sector",
+}
+
+
+def _explain_position(
+    position: PortfolioPosition,
+    bundle: StockScoreBundle | None,
+    dossier: Dossier | None,
+    sector_snap: SectorSnapshot | None,
+    news_items: list[NewsItem] | None = None,
+) -> dict:
+    """Build a structured reasoning packet for one position.
+
+    Returns dict with keys: headline (str), drivers (list[str]),
+    context (list[str]), fundamentals (list[str] chips), news_summary (HTML str).
+    Pure code -- no LLM call. Inputs are whatever's available from the run.
+    """
+    out: dict = {
+        "headline": "",
+        "drivers": [],
+        "context": [],
+        "fundamentals": [],
+        "news_summary": "",
+    }
+    if bundle is None:
+        out["headline"] = "No score data available for this position."
+        return out
+
+    is_long = position.direction == "long"
+    composite_z_score = bundle.composite_z if bundle.composite_z is not None else 50.0
+    weighted_z = (composite_z_score - 50.0) / 25.0  # invert the [-2,+2]z -> [0,100] map
+    side_phrase = "ranks at the TOP of the universe" if is_long else "ranks at the BOTTOM of the universe"
+
+    out["headline"] = (
+        f"Composite {composite_z_score:.1f}/100 (weighted z {weighted_z:+.2f}σ) — "
+        f"{position.ticker} {side_phrase} on the regime-weighted ranking this run."
+    )
+
+    # --- score drivers ---
+    z_components: list[tuple[str, float]] = []
+    for attr in ("z_quality", "z_valuation", "z_momentum",
+                 "z_news_sentiment", "z_sector"):
+        v = getattr(bundle, attr, None)
+        if v is None:
+            continue
+        z_components.append((_Z_COMPONENT_LABEL[attr], float(v)))
+
+    if z_components:
+        if is_long:
+            ranked = sorted(z_components, key=lambda kv: kv[1], reverse=True)
+            sign_word = "tailwind"; drag_word = "drag"
+        else:
+            ranked = sorted(z_components, key=lambda kv: kv[1])
+            sign_word = "headwind"; drag_word = "lift"
+
+        favored = [c for c in ranked[:3] if abs(c[1]) >= 0.3]
+        if favored:
+            parts = [f"<b>{name}</b> ({z:+.2f}σ)" for name, z in favored]
+            out["drivers"].append(
+                f"Main {sign_word}{'s' if len(favored) > 1 else ''}: "
+                + ", ".join(parts) + "."
+            )
+
+        # Counter-signal: must actually be against the direction of the call.
+        if is_long:
+            counter_pool = sorted(
+                [c for c in z_components if c[1] <= -0.5],
+                key=lambda kv: kv[1],
+            )
+        else:
+            counter_pool = sorted(
+                [c for c in z_components if c[1] >= 0.5],
+                key=lambda kv: kv[1], reverse=True,
+            )
+        if counter_pool:
+            name, z = counter_pool[0]
+            out["drivers"].append(
+                f"Counter-signal: <b>{name}</b> {z:+.2f}σ acts as a {drag_word}."
+            )
+
+    # --- price action ---
+    rets: list[str] = []
+    if bundle.return_1m is not None:
+        rets.append(f"1m {bundle.return_1m*100:+.1f}%")
+    if bundle.return_3m is not None:
+        rets.append(f"3m {bundle.return_3m*100:+.1f}%")
+    if bundle.return_6m is not None:
+        rets.append(f"6m {bundle.return_6m*100:+.1f}%")
+    if rets:
+        out["context"].append("Trailing returns: " + " · ".join(rets) + ".")
+
+    # --- sector context ---
+    if bundle.sector_etf and sector_snap is not None:
+        m = sector_snap.sectors.get(bundle.sector_etf)
+        rank = bundle.sector_rank
+        favor = "favorable" if bundle.sector_in_favor else "unfavorable"
+        rank_phrase = f"rank {rank}/11" if rank else "rank n/a"
+        rel_phrase = ""
+        if m is not None and m.rel_1m is not None:
+            rel_phrase = f", 1m vs SPY {m.rel_1m*100:+.2f}%"
+        out["context"].append(
+            f"Sector <b>{bundle.sector_etf}</b> ({position.sector or '?'}): "
+            f"{rank_phrase}{rel_phrase}; regime fit <b>{favor}</b>."
+        )
+
+    # --- fundamentals chips ---
+    if dossier is not None:
+        bits: list[str] = []
+        if dossier.revenue_3y_cagr is not None:
+            bits.append(f"rev 3y CAGR {dossier.revenue_3y_cagr*100:+.1f}%")
+        if dossier.operating_margin_current is not None:
+            bits.append(f"op margin {dossier.operating_margin_current*100:.1f}%")
+        if dossier.fcf_margin_current is not None:
+            bits.append(f"FCF margin {dossier.fcf_margin_current*100:.1f}%")
+        if dossier.roe is not None and abs(dossier.roe) > 0.005:
+            bits.append(f"ROE {dossier.roe*100:.1f}%")
+        if dossier.pe_trailing is not None and 0 < dossier.pe_trailing < 200:
+            bits.append(f"P/E {dossier.pe_trailing:.1f}x")
+        if dossier.fcf_yield is not None:
+            bits.append(f"FCF yield {dossier.fcf_yield*100:.2f}%")
+        if dossier.net_debt_to_ebitda is not None:
+            bits.append(f"netDebt/EBITDA {dossier.net_debt_to_ebitda:.2f}x")
+        if dossier.share_count_change_yoy is not None and abs(dossier.share_count_change_yoy) > 0.005:
+            bits.append(f"shareCt YoY {dossier.share_count_change_yoy*100:+.1f}%")
+        if bits:
+            out["fundamentals"] = bits[:6]
+
+    # --- news summary ---
+    if news_items:
+        material = [
+            it for it in news_items
+            if it.classification is not None
+            and it.classification.materiality in ("HIGH", "MEDIUM")
+        ]
+        material.sort(
+            key=lambda it: abs(
+                it.classification.sentiment_value * it.classification.materiality_weight
+            ),
+            reverse=True,
+        )
+        if material:
+            top = material[:3]
+            lines = []
+            for it in top:
+                c = it.classification
+                contrib = c.sentiment_value * c.materiality_weight
+                title = (it.title or "")[:110].replace("<", "&lt;").replace(">", "&gt;")
+                lines.append(
+                    f"<span class='news-tag {c.sentiment.lower()}'>{c.sentiment}</span> "
+                    f"<span class='news-mat'>{c.materiality}</span> "
+                    f"<span class='news-theme'>{c.theme}</span> "
+                    f"<a href='{it.url}'>{title}</a>"
+                    f" <em>(contrib {contrib:+.2f})</em>"
+                )
+            out["news_summary"] = "<br>".join(lines)
+
+    return out
 
 
 def render_portfolio_markdown(
@@ -39,6 +210,8 @@ def render_portfolio_markdown(
     previous_longs: set[str] | None = None,
     previous_shorts: set[str] | None = None,
     earnings_calendar: dict[str, str] | None = None,
+    dossiers: dict[str, "Dossier"] | None = None,  # for per-position reasoning
+    news_items_by_ticker: dict[str, list["NewsItem"]] | None = None,  # for news themes
 ) -> str:
     """Compose the full portfolio Markdown.
 
@@ -55,8 +228,16 @@ def render_portfolio_markdown(
     parts.append(_render_header(portfolio))
     if macro_snapshot or macro_regime or fed_posture:
         parts.append(_render_market_context(macro_snapshot, macro_regime, fed_posture, sector_snap))
-    parts.append(_render_positions("Longs", portfolio.longs, convictions, bundles))
-    parts.append(_render_positions("Shorts", portfolio.shorts, convictions, bundles))
+    parts.append(_render_positions(
+        "Longs", portfolio.longs, convictions, bundles,
+        dossiers=dossiers, sector_snap=sector_snap,
+        news_items_by_ticker=news_items_by_ticker,
+    ))
+    parts.append(_render_positions(
+        "Shorts", portfolio.shorts, convictions, bundles,
+        dossiers=dossiers, sector_snap=sector_snap,
+        news_items_by_ticker=news_items_by_ticker,
+    ))
     parts.append(_render_changes(portfolio, previous_longs, previous_shorts))
     parts.append(_render_portfolio_metrics(portfolio))
     if focus is not None:
@@ -87,53 +268,209 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <meta charset="utf-8">
 <title>{title}</title>
 <style>
+* {{ box-sizing: border-box; }}
 body {{
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  max-width: 920px;
+  max-width: 980px;
   margin: 2em auto;
   padding: 0 1em 4em;
   color: #1c1c1c;
   line-height: 1.55;
-  background: #fafafa;
+  background: #f6f7f9;
 }}
-h1, h2, h3 {{ color: #111; }}
 h1 {{
-  border-bottom: 2px solid #888;
-  padding-bottom: 0.3em;
+  color: #0f1e3a;
+  border-bottom: 3px solid #2a5fa0;
+  padding-bottom: 0.4em;
   margin-bottom: 0.6em;
+  font-size: 1.9em;
 }}
 h2 {{
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 0.2em;
-  margin-top: 1.8em;
+  color: #1a2540;
+  border-bottom: 1px solid #c8d2e0;
+  padding-bottom: 0.25em;
+  margin-top: 2em;
+  font-size: 1.4em;
 }}
-h3 {{ margin-top: 1.4em; }}
+h3 {{ margin-top: 1.2em; color: #1a2540; }}
 table {{
   border-collapse: collapse;
   margin: 0.6em 0;
   font-size: 0.95em;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
 }}
-th, td {{ border: 1px solid #ddd; padding: 0.35em 0.7em; text-align: left; }}
-th {{ background: #f1f1f1; }}
-td.numeric, th.numeric {{ text-align: right; font-variant-numeric: tabular-nums; }}
+th, td {{ border: 1px solid #e0e4ea; padding: 0.4em 0.8em; text-align: left; }}
+th {{ background: #eef1f6; color: #2a3b5c; }}
 code {{
-  background: #ececec;
+  background: #eef1f6;
   padding: 0.05em 0.35em;
   border-radius: 3px;
   font-size: 0.92em;
+  color: #2a3b5c;
 }}
-pre code {{ padding: 0.6em; display: block; overflow-x: auto; }}
 blockquote {{
-  border-left: 4px solid #888;
+  border-left: 4px solid #2a5fa0;
   margin: 0.6em 0;
-  padding: 0.3em 1em;
-  color: #555;
-  background: #f3f3f3;
+  padding: 0.4em 1em;
+  color: #2a3b5c;
+  background: #eef3fa;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
 }}
-hr {{ border: 0; border-top: 1px solid #ddd; margin: 2em 0; }}
+hr {{ border: 0; border-top: 1px solid #c8d2e0; margin: 2em 0; }}
 ul, ol {{ padding-left: 1.4em; }}
-a {{ color: #0366d6; text-decoration: none; }}
+a {{ color: #2a5fa0; text-decoration: none; }}
 a:hover {{ text-decoration: underline; }}
+
+/* === Position cards === */
+.position {{
+  background: #fff;
+  border-radius: 8px;
+  padding: 1em 1.2em 0.8em;
+  margin: 0.9em 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-left: 5px solid #888;
+}}
+.position.long  {{ border-left-color: #1f8a5c; }}
+.position.short {{ border-left-color: #c14242; }}
+
+.position-head {{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6em;
+  margin-bottom: 0.3em;
+}}
+.side-badge {{
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 0.1em 0.55em;
+  border-radius: 3px;
+  color: #fff;
+  letter-spacing: 0.04em;
+}}
+.side-badge.long  {{ background: #1f8a5c; }}
+.side-badge.short {{ background: #c14242; }}
+.position-head .rank {{
+  color: #6c7a93;
+  font-size: 0.95em;
+  font-weight: 600;
+}}
+.position-head .ticker {{
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #0f1e3a;
+  letter-spacing: 0.02em;
+}}
+.position-head .meta {{
+  color: #6c7a93;
+  font-size: 0.9em;
+}}
+.position-headline {{
+  color: #2a3b5c;
+  font-size: 0.98em;
+  margin-bottom: 0.6em;
+  padding-bottom: 0.55em;
+  border-bottom: 1px dashed #d6dce5;
+}}
+
+.position-stats {{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  margin: 0.5em 0 0.8em;
+  font-size: 0.86em;
+}}
+.position-stats .stat {{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}}
+.position-stats .lbl {{
+  color: #6c7a93;
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}}
+.position-stats .val {{
+  color: #1a2540;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}}
+.conviction-high   {{ color: #1f8a5c; }}
+.conviction-medium {{ color: #b87800; }}
+.conviction-low    {{ color: #c14242; }}
+
+.reasoning-block {{
+  margin: 0.55em 0;
+  padding: 0.45em 0;
+}}
+.reasoning-block .label {{
+  font-size: 0.76em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c7a93;
+  margin-bottom: 0.25em;
+  font-weight: 600;
+}}
+.reasoning-block ul {{ margin: 0.2em 0; padding-left: 1.2em; }}
+.reasoning-block li {{ margin: 0.18em 0; color: #2a3b5c; }}
+.reasoning-block.llm {{ background: #f4f7fb; padding: 0.6em 0.8em; border-radius: 4px; }}
+.reasoning-block .sub-label {{
+  font-size: 0.82em;
+  font-weight: 600;
+  color: #1a2540;
+  margin-top: 0.4em;
+}}
+.reasoning-block .sub-label.flags {{ color: #c14242; }}
+
+.chips {{ display: flex; flex-wrap: wrap; gap: 0.4em; }}
+.chip {{
+  background: #eef1f6;
+  border: 1px solid #d6dce5;
+  border-radius: 12px;
+  padding: 0.15em 0.7em;
+  font-size: 0.82em;
+  color: #2a3b5c;
+  font-variant-numeric: tabular-nums;
+}}
+
+.news-list {{ font-size: 0.88em; line-height: 1.7; }}
+.news-tag {{
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  vertical-align: middle;
+}}
+.news-tag.positive {{ background: #1f8a5c; }}
+.news-tag.negative {{ background: #c14242; }}
+.news-tag.neutral  {{ background: #888; }}
+.news-mat {{
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  font-weight: 700;
+  background: #eef1f6;
+  color: #2a3b5c;
+  vertical-align: middle;
+}}
+.news-theme {{
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  background: #fff8e6;
+  border: 1px solid #ecd99b;
+  color: #6c5410;
+  vertical-align: middle;
+}}
 </style>
 </head>
 <body>
@@ -144,11 +481,16 @@ a:hover {{ text-decoration: underline; }}
 
 
 def render_html(markdown_text: str, *, title: str) -> str:
-    """Convert the Markdown report to a styled standalone HTML page."""
+    """Convert the Markdown report to a styled standalone HTML page.
+
+    The position cards contain raw HTML (div + class), which the
+    ``md_in_html`` extension passes through verbatim. Other Markdown
+    elements (tables, lists, headings) still render normally.
+    """
     import markdown as _md
     body = _md.markdown(
         markdown_text,
-        extensions=["tables", "fenced_code", "sane_lists"],
+        extensions=["tables", "fenced_code", "sane_lists", "md_in_html"],
     )
     return _HTML_TEMPLATE.format(title=title, content=body)
 
@@ -231,39 +573,110 @@ def _render_positions(
     positions: list[PortfolioPosition],
     convictions: dict[str, ConvictionCheck],
     bundles: dict[str, StockScoreBundle],
+    *,
+    dossiers: dict[str, Dossier] | None = None,
+    sector_snap: SectorSnapshot | None = None,
+    news_items_by_ticker: dict[str, list[NewsItem]] | None = None,
 ) -> str:
+    """Render a side (longs or shorts) as HTML cards with reasoning."""
     if not positions:
         return f"## {label}\n\n_(none selected)_"
-    lines = [f"## {label} ({len(positions)})", ""]
+    dossiers = dossiers or {}
+    news_items_by_ticker = news_items_by_ticker or {}
+    side_class = "long" if label.lower().startswith("long") else "short"
+    badge = "LONG" if side_class == "long" else "SHORT"
+
+    out: list[str] = [f"## {label} ({len(positions)})", ""]
     for i, p in enumerate(positions, 1):
-        score = (p.composite_z if p.composite_z is not None else p.composite_score) or 0.0
-        sector = p.sector or "?"
+        bundle = bundles.get(p.ticker) if bundles else None
+        dossier = dossiers.get(p.ticker)
+        news_items = news_items_by_ticker.get(p.ticker)
+        reasoning = _explain_position(p, bundle, dossier, sector_snap, news_items)
+
+        composite_disp = (
+            f"{p.composite_z:.2f}" if p.composite_z is not None
+            else (f"{p.composite_score:.2f}" if p.composite_score is not None else "n/a")
+        )
         beta_str = _fmt_beta(p.beta)
         weight_pct = (p.weight or 0) * 100
-        lines.append(
-            f"### {i}. `{p.ticker}` — {sector} (β={beta_str}, weight={weight_pct:.1f}%)"
-        )
-        lines.append(
-            f"Composite: **{score:.2f}** · Selection: `{p.selection_reason}`"
-        )
         check = convictions.get(p.ticker)
+
+        out.append(f"<div class='position {side_class}'>")
+        out.append(
+            f"<div class='position-head'>"
+            f"<span class='side-badge {side_class}'>{badge}</span>"
+            f"<span class='rank'>#{i}</span>"
+            f"<span class='ticker'>{p.ticker}</span>"
+            f"<span class='meta'>{p.sector or '?'} · β {beta_str} · weight {weight_pct:.1f}%</span>"
+            f"</div>"
+        )
+        out.append(
+            f"<div class='position-headline'>{reasoning['headline']}</div>"
+        )
+
+        # Numeric stat strip
+        stat_bits = [
+            f"<span class='stat'><span class='lbl'>composite</span>"
+            f"<span class='val'>{composite_disp}</span></span>",
+            f"<span class='stat'><span class='lbl'>selection</span>"
+            f"<span class='val'>{p.selection_reason}</span></span>",
+        ]
         if check is not None:
-            lines.append(f"Conviction: **{check.confidence}**")
+            stat_bits.append(
+                f"<span class='stat'><span class='lbl'>conviction</span>"
+                f"<span class='val conviction-{check.confidence.lower()}'>{check.confidence}</span></span>"
+            )
+        out.append("<div class='position-stats'>" + "".join(stat_bits) + "</div>")
+
+        # Drivers + context
+        if reasoning["drivers"]:
+            out.append("<div class='reasoning-block'><div class='label'>Why this rank</div><ul>")
+            for line in reasoning["drivers"]:
+                out.append(f"<li>{line}</li>")
+            out.append("</ul></div>")
+        if reasoning["context"]:
+            out.append("<div class='reasoning-block'><div class='label'>Context</div><ul>")
+            for line in reasoning["context"]:
+                out.append(f"<li>{line}</li>")
+            out.append("</ul></div>")
+
+        # Fundamentals chips
+        if reasoning["fundamentals"]:
+            chips = "".join(
+                f"<span class='chip'>{b}</span>" for b in reasoning["fundamentals"]
+            )
+            out.append(
+                f"<div class='reasoning-block'><div class='label'>Fundamentals</div>"
+                f"<div class='chips'>{chips}</div></div>"
+            )
+
+        # News (only when material items exist for this ticker)
+        if reasoning["news_summary"]:
+            out.append(
+                f"<div class='reasoning-block'><div class='label'>Material news</div>"
+                f"<div class='news-list'>{reasoning['news_summary']}</div></div>"
+            )
+
+        # Conviction LLM thesis (if available)
+        if check is not None and (check.thesis or check.risks or check.flags):
+            out.append("<div class='reasoning-block llm'><div class='label'>LLM conviction</div>")
             if check.thesis:
-                lines.append("")
-                lines.append(f"> {check.thesis}")
+                out.append(f"<blockquote>{check.thesis}</blockquote>")
             if check.risks:
-                lines.append("")
-                lines.append("Top risks:")
+                out.append("<div class='sub-label'>Top risks</div><ul>")
                 for r in check.risks:
-                    lines.append(f"- {r}")
+                    out.append(f"<li>{r}</li>")
+                out.append("</ul>")
             if check.flags:
-                lines.append("")
-                lines.append("**Data flags**:")
+                out.append("<div class='sub-label flags'>Data flags</div><ul>")
                 for f in check.flags:
-                    lines.append(f"- {f}")
-        lines.append("")
-    return "\n".join(lines)
+                    out.append(f"<li>{f}</li>")
+                out.append("</ul>")
+            out.append("</div>")
+
+        out.append("</div>")  # /.position
+        out.append("")
+    return "\n".join(out)
 
 
 def _render_changes(
