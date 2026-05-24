@@ -27,6 +27,7 @@ import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from weekly_strategy import performance as perf_mod
 from weekly_strategy.config import settings
 from weekly_strategy.data import fetchers, predictions, storage
 from weekly_strategy.data.schemas import Dossier, Universe, UniverseEntry
@@ -394,6 +395,20 @@ def main(argv: list[str] | None = None) -> int:
         universe_tickers=universe.tickers,
     )
     print(f"[stage3] saved snapshot -> {snap_dir}")
+
+    # --- 11. Performance tracker for the public dashboard ---
+    try:
+        new_entry = perf_mod.record_portfolio_entry(portfolio)
+        if new_entry:
+            print(f"[stage3] recorded portfolio entry for {week_ending} "
+                  f"({len(new_entry['longs'])} longs, {len(new_entry['shorts'])} shorts)")
+        view = perf_mod.update_performance()
+        print(f"[stage3] performance: {view['stats']['n_closed']} closed "
+              f"(cum {view['stats']['cumulative_return']*100:+.2f}%), "
+              f"{view['stats']['n_open']} open "
+              f"(current P&L {view['stats']['current_open_pnl']*100:+.2f}%)")
+    except Exception as e:
+        print(f"[stage3] performance update FAILED: {e}")
 
     _print_summary(score_res, portfolio, checks)
 

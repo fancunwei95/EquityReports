@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cunwei's Daily Reports</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <h1>Cunwei's Daily Reports</h1>
+    <p class="tagline">Weekly L/S equity signals · published daily before US market open</p>
+  </div>
+</header>
+
+<nav class="tabs container">
+  <button class="tab-btn active" data-section="portfolio">📈 Portfolio recommendations</button>
+  <a class="tab-btn external" href="https://fancunwei95.github.io/dailyreport/" target="_blank" rel="noopener">📰 Top news (separate project) ↗</a>
+</nav>
+
+<main class="container">
+
+<section id="portfolio" class="tab-section active">
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="label">Cumulative return</div>
+      <div class="value" id="stat-cum">—</div>
+      <div class="sub">closed portfolios summed</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Open P&amp;L (live)</div>
+      <div class="value" id="stat-open-pnl">—</div>
+      <div class="sub">mark-to-market of open books</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Closed portfolios</div>
+      <div class="value" id="stat-n-closed">—</div>
+      <div class="sub">5-trading-day holding period</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Open portfolios</div>
+      <div class="value" id="stat-n-open">—</div>
+      <div class="sub">running right now</div>
+    </div>
+  </div>
+
+  <section class="chart-block">
+    <h2>Cumulative L/S return — closed portfolios</h2>
+    <canvas id="cum-chart" height="120"></canvas>
+    <p class="sub">Each point is a portfolio closed on its exit date (5 trading days after entry).
+       L/S return per book = mean(long returns) + mean(short returns flipped).
+       Curve sums (not compounds) closed returns; treat as a running tally, not a NAV.</p>
+  </section>
+
+  <section class="open-block">
+    <h2>Open portfolios (last 5)</h2>
+    <p class="sub">Marked to market using the latest close. Closes after 5 trading days from entry.</p>
+    <div id="open-list"></div>
+  </section>
+
+  <section class="closed-block">
+    <h2>Closed portfolios</h2>
+    <table id="closed-table">
+      <thead>
+        <tr>
+          <th>Entry</th><th>Exit</th><th>Days</th>
+          <th class="num">Long basket</th><th class="num">Short basket</th><th class="num">L/S</th>
+          <th class="num">Cumulative</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p id="closed-empty" class="sub" style="display:none">
+      No closed portfolios yet. Will populate after the first portfolio reaches its 5-trading-day exit.
+    </p>
+  </section>
+
+  <section class="latest-block">
+    <h2>Latest full report</h2>
+    <p><a id="latest-report-link" href="#">Open today's full report (per-position cards, news, fundamentals) →</a></p>
+    <p class="sub">All historical daily reports are under <code>portfolio/{YYYY-MM-DD}.html</code>.</p>
+  </section>
+
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>
+      Source &amp; methodology:
+      <a href="https://github.com/fancunwei95/202605_equityReports">github.com/fancunwei95/202605_equityReports</a>
+      · Built with the Anthropic Claude API in headless mode ·
+      Last updated <span id="last-updated">—</span>
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="assets/app.js"></script>
+
+</body>
+</html>

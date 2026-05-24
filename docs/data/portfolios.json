@@ -1,0 +1,104 @@
+[
+  {
+    "entry_date": "2026-05-24",
+    "status": "open",
+    "longs": [
+      {
+        "ticker": "AMAT",
+        "sector": "Technology",
+        "composite_z": 1.85,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 432.1600036621094,
+        "current_close": 432.1600036621094,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "LRCX",
+        "sector": "Technology",
+        "composite_z": 1.8,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 305.3500061035156,
+        "current_close": 305.3500061035156,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "ASML",
+        "sector": "Technology",
+        "composite_z": 1.77,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 1632.9000244140625,
+        "current_close": 1632.9000244140625,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "XOM",
+        "sector": "Energy",
+        "composite_z": 1.43,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 154.9199981689453,
+        "current_close": 154.9199981689453,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "EOG",
+        "sector": "Energy",
+        "composite_z": 1.42,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 141.22000122070312,
+        "current_close": 141.22000122070312,
+        "current_return": 0.0
+      }
+    ],
+    "shorts": [
+      {
+        "ticker": "OKLO",
+        "sector": "Utilities",
+        "composite_z": -1.17,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 65.87999725341797,
+        "current_close": 65.87999725341797,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "SMR",
+        "sector": "Industrials",
+        "composite_z": -1.06,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 11.399999618530273,
+        "current_close": 11.399999618530273,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "AAPL",
+        "sector": "Technology",
+        "composite_z": -0.94,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 308.82000732421875,
+        "current_close": 308.82000732421875,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "CEG",
+        "sector": "Utilities",
+        "composite_z": -0.93,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 294.07000732421875,
+        "current_close": 294.07000732421875,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "AI",
+        "sector": "Technology",
+        "composite_z": -0.63,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 9.289999961853027,
+        "current_close": 9.289999961853027,
+        "current_return": -0.0
+      }
+    ],
+    "days_held": 0,
+    "current_long_return": 0.0,
+    "current_short_return": 0.0,
+    "current_ls_return": 0.0
+  }
+]

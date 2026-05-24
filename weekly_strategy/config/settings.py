@@ -30,8 +30,13 @@ if DATA_ROOT_ENV:
 else:
     DATA_CACHE_DIR = PACKAGE_ROOT / "data_cache"
     REPORTS_DIR = PACKAGE_ROOT / "reports"           # per-ticker single-stock notes
-    DAILY_REPORTS_DIR = REPO_ROOT / "daily_reports"  # portfolio report (one per day)
+    # Daily portfolio HTML/MD lands under docs/ so GitHub Pages picks it up.
+    DAILY_REPORTS_DIR = REPO_ROOT / "docs" / "portfolio"
     DOSSIER_DIR = PACKAGE_ROOT / "dossier" / "data"
+
+# Public site root (GitHub Pages serves this). Holds index.html + per-day reports.
+DOCS_DIR = REPO_ROOT / "docs"
+DOCS_DATA_DIR = DOCS_DIR / "data"
 
 TICKERS_FILE = PACKAGE_ROOT / "config" / "tickers.json"
 SQLITE_PATH = DATA_CACHE_DIR / "weekly.db"
