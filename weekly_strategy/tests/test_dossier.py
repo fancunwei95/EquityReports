@@ -8,7 +8,7 @@ and storage to keep the suite offline + isolated.
 """
 
 import importlib
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -47,10 +47,12 @@ def builder_mod(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
 # ---------------------------------------------------------------------------
 
 
-def _fy(end: str, filed: str, val: float, *, start: str | None = None) -> dict:
-    """Annual entry. start is None for balance-sheet items (point-in-time)."""
+def _fy(end: str, filed: str, val: float) -> dict:
+    """Full-year (flow) entry. start auto-computed so span is ~365 days."""
+    end_d = date.fromisoformat(end)
+    start_d = end_d - timedelta(days=364)  # span = 364 days, inside _ANNUAL_DAYS
     return {
-        "val": val, "end": end, "start": start, "filed": filed,
+        "val": val, "end": end, "start": start_d.isoformat(), "filed": filed,
         "fp": "FY", "fy": int(end[:4]), "form": "10-K",
     }
 
@@ -106,6 +108,69 @@ def test_extract_concept_picks_first_matching_tag(builder_mod):
     entries = builder_mod.extract_concept(facts, "revenue")
     assert len(entries) == 1
     assert entries[0]["val"] == 100.0
+
+
+def test_latest_fy_ignores_partial_period_tagged_as_fy(builder_mod):
+    """Regression: AAPL's XBRL has 90-day partial-period values tagged fp=FY
+    (they appear inside the 10-K filing). Selector must filter by span."""
+    entries = [
+        # Real full-year: 363-day span.
+        {"val": 265_000_000_000, "start": "2017-10-01", "end": "2018-09-29",
+         "fp": "FY", "fy": 2018, "form": "10-K", "filed": "2018-11-05"},
+        # AAPL quirk: a single-quarter value tagged fp=FY, span 90 days.
+        {"val": 62_900_000_000, "start": "2018-07-01", "end": "2018-09-29",
+         "fp": "FY", "fy": 2018, "form": "10-K", "filed": "2018-11-05"},
+    ]
+    fy = builder_mod.latest_fy(entries)
+    assert fy["val"] == 265_000_000_000
+
+
+def test_extract_concept_merges_across_candidate_tags(builder_mod):
+    """Regression: AAPL moved from `Revenues` to `RevenueFromContract...`
+    after ASC 606. Old data is only under the old tag; new data only under
+    the new tag. We need both, deduped."""
+    facts = {
+        "facts": {
+            "us-gaap": {
+                "Revenues": {
+                    "units": {"USD": [
+                        {"val": 100, "end": "2017-09-30", "start": "2016-10-01",
+                         "fp": "FY", "fy": 2017, "form": "10-K", "filed": "2017-11-01"},
+                    ]}
+                },
+                "RevenueFromContractWithCustomerExcludingAssessedTax": {
+                    "units": {"USD": [
+                        {"val": 250, "end": "2020-09-30", "start": "2019-10-01",
+                         "fp": "FY", "fy": 2020, "form": "10-K", "filed": "2020-11-01"},
+                        # Also include the old-tag's 100 to verify dedupe.
+                        {"val": 100, "end": "2017-09-30", "start": "2016-10-01",
+                         "fp": "FY", "fy": 2017, "form": "10-K", "filed": "2017-11-01"},
+                    ]}
+                },
+            }
+        }
+    }
+    entries = builder_mod.extract_concept(facts, "revenue")
+    vals = sorted(e["val"] for e in entries)
+    assert vals == [100, 250]  # 2 unique, not 3
+
+
+def test_yoy_quarter_pair_finds_match_365_days_apart(builder_mod):
+    """Regression: AAPL-style entries where fp doesn't reliably mark Q1/Q2/Q3.
+    YoY logic must match by span + ~365-day offset, not by matching fp."""
+    entries = [
+        # Q3 2024 -- end 2024-06-30, span 91
+        {"val": 80_000, "start": "2024-04-01", "end": "2024-06-30",
+         "fp": "FY", "fy": 2024, "form": "10-K", "filed": "2024-08-01"},
+        # Q3 2025 -- end 2025-06-30, span 91 -- "latest"
+        {"val": 88_000, "start": "2025-04-01", "end": "2025-06-30",
+         "fp": "FY", "fy": 2025, "form": "10-K", "filed": "2025-08-01"},
+    ]
+    pair = builder_mod._yoy_quarter_pair(entries)
+    assert pair is not None
+    prior, latest = pair
+    assert prior["val"] == 80_000
+    assert latest["val"] == 88_000
 
 
 def test_latest_fy_and_quarter(builder_mod):

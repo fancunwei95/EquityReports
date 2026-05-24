@@ -110,52 +110,79 @@ def _entries_for(facts: dict, namespace: str, tag: str) -> list[dict]:
 
 
 def extract_concept(facts: dict, concept: str) -> list[dict]:
-    """Try each candidate tag in order; return the first non-empty entries list."""
+    """Merge entries across all candidate tags for ``concept``, deduped.
+
+    Why merge instead of first-tag-wins: many filers transition between tags
+    (e.g., AAPL post-ASC606 moved from ``Revenues`` to
+    ``RevenueFromContractWithCustomerExcludingAssessedTax``). The old tag
+    still has historical entries; the new tag has the recent ones. We want
+    the full timeline. Dedupe key is (start, end, val).
+    """
+    seen: set[tuple] = set()
+    merged: list[dict] = []
     for ns, tag in CONCEPT_TAGS.get(concept, []):
-        entries = _entries_for(facts, ns, tag)
-        if entries:
-            return entries
-    return []
+        for e in _entries_for(facts, ns, tag):
+            key = (e.get("start"), e.get("end"), e.get("val"))
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(e)
+    return merged
+
+
+# Period spans (days). Annual is generally 365 +/- a few; quarters are 90-92.
+# We use these instead of trusting the ``fp`` field because some filers
+# (notably AAPL) tag partial-period values inside a 10-K filing as fp="FY",
+# so fp alone misclassifies them as annual.
+_ANNUAL_DAYS = (350, 380)
+_QUARTER_DAYS = (80, 100)
+
+
+def _span_days(entry: dict) -> int | None:
+    s, e = entry.get("start"), entry.get("end")
+    if not s or not e:
+        return None
+    try:
+        return (date.fromisoformat(e) - date.fromisoformat(s)).days
+    except ValueError:
+        return None
+
+
+def _in_range(d: int | None, rng: tuple[int, int]) -> bool:
+    if d is None:
+        return False
+    lo, hi = rng
+    return lo <= d <= hi
+
+
+def _is_annual(entry: dict) -> bool:
+    return _in_range(_span_days(entry), _ANNUAL_DAYS)
+
+
+def _is_discrete_quarter(entry: dict) -> bool:
+    return _in_range(_span_days(entry), _QUARTER_DAYS)
 
 
 def latest_fy(entries: Sequence[dict]) -> dict | None:
-    """Most recent annual entry. Annual entries have fp='FY' and span ~365 days."""
-    annual = [e for e in entries if e.get("fp") == "FY"]
+    """Most recent full-year entry. Span-based, not fp-based -- see _ANNUAL_DAYS."""
+    annual = [e for e in entries if _is_annual(e)]
     if not annual:
         return None
     return max(annual, key=lambda e: e.get("end") or "")
 
 
 def latest_quarter(entries: Sequence[dict]) -> dict | None:
-    """Most recent discrete quarter (fp in Q1/Q2/Q3, span ~90 days).
-
-    Falls back to any quarterly entry if no discrete-Q is found (some filers
-    report only YTD-cumulative).
-    """
-    quarterly = [e for e in entries if e.get("fp") in ("Q1", "Q2", "Q3")]
+    """Most recent discrete-quarter entry. Span-based -- see _QUARTER_DAYS."""
+    quarterly = [e for e in entries if _is_discrete_quarter(e)]
     if not quarterly:
         return None
-    discrete = [e for e in quarterly if _is_discrete_quarter(e)]
-    pool = discrete or quarterly
-    return max(pool, key=lambda e: e.get("end") or "")
-
-
-def _is_discrete_quarter(entry: dict) -> bool:
-    s, e = entry.get("start"), entry.get("end")
-    if not s or not e:
-        # Balance-sheet items have no start (point-in-time); treat as discrete.
-        return s is None
-    try:
-        delta = (date.fromisoformat(e) - date.fromisoformat(s)).days
-    except ValueError:
-        return False
-    return 80 <= delta <= 100
+    return max(quarterly, key=lambda e: e.get("end") or "")
 
 
 def annual_history(entries: Sequence[dict], n: int) -> list[dict]:
-    """Last ``n`` annual entries, oldest first."""
+    """Last ``n`` full-year entries, oldest first."""
     annual = sorted(
-        (e for e in entries if e.get("fp") == "FY"),
+        (e for e in entries if _is_annual(e)),
         key=lambda e: e.get("end") or "",
     )
     return annual[-n:]
@@ -163,11 +190,10 @@ def annual_history(entries: Sequence[dict], n: int) -> list[dict]:
 
 def quarterly_history(entries: Sequence[dict], n: int) -> list[dict]:
     """Last ``n`` discrete-quarter entries, oldest first."""
-    quarterly = [
-        e for e in entries
-        if e.get("fp") in ("Q1", "Q2", "Q3") and _is_discrete_quarter(e)
-    ]
-    quarterly.sort(key=lambda e: e.get("end") or "")
+    quarterly = sorted(
+        (e for e in entries if _is_discrete_quarter(e)),
+        key=lambda e: e.get("end") or "",
+    )
     return quarterly[-n:]
 
 
@@ -365,22 +391,37 @@ def _latest_pit(entries: Sequence[dict]) -> dict | None:
 
 
 def _yoy_quarter_pair(entries: Sequence[dict]) -> tuple[dict, dict] | None:
-    """Returns (year-ago-Q, latest-Q) where both are discrete quarters of the same fp."""
+    """Returns (year-ago-Q, latest-Q): two discrete quarters ~365 days apart.
+
+    Span-based, not fp-based, because some filers (AAPL) don't tag fp
+    consistently for inter-period values inside a 10-K.
+    """
     latest = latest_quarter(entries)
-    if latest is None:
+    if latest is None or not latest.get("end"):
         return None
-    target_fp = latest.get("fp")
-    target_end = latest.get("end")
-    if not target_end:
+    try:
+        latest_end = date.fromisoformat(latest["end"])
+    except ValueError:
         return None
-    same_fp = [
+    candidates = [
         e for e in entries
-        if e.get("fp") == target_fp and _is_discrete_quarter(e) and e.get("end") != target_end
+        if _is_discrete_quarter(e) and e.get("end") and e["end"] != latest["end"]
     ]
-    if not same_fp:
+    if not candidates:
         return None
-    year_ago = max(same_fp, key=lambda e: e.get("end") or "")
-    return year_ago, latest
+
+    def offset_from_year_ago(e: dict) -> int:
+        try:
+            d = (latest_end - date.fromisoformat(e["end"])).days
+        except ValueError:
+            return 10_000
+        return abs(d - 365)
+
+    best = min(candidates, key=offset_from_year_ago)
+    # Require the match to be within ~15 days of one year ago.
+    if offset_from_year_ago(best) > 15:
+        return None
+    return best, latest
 
 
 def _consecutive_quarters(entries: Sequence[dict]) -> tuple[dict, dict] | None:
