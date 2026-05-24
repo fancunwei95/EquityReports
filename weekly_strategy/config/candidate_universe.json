@@ -1,0 +1,37 @@
+{
+  "_comment": "Stage 3 candidate pool. Refresh quarterly from S&P 500 + Nasdaq 100. construct_universe filters this down to ~100 by market cap, sector caps, and thematic picks.",
+  "tickers": [
+    "AAPL", "MSFT", "GOOGL", "GOOG", "META", "AMZN", "NVDA", "AVGO", "ORCL", "CRM",
+    "ADBE", "NFLX", "AMD", "INTC", "CSCO", "TXN", "QCOM", "IBM", "NOW", "MU",
+    "PANW", "INTU", "AMAT", "LRCX", "KLAC", "ANET", "ADI", "CDNS", "SNPS", "MRVL",
+
+    "JPM", "BAC", "WFC", "GS", "MS", "C", "BLK", "SPGI", "AXP", "MA",
+    "V", "SCHW", "USB", "PNC", "TFC", "COF", "MET", "PRU", "AIG", "ICE",
+    "CB", "MMC", "AON", "CME",
+
+    "UNH", "JNJ", "LLY", "ABBV", "PFE", "MRK", "TMO", "ABT", "DHR", "BMY",
+    "AMGN", "GILD", "CVS", "ELV", "CI", "ISRG", "REGN", "VRTX", "SYK", "MDT",
+    "BSX", "ZTS", "BDX",
+
+    "TSLA", "HD", "MCD", "NKE", "LOW", "SBUX", "BKNG", "TJX", "CMG", "MAR",
+    "F", "GM", "DIS", "RCL", "CCL", "ROST", "DG", "DLTR", "ORLY", "YUM",
+    "ABNB", "LULU",
+
+    "PG", "KO", "PEP", "COST", "WMT", "MDLZ", "PM", "MO", "CL", "KMB",
+    "GIS", "K", "HSY", "SYY", "TGT", "MNST",
+
+    "BA", "GE", "CAT", "HON", "UPS", "RTX", "LMT", "DE", "ETN", "UNP",
+    "NOC", "EMR", "ITW", "PH", "GD", "MMM", "CSX", "FDX", "WM", "RSG",
+
+    "VZ", "T", "TMUS", "CMCSA", "CHTR", "EA", "TTWO", "WBD",
+
+    "XOM", "CVX", "COP", "SLB", "EOG", "MPC", "PSX", "VLO", "OXY", "WMB",
+    "KMI", "OKE",
+
+    "LIN", "APD", "ECL", "SHW", "FCX", "NEM", "DOW", "DD", "NUE",
+
+    "NEE", "SO", "DUK", "AEP", "D", "PCG", "XEL", "ED", "SRE",
+
+    "AMT", "PLD", "CCI", "EQIX", "SPG", "O", "AVB", "EQR", "PSA"
+  ]
+}

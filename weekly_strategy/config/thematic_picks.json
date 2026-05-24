@@ -1,0 +1,6 @@
+{
+  "_comment": "Names you want in the universe regardless of cap-based ranking. Cap total to 10-15 to leave room for systematic selection.",
+  "ai_infrastructure": ["NVDA", "AMD", "AVGO", "TSM"],
+  "defense_space": ["LMT", "RTX", "NOC"],
+  "ev_battery": ["TSLA"]
+}

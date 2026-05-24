@@ -143,6 +143,41 @@ _FIN_COND_VALUES = ("easing", "stable", "tightening", "unknown")
 _CYCLE_PHASE_VALUES = ("early", "mid", "late", "recession", "unknown")
 
 
+class UniverseEntry(BaseModel):
+    """A single name in the Stage 3 universe, with the metadata that put it there."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    sector: str | None = None
+    industry: str | None = None
+    market_cap: float | None = None
+    beta: float | None = None
+    included_reason: str = "cap_rank"  # cap_rank | thematic | manual
+
+
+class Universe(BaseModel):
+    """Stage 3 ticker universe, refreshed quarterly."""
+
+    model_config = ConfigDict(frozen=True)
+
+    quarter: str  # "2026Q2"
+    constructed_at: datetime
+    entries: list[UniverseEntry] = Field(default_factory=list)
+    sector_counts: dict[str, int] = Field(default_factory=dict)
+    n_thematic_added: int = 0
+
+    @property
+    def tickers(self) -> list[str]:
+        return [e.ticker for e in self.entries]
+
+    def get(self, ticker: str) -> UniverseEntry | None:
+        for e in self.entries:
+            if e.ticker == ticker.upper():
+                return e
+        return None
+
+
 class CrossStockImplications(BaseModel):
     """Step 2.5 (deferred Step 1.5 pass 3): cross-stock / sectoral read.
 

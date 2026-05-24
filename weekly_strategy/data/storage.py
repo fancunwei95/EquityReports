@@ -24,6 +24,8 @@ from weekly_strategy.data.schemas import (
     NewsClassification,
     NewsItem,
     RedditPost,
+    Universe,
+    UniverseEntry,
 )
 
 # ---------------------------------------------------------------------------
@@ -79,6 +81,16 @@ CREATE TABLE IF NOT EXISTS reddit_posts (
     fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_reddit_ticker_created ON reddit_posts(ticker, created_at);
+
+CREATE TABLE IF NOT EXISTS universe_history (
+    quarter TEXT NOT NULL,
+    ticker TEXT NOT NULL,
+    added_date DATE,
+    removed_date DATE,
+    metadata TEXT,
+    PRIMARY KEY (quarter, ticker)
+);
+CREATE INDEX IF NOT EXISTS idx_universe_ticker ON universe_history(ticker);
 """
 
 
@@ -380,3 +392,46 @@ def save_weekly_report(ticker: str, report_date: date, data: dict) -> Path:
 def list_weekly_reports(ticker: str) -> list[Path]:
     d = _report_dir(ticker)
     return sorted(d.glob("*.json"))
+
+
+# ---------------------------------------------------------------------------
+# Universe (Stage 3)
+# ---------------------------------------------------------------------------
+
+_UNIVERSE_DIR = settings.DATA_CACHE_DIR / "universe"
+_UNIVERSE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def save_universe(universe: Universe) -> Path:
+    """Persist a Universe both as a JSON snapshot file and in SQLite history."""
+    path = _UNIVERSE_DIR / f"{universe.quarter}.json"
+    path.write_text(universe.model_dump_json(indent=2))
+
+    today = date.today().isoformat()
+    rows = [
+        (universe.quarter, e.ticker, today, e.model_dump_json())
+        for e in universe.entries
+    ]
+    with _conn() as conn:
+        conn.executemany(
+            "INSERT OR REPLACE INTO universe_history "
+            "(quarter, ticker, added_date, metadata) "
+            "VALUES (?, ?, ?, ?)",
+            rows,
+        )
+    return path
+
+
+def load_universe(quarter: str) -> Universe | None:
+    path = _UNIVERSE_DIR / f"{quarter}.json"
+    if not path.exists():
+        return None
+    return Universe.model_validate_json(path.read_text())
+
+
+def load_current_universe() -> Universe | None:
+    """Most-recent saved universe by quarter label (lex-sorted)."""
+    snapshots = sorted(_UNIVERSE_DIR.glob("*.json"))
+    if not snapshots:
+        return None
+    return Universe.model_validate_json(snapshots[-1].read_text())
