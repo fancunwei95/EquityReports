@@ -243,7 +243,9 @@ def main(argv: list[str] | None = None) -> int:
         previous_shorts=prev_shorts,
     )
     path = portfolio_mod.save_portfolio_markdown(portfolio, md)
+    html_path = portfolio_mod.save_portfolio_html(portfolio, md)
     print(f"[stage3] saved report -> {path}")
+    print(f"[stage3] saved html   -> {html_path}")
 
     # --- 10. Persist daily prediction snapshot (Stage 5 calibration substrate) ---
     snap_dir = predictions.save_daily_snapshot(

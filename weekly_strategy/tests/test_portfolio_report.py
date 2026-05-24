@@ -177,3 +177,41 @@ def test_save_writes_to_daily_reports_dir(tmp_path, monkeypatch):
     assert path.exists()
     assert path.parent.name == "daily_reports"
     assert path.name == "2026-05-24.md"
+
+
+def test_render_html_produces_styled_document():
+    md = "# Weekly Portfolio Report\n\n## Longs (2)\n\n- AAPL\n- MSFT\n"
+    html = port.render_html(md, title="Test")
+    assert "<!DOCTYPE html>" in html
+    assert "<title>Test</title>" in html
+    assert "<h1>Weekly Portfolio Report</h1>" in html
+    assert "<h2>Longs (2)</h2>" in html
+    assert "<li>AAPL</li>" in html
+    # CSS is inlined in the template.
+    assert "font-family" in html
+
+
+def test_render_html_handles_tables():
+    md = "| A | B |\n|---|---|\n| 1 | 2 |"
+    html = port.render_html(md, title="Tbl")
+    assert "<table>" in html
+    assert "<th>A</th>" in html
+    assert "<td>1</td>" in html
+
+
+def test_save_portfolio_html_writes_sibling(tmp_path, monkeypatch):
+    import importlib
+    import weekly_strategy.config.settings as settings_mod
+    monkeypatch.setattr(settings_mod, "DAILY_REPORTS_DIR", tmp_path / "daily_reports")
+    import weekly_strategy.reporting.portfolio as mod
+    mod = importlib.reload(mod)
+    p = _portfolio()
+    md = mod.render_portfolio_markdown(p)
+    md_path = mod.save_portfolio_markdown(p, md)
+    html_path = mod.save_portfolio_html(p, md)
+    assert html_path.exists()
+    assert html_path.parent == md_path.parent
+    assert html_path.name == "2026-05-24.html"
+    body = html_path.read_text()
+    assert "<h1>" in body
+    assert "AAPL" in body

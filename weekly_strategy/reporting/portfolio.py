@@ -81,6 +81,92 @@ def save_portfolio_markdown(
     return path
 
 
+_HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{title}</title>
+<style>
+body {{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  max-width: 920px;
+  margin: 2em auto;
+  padding: 0 1em 4em;
+  color: #1c1c1c;
+  line-height: 1.55;
+  background: #fafafa;
+}}
+h1, h2, h3 {{ color: #111; }}
+h1 {{
+  border-bottom: 2px solid #888;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.6em;
+}}
+h2 {{
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.2em;
+  margin-top: 1.8em;
+}}
+h3 {{ margin-top: 1.4em; }}
+table {{
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  font-size: 0.95em;
+}}
+th, td {{ border: 1px solid #ddd; padding: 0.35em 0.7em; text-align: left; }}
+th {{ background: #f1f1f1; }}
+td.numeric, th.numeric {{ text-align: right; font-variant-numeric: tabular-nums; }}
+code {{
+  background: #ececec;
+  padding: 0.05em 0.35em;
+  border-radius: 3px;
+  font-size: 0.92em;
+}}
+pre code {{ padding: 0.6em; display: block; overflow-x: auto; }}
+blockquote {{
+  border-left: 4px solid #888;
+  margin: 0.6em 0;
+  padding: 0.3em 1em;
+  color: #555;
+  background: #f3f3f3;
+}}
+hr {{ border: 0; border-top: 1px solid #ddd; margin: 2em 0; }}
+ul, ol {{ padding-left: 1.4em; }}
+a {{ color: #0366d6; text-decoration: none; }}
+a:hover {{ text-decoration: underline; }}
+</style>
+</head>
+<body>
+{content}
+</body>
+</html>
+"""
+
+
+def render_html(markdown_text: str, *, title: str) -> str:
+    """Convert the Markdown report to a styled standalone HTML page."""
+    import markdown as _md
+    body = _md.markdown(
+        markdown_text,
+        extensions=["tables", "fenced_code", "sane_lists"],
+    )
+    return _HTML_TEMPLATE.format(title=title, content=body)
+
+
+def save_portfolio_html(
+    portfolio: Portfolio, markdown_text: str,
+) -> Path:
+    """Write a styled HTML sibling to the Markdown report."""
+    settings.DAILY_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    html = render_html(
+        markdown_text,
+        title=f"Portfolio — {portfolio.week_ending.isoformat()}",
+    )
+    path = settings.DAILY_REPORTS_DIR / f"{portfolio.week_ending.isoformat()}.html"
+    path.write_text(html)
+    return path
+
+
 # ---------------------------------------------------------------------------
 # Section renderers
 # ---------------------------------------------------------------------------

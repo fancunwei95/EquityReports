@@ -68,18 +68,60 @@ Inside `weekly_strategy/data_cache/predictions/{YYYY-MM-DD}/`:
   (pinned snapshot so calibration doesn't rely on the live price cache
   weeks later).
 
-Also under `weekly_strategy/reports/`:
+In `daily_reports/` at the repo root:
 
-* `portfolio_{date}.md` — the human-readable weekly note.
+* `{YYYY-MM-DD}.md`   — Markdown portfolio note (one per day)
+* `{YYYY-MM-DD}.html` — styled standalone HTML for browser viewing
 
-These directories are gitignored by default; nothing else clutters the
-repo.
+Daemon logs go to `daily_loop_logs/loop_{startup-date}.log` plus stdout
+inside the `screen` session.
+
+All these directories are gitignored by default; nothing clutters the repo.
 
 ---
 
 ## Cadence options
 
-### A. Local cron (recommended)
+### A. Long-running Python daemon in `screen` (recommended for this setup)
+
+```
+# Start a detachable session
+screen -S daily-loop
+
+# Inside the session: launch the daemon
+cd /mnt/thdcan01/data/cfan/projects/202605_equityReports
+.venv/bin/python -m weekly_strategy.scripts.daily_loop \
+    --time-utc 21:30 \
+    --mode cheap \
+    --weekdays-only
+
+# Detach (leave it running): Ctrl-A then D
+# Re-attach later:
+screen -r daily-loop
+```
+
+The daemon sleeps until ``--time-utc`` each day (default 21:30 UTC =
+5:30 PM ET, after US close), then invokes ``run_stage3`` with the right
+flag set for the chosen ``--mode``:
+
+* ``cheap``     -- ``--skip-news --skip-reddit --skip-conviction --skip-macro``.
+                   No Sonnet calls. ~50s/run. Recommended for month-1
+                   data collection.
+* ``standard``  -- ``--skip-conviction``. Adds Haiku news sentiment + Sonnet
+                   fundamental cascade + macro layer. ~2-5 min/run; ~$0.05/day.
+* ``full``      -- everything including the conviction pass. ~hours/run; not
+                   recommended for daily.
+
+Single-day crashes log and continue -- the loop survives one bad day.
+Logs go to stdout AND ``daily_loop_logs/loop_{date}.log``.
+
+Smoke test before committing to the loop:
+
+```
+.venv/bin/python -m weekly_strategy.scripts.daily_loop --once --mode cheap
+```
+
+### B. Local cron
 
 Edit your crontab (`crontab -e`):
 
@@ -91,14 +133,14 @@ Edit your crontab (`crontab -e`):
         --week-ending $(date -u +\%F) >> daily.log 2>&1
 ```
 
-### B. Claude Code `/schedule`
+### C. Claude Code `/schedule`
 
 Claude Code can schedule recurring runs via `/schedule`. Run that slash
 command at the prompt and configure a daily routine that invokes the
 same command above. (`/schedule` is a user-triggered skill; I can't set
 it up for you, but it's a one-liner once you invoke it.)
 
-### C. Manual
+### D. Manual
 
 Just run it daily. The script is idempotent: re-running with the same
 `--week-ending` overwrites the snapshot in place. Missing days are

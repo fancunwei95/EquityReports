@@ -20,5 +20,8 @@ python-dotenv>=1.0.1
 # LLM access is via `claude` CLI in headless mode (subscription auth);
 # no Python SDK dependency required.
 
+# Report rendering
+markdown>=3.5
+
 # Dev / tests
 pytest>=8.0
