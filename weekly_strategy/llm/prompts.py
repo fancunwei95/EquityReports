@@ -7,6 +7,52 @@ single-file diff and so we can later run prompt-diff tests.
 """
 
 # ---------------------------------------------------------------------------
+# Step 1.8 -- weekly thesis writer
+# ---------------------------------------------------------------------------
+
+THESIS_SYSTEM = (
+    "You are a sell-side equity analyst writing a single-stock weekly note. "
+    "You read a structured input bundle (dossier, scores, top news, reddit, "
+    "price action) and output ONE JSON object with the sections requested. "
+    "No prose around the JSON, no markdown fences. Be specific: cite numbers "
+    "from the bundle. Avoid hedge-everything language."
+)
+
+
+THESIS_USER_TEMPLATE = """\
+Stock: {ticker}{company_suffix}
+Week ending: {week_ending}
+
+=== Dossier (latest fundamentals) ===
+{dossier_block}
+
+=== Score bundle (0-100; higher = more attractive long) ===
+{scores_block}
+
+=== Top news items this week (with fundamental implications) ===
+{news_block}
+
+=== Reddit activity (last 24h) ===
+{reddit_block}
+
+=== Price action ===
+{price_block}
+
+Write a structured weekly note as JSON with these EXACT keys:
+
+{{
+  "bottom_line":           "2-3 sentences. Is the week constructive, cautious, or neutral, and why?",
+  "what_changed":          ["bullet 1", "bullet 2", ...],  // 3-5 concrete developments
+  "quality_and_valuation": "2-3 sentences. Where does this stand vs its own profile? Cite scores and numbers.",
+  "risks":                 ["risk 1", "risk 2"],          // exactly 2 specific risks
+  "watch_items":           ["item 1", "item 2", ...]      // 2-4 catalysts / events to monitor next week
+}}
+
+Be specific. Cite numbers. No hedge-everything language.
+"""
+
+
+# ---------------------------------------------------------------------------
 # Step 1.5 pass 2 -- fundamental implication of a (material) news item
 # ---------------------------------------------------------------------------
 

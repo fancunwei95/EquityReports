@@ -133,6 +133,23 @@ class RedditPost(BaseModel):
     url: str | None = None
 
 
+class WeeklyThesis(BaseModel):
+    """Structured analyst note produced by the LLM thesis writer (Step 1.8)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    week_ending: date
+    bottom_line: str
+    what_changed: list[str] = Field(default_factory=list)
+    quality_and_valuation: str | None = None
+    risks: list[str] = Field(default_factory=list)
+    watch_items: list[str] = Field(default_factory=list)
+    # Side metadata so we can audit cost without re-running:
+    model: str | None = None
+    cost_usd: float | None = None
+
+
 class StockScoreBundle(BaseModel):
     """Numeric weekly snapshot per ticker. Stage 1: standalone; Stage 2 adds
     macro/sector overlays; Stage 3 adds cross-sectional ranks."""
