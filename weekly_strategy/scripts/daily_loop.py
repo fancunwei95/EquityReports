@@ -221,7 +221,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Skip the auto-commit + push of docs/ after each run. "
              "Default: stage docs/, commit if changed, push to origin -- "
              "so the public dashboard at "
-             "https://fancunwei95.github.io/202605_equityReports/ updates daily.",
+             "https://fancunwei95.github.io/EquityReports/ updates daily.",
     )
     args = parser.parse_args(argv)
 

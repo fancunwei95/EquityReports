@@ -47,7 +47,7 @@ Push failures are logged but never crash the loop -- the next morning
 retries. Pass `--no-auto-push` to disable.
 
 The public dashboard at
-https://fancunwei95.github.io/202605_equityReports/ updates within a
+https://fancunwei95.github.io/EquityReports/ updates within a
 minute of each push.
 
 The full loop (news cascade + reddit + cross-stock + conviction):
