@@ -24,7 +24,7 @@ to bypass LLM-bound steps. The structural plumbing still gets exercised.
 import argparse
 import json
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from weekly_strategy.config import settings
@@ -35,7 +35,7 @@ from weekly_strategy.dossier import universe as universe_mod
 from weekly_strategy.llm import conviction as conviction_mod
 from weekly_strategy.reporting import portfolio as portfolio_mod
 from weekly_strategy.run_stage1 import build_macro_context
-from weekly_strategy.signals import batch_scoring, selection
+from weekly_strategy.signals import batch_scoring, news_sentiment, reddit_sentiment, selection
 
 
 def _adhoc_universe(tickers: list[str]) -> Universe:
@@ -104,9 +104,21 @@ def main(argv: list[str] | None = None) -> int:
                         help="Build any missing dossiers before scoring.")
     parser.add_argument("--refresh-dossiers", action="store_true",
                         help="Force-refresh all dossiers (re-pull companyfacts).")
-    parser.add_argument("--position-count", type=int, default=5,
-                        help="Longs and shorts per side (default 5).")
-    parser.add_argument("--max-per-sector", type=int, default=2)
+    parser.add_argument(
+        "--position-count", type=int, default=20,
+        help="Longs and shorts per side. Default 20 -- wider book for daily "
+             "data collection so news/reddit sentiment can drop weak names "
+             "without leaving the book thin. Drop to 5 for a tighter trading-ready book.",
+    )
+    parser.add_argument("--max-per-sector", type=int, default=5,
+                        help="Cap positions per GICS sector (default 5; with "
+                             "position_count=20 across ~7 sectors this needs headroom).")
+    parser.add_argument(
+        "--focus-list-size", type=int, default=30,
+        help="Top-K longs / bottom-K shorts pulled into the focus list before "
+             "selection applies constraints. Default 30 -- should always be "
+             "comfortably larger than --position-count to give selection room.",
+    )
     parser.add_argument("--news-days", type=int, default=7)
     parser.add_argument("--price-days", type=int, default=365)
     parser.add_argument("--reddit-hours", type=int, default=24)
@@ -117,6 +129,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--skip-sector", action="store_true")
     parser.add_argument("--skip-conviction", action="store_true",
                         help="Skip the post-selection LLM conviction pass.")
+    parser.add_argument("--skip-enrich-selected", action="store_true",
+                        help="Skip news/reddit fetch + sentiment on the 10 selected "
+                             "positions. By default we enrich the selected book even "
+                             "in cheap mode, so the report has news/sentiment per "
+                             "position (~$0.30/day, ~5 min added).")
     args = parser.parse_args(argv)
 
     storage.init_db()
@@ -183,6 +200,8 @@ def main(argv: list[str] | None = None) -> int:
     focus = selection.build_focus_list(
         bundles,
         week_ending=week_ending,
+        top_k_longs=args.focus_list_size,
+        top_k_shorts=args.focus_list_size,
         sector_lookup=sector_lookup,
         beta_lookup=beta_lookup,
     )
@@ -197,6 +216,47 @@ def main(argv: list[str] | None = None) -> int:
         held_long_tickers=prev_longs,
         held_short_tickers=prev_shorts,
     )
+
+    # --- 7d. Enrich selected positions with news + reddit (cheap-mode default) ---
+    # Even when scoring skipped LLM cascades (--skip-news/--skip-reddit), we still
+    # want news + reddit context on the ~10 selected positions for the report.
+    # Costs ~$0.30/day and ~5 min, but produces a meaningfully richer per-position
+    # reasoning card.
+    # Dedupe -- with tiny universes a name can land on both sides; we only
+    # want to enrich it once.
+    selected_tickers_for_enrich = list(dict.fromkeys(
+        p.ticker for p in (portfolio.longs + portfolio.shorts)
+    ))
+    selected_reddit_scores: dict = {}
+    if (not args.skip_enrich_selected) and selected_tickers_for_enrich:
+        print(f"[stage3] enriching {len(selected_tickers_for_enrich)} selected positions "
+              f"with news + reddit...")
+        since_dt = datetime.combine(week_ending, datetime.min.time()) - timedelta(days=args.news_days)
+        for tk in selected_tickers_for_enrich:
+            # News: fetch + insert + score (idempotent on rerun)
+            try:
+                info = fetchers.get_basic_info(tk)
+                items = fetchers.fetch_news(tk, days=args.news_days)
+                if items:
+                    storage.insert_news(items)
+                ns = news_sentiment.score_news(
+                    tk, since=since_dt, company_name=info.get("name"),
+                )
+                print(f"   [{tk}] news: {ns.n_classified}/{ns.n_total} classified, "
+                      f"sent={ns.sentiment_score:+.2f}")
+            except Exception as e:
+                print(f"   [{tk}] news enrich FAILED: {e}")
+            # Reddit: fetch + score (no DB schema for RedditScore; we hold it in memory)
+            try:
+                posts = fetchers.fetch_reddit_recent(tk, hours=args.reddit_hours)
+                if posts:
+                    storage.insert_reddit(posts)
+                snap = fetchers.build_reddit_snapshot(
+                    tk, current_posts=posts, window_hours=args.reddit_hours,
+                )
+                selected_reddit_scores[tk] = reddit_sentiment.score_reddit_snapshot(snap)
+            except Exception as e:
+                print(f"   [{tk}] reddit enrich FAILED: {e}")
 
     # --- 8. Conviction (Sonnet, one call per selected position) ---
     checks: dict = {}
@@ -255,6 +315,7 @@ def main(argv: list[str] | None = None) -> int:
         previous_shorts=prev_shorts,
         dossiers=selected_dossiers,
         news_items_by_ticker=news_for_positions,
+        reddit_scores=selected_reddit_scores,
     )
     path = portfolio_mod.save_portfolio_markdown(portfolio, md)
     html_path = portfolio_mod.save_portfolio_html(portfolio, md)

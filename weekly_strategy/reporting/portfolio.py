@@ -23,6 +23,7 @@ from weekly_strategy.data.schemas import (
     NewsItem,
     Portfolio,
     PortfolioPosition,
+    RedditScore,
     SectorSnapshot,
     StockScoreBundle,
 )
@@ -48,12 +49,14 @@ def _explain_position(
     dossier: Dossier | None,
     sector_snap: SectorSnapshot | None,
     news_items: list[NewsItem] | None = None,
+    reddit_score: RedditScore | None = None,
 ) -> dict:
     """Build a structured reasoning packet for one position.
 
     Returns dict with keys: headline (str), drivers (list[str]),
-    context (list[str]), fundamentals (list[str] chips), news_summary (HTML str).
-    Pure code -- no LLM call. Inputs are whatever's available from the run.
+    context (list[str]), fundamentals (list[str] chips), news_summary,
+    sentiment_summary (HTML strs). Pure code -- no LLM call. Inputs are
+    whatever's available from the run.
     """
     out: dict = {
         "headline": "",
@@ -61,6 +64,7 @@ def _explain_position(
         "context": [],
         "fundamentals": [],
         "news_summary": "",
+        "sentiment_summary": "",
     }
     if bundle is None:
         out["headline"] = "No score data available for this position."
@@ -165,7 +169,7 @@ def _explain_position(
         if bits:
             out["fundamentals"] = bits[:6]
 
-    # --- news summary ---
+    # --- news summary (top material items + fundamental impacts) ---
     if news_items:
         material = [
             it for it in news_items
@@ -179,20 +183,75 @@ def _explain_position(
             reverse=True,
         )
         if material:
-            top = material[:3]
-            lines = []
+            # Aggregate sentiment summary header
+            wsum = sum(it.classification.materiality_weight for it in material)
+            agg = sum(
+                it.classification.sentiment_value * it.classification.materiality_weight
+                for it in material
+            ) / max(wsum, 1e-9)
+            sent_label = (
+                "positive" if agg > 0.15 else "negative" if agg < -0.15 else "neutral"
+            )
+            header = (
+                f"<div class='news-aggregate'>"
+                f"<strong>{len(material)}</strong> material items this week · "
+                f"aggregate sentiment "
+                f"<span class='news-tag {sent_label}'>{agg:+.2f}</span>"
+                f"</div>"
+            )
+            top = material[:4]
+            lines: list[str] = []
             for it in top:
                 c = it.classification
                 contrib = c.sentiment_value * c.materiality_weight
                 title = (it.title or "")[:110].replace("<", "&lt;").replace(">", "&gt;")
+                fi_block = ""
+                if it.fundamental_impact is not None:
+                    fi = it.fundamental_impact
+                    fi_block = (
+                        f"<div class='fi'>↳ <b>{fi.direction}</b> · {fi.magnitude} · "
+                        f"{fi.horizon} on {', '.join(fi.areas)}"
+                    )
+                    if fi.implication:
+                        impl = fi.implication[:220].replace("<", "&lt;").replace(">", "&gt;")
+                        fi_block += f"<br><span class='fi-impl'>{impl}</span>"
+                    fi_block += "</div>"
                 lines.append(
+                    f"<div class='news-item'>"
                     f"<span class='news-tag {c.sentiment.lower()}'>{c.sentiment}</span> "
                     f"<span class='news-mat'>{c.materiality}</span> "
                     f"<span class='news-theme'>{c.theme}</span> "
                     f"<a href='{it.url}'>{title}</a>"
                     f" <em>(contrib {contrib:+.2f})</em>"
+                    f"{fi_block}"
+                    f"</div>"
                 )
-            out["news_summary"] = "<br>".join(lines)
+            out["news_summary"] = header + "".join(lines)
+
+    # --- reddit sentiment summary ---
+    if reddit_score is not None and reddit_score.mention_count > 0:
+        bits: list[str] = []
+        bits.append(
+            f"<strong>{reddit_score.mention_count}</strong> mentions (last 24h"
+            f"; prior {reddit_score.mention_count_prior_window}, "
+            f"delta {reddit_score.mention_delta_pct:+.0%})"
+        )
+        if reddit_score.is_crowded:
+            bits.append("<span class='reddit-flag'>⚠ crowded</span>")
+        if reddit_score.llm_sentiment is not None:
+            lab = (
+                "positive" if reddit_score.llm_sentiment > 0.15
+                else "negative" if reddit_score.llm_sentiment < -0.15
+                else "neutral"
+            )
+            bits.append(
+                f"LLM sentiment "
+                f"<span class='news-tag {lab}'>{reddit_score.llm_sentiment:+.2f}</span>"
+            )
+        if reddit_score.llm_themes:
+            chips = "".join(f"<span class='chip'>{t}</span>" for t in reddit_score.llm_themes)
+            bits.append(f"Themes: <span class='chips inline'>{chips}</span>")
+        out["sentiment_summary"] = " · ".join(bits)
 
     return out
 
@@ -212,6 +271,7 @@ def render_portfolio_markdown(
     earnings_calendar: dict[str, str] | None = None,
     dossiers: dict[str, "Dossier"] | None = None,  # for per-position reasoning
     news_items_by_ticker: dict[str, list["NewsItem"]] | None = None,  # for news themes
+    reddit_scores: dict[str, "RedditScore"] | None = None,             # for per-position reddit
 ) -> str:
     """Compose the full portfolio Markdown.
 
@@ -232,11 +292,13 @@ def render_portfolio_markdown(
         "Longs", portfolio.longs, convictions, bundles,
         dossiers=dossiers, sector_snap=sector_snap,
         news_items_by_ticker=news_items_by_ticker,
+        reddit_scores=reddit_scores,
     ))
     parts.append(_render_positions(
         "Shorts", portfolio.shorts, convictions, bundles,
         dossiers=dossiers, sector_snap=sector_snap,
         news_items_by_ticker=news_items_by_ticker,
+        reddit_scores=reddit_scores,
     ))
     parts.append(_render_changes(portfolio, previous_longs, previous_shorts))
     parts.append(_render_portfolio_metrics(portfolio))
@@ -437,7 +499,40 @@ a:hover {{ text-decoration: underline; }}
   font-variant-numeric: tabular-nums;
 }}
 
-.news-list {{ font-size: 0.88em; line-height: 1.7; }}
+.news-aggregate {{
+  font-size: 0.88em;
+  color: #2a3b5c;
+  margin-bottom: 0.45em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px dashed #d6dce5;
+}}
+.news-item {{
+  font-size: 0.88em;
+  line-height: 1.5;
+  margin: 0.4em 0;
+  padding: 0.35em 0;
+  border-top: 1px dotted #e0e4ea;
+}}
+.news-item:first-child {{ border-top: 0; }}
+.news-item .fi {{
+  margin: 0.25em 0 0 1.4em;
+  font-size: 0.92em;
+  color: #4a5775;
+}}
+.news-item .fi-impl {{
+  display: block;
+  margin-top: 0.2em;
+  font-style: italic;
+  color: #6c7a93;
+}}
+.news-list {{ font-size: 0.88em; line-height: 1.6; }}
+.reddit-summary {{ font-size: 0.88em; color: #2a3b5c; }}
+.reddit-flag {{
+  color: #c14242;
+  font-weight: 600;
+  font-size: 0.85em;
+}}
+.chips.inline {{ display: inline-flex; }}
 .news-tag {{
   display: inline-block;
   padding: 0 0.4em;
@@ -577,12 +672,14 @@ def _render_positions(
     dossiers: dict[str, Dossier] | None = None,
     sector_snap: SectorSnapshot | None = None,
     news_items_by_ticker: dict[str, list[NewsItem]] | None = None,
+    reddit_scores: dict[str, RedditScore] | None = None,
 ) -> str:
     """Render a side (longs or shorts) as HTML cards with reasoning."""
     if not positions:
         return f"## {label}\n\n_(none selected)_"
     dossiers = dossiers or {}
     news_items_by_ticker = news_items_by_ticker or {}
+    reddit_scores = reddit_scores or {}
     side_class = "long" if label.lower().startswith("long") else "short"
     badge = "LONG" if side_class == "long" else "SHORT"
 
@@ -591,7 +688,10 @@ def _render_positions(
         bundle = bundles.get(p.ticker) if bundles else None
         dossier = dossiers.get(p.ticker)
         news_items = news_items_by_ticker.get(p.ticker)
-        reasoning = _explain_position(p, bundle, dossier, sector_snap, news_items)
+        reddit_score = reddit_scores.get(p.ticker)
+        reasoning = _explain_position(
+            p, bundle, dossier, sector_snap, news_items, reddit_score,
+        )
 
         composite_disp = (
             f"{p.composite_z:.2f}" if p.composite_z is not None
@@ -653,8 +753,15 @@ def _render_positions(
         # News (only when material items exist for this ticker)
         if reasoning["news_summary"]:
             out.append(
-                f"<div class='reasoning-block'><div class='label'>Material news</div>"
+                f"<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div>"
                 f"<div class='news-list'>{reasoning['news_summary']}</div></div>"
+            )
+
+        # Reddit sentiment (only when enrichment ran and mention_count > 0)
+        if reasoning["sentiment_summary"]:
+            out.append(
+                f"<div class='reasoning-block'><div class='label'>Reddit chatter (24h)</div>"
+                f"<div class='reddit-summary'>{reasoning['sentiment_summary']}</div></div>"
             )
 
         # Conviction LLM thesis (if available)
