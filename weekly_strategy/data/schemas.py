@@ -133,6 +133,55 @@ class RedditPost(BaseModel):
     url: str | None = None
 
 
+class MacroSnapshot(BaseModel):
+    """Universe-level rates / credit / vol / inflation / FX snapshot.
+
+    Populated once per weekly run (not per ticker). The Stage 2 thesis writer
+    consumes this so a stock's view incorporates the macro backdrop.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    week_ending: date
+
+    # Rates state -- all in percent (5.25 means 5.25%).
+    yield_10y: float | None = None
+    yield_10y_wow_change_bps: float | None = None
+    yield_2y: float | None = None
+    yield_2y_wow_change_bps: float | None = None
+    real_yield_10y: float | None = None
+    real_yield_10y_wow_change_bps: float | None = None
+    fed_funds: float | None = None
+    mortgage_30y: float | None = None
+
+    # Curve
+    curve_2s10s_bps: float | None = None
+    curve_inverted: bool = False
+
+    # Credit -- in basis points (350 means 350 bps OAS).
+    hy_oas_bps: float | None = None
+    hy_oas_wow_change_bps: float | None = None
+    ig_oas_bps: float | None = None
+    hy_regime: str = "unknown"      # tight | normal | wide | stressed | unknown
+
+    # Vol
+    vix_level: float | None = None
+    vix_wow_change: float | None = None
+    vix_regime: str = "unknown"     # complacent | normal | elevated | panic | unknown
+
+    # Inflation expectations
+    breakeven_10y: float | None = None
+    breakeven_10y_wow_change_bps: float | None = None
+
+    # Currency
+    dxy_level: float | None = None
+    dxy_wow_change_pct: float | None = None
+
+    # Recent data prints (last 7 days). Free-form dicts so we can include
+    # CPI / payrolls / claims surprises without a rigid schema in v1.
+    recent_prints: list[dict] = Field(default_factory=list)
+
+
 class WeeklyThesis(BaseModel):
     """Structured analyst note produced by the LLM thesis writer (Step 1.8)."""
 
