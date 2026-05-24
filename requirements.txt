@@ -1,0 +1,19 @@
+# Python 3.9 — uses `from __future__ import annotations` for modern type hints.
+# Versions pinned to recent releases known to work on 3.9; bump as needed.
+
+# Data
+yfinance>=0.2.50
+pandas>=2.2,<2.3
+requests>=2.32
+feedparser>=6.0.11
+fredapi>=0.5.2
+
+# Validation / config
+pydantic>=2.7,<3
+python-dotenv>=1.0.1
+
+# LLM
+anthropic>=0.40,<1.0
+
+# Dev / tests
+pytest>=8.0

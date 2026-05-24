@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+*.key
+
+# Project caches and generated artifacts
+weekly_strategy/data_cache/
+weekly_strategy/reports/
+weekly_strategy/dossier/data/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
