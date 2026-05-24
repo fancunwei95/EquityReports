@@ -133,6 +133,34 @@ class RedditPost(BaseModel):
     url: str | None = None
 
 
+class StockScoreBundle(BaseModel):
+    """Numeric weekly snapshot per ticker. Stage 1: standalone; Stage 2 adds
+    macro/sector overlays; Stage 3 adds cross-sectional ranks."""
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    week_ending: date
+
+    # Composite scores in [0, 100]. Higher is "more attractive" for a long.
+    quality_score: float
+    valuation_score: float
+    momentum_score: float
+
+    # Raw returns used by momentum, surfaced for the report.
+    return_1m: float | None = None
+    return_3m: float | None = None
+    return_6m: float | None = None
+
+    # Cross-references to other signals so the thesis writer + report
+    # can read everything from one bundle. None until the orchestrator
+    # populates them.
+    news_sentiment_score: float | None = None  # [-1, +1] from NewsScore
+    news_noise_ratio: float | None = None
+    reddit_sentiment: float | None = None      # [-1, +1] from RedditScore
+    reddit_is_crowded: bool = False
+
+
 class Dossier(BaseModel):
     """Per-ticker fundamental snapshot built from EDGAR + yfinance.
 
