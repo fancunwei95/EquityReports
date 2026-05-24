@@ -19,13 +19,17 @@ hands back a proposal for human review before commit.
 """
 
 import json
+import time
+import traceback
+from dataclasses import dataclass, field
 from datetime import datetime, date
 from pathlib import Path
 from typing import Iterable
 
 from weekly_strategy.config import settings
 from weekly_strategy.data import fetchers, storage
-from weekly_strategy.data.schemas import Universe, UniverseEntry
+from weekly_strategy.data.schemas import Dossier, Universe, UniverseEntry
+from weekly_strategy.dossier import builder as dossier_builder
 
 
 # Sector cap allocation (sums to 100). From plan.md Step 3.1.
@@ -221,3 +225,88 @@ def _current_quarter_label(*, today: date | None = None) -> str:
     d = today or date.today()
     q = (d.month - 1) // 3 + 1
     return f"{d.year}Q{q}"
+
+
+# ---------------------------------------------------------------------------
+# Step 3.2: batch dossier generation
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class BatchResult:
+    succeeded: list[str] = field(default_factory=list)
+    failed: list[tuple[str, str]] = field(default_factory=list)  # (ticker, error)
+    warnings: list[tuple[str, str]] = field(default_factory=list)
+    elapsed_s: float = 0.0
+
+    @property
+    def n_total(self) -> int:
+        return len(self.succeeded) + len(self.failed)
+
+
+# Sanity checks applied to each freshly-built dossier. Failure here is a
+# warning -- the dossier still saves -- so the human can spot-check later.
+def _validate_dossier(d: Dossier) -> list[str]:
+    flags: list[str] = []
+    if d.roic is not None and d.roic > 1.0:
+        flags.append(f"ROIC > 100% ({d.roic*100:.1f}%) -- likely denominator issue")
+    if d.gross_margin_current is not None and d.gross_margin_current > 1.0:
+        flags.append(
+            f"Gross margin > 100% ({d.gross_margin_current*100:.1f}%) -- "
+            "revenue probably picked up a partial period"
+        )
+    if d.revenue_latest_fy is not None and d.revenue_latest_fy < 0:
+        flags.append(f"Negative revenue ({d.revenue_latest_fy}) -- definitely wrong")
+    if d.operating_margin_current is not None and abs(d.operating_margin_current) > 2.0:
+        flags.append(
+            f"Operating margin off the rails ({d.operating_margin_current*100:.1f}%)"
+        )
+    if d.market_cap is not None and d.current_price is None:
+        flags.append("market_cap set but current_price missing -- inconsistent inputs")
+    return flags
+
+
+def batch_build_dossiers(
+    universe: Universe,
+    *,
+    force_refresh: bool = False,
+    log=print,
+) -> BatchResult:
+    """Build (or refresh) a dossier per universe ticker, with per-ticker isolation.
+
+    EDGAR rate-limiting is already enforced inside the fetcher (10 req/s).
+    Per-ticker errors don't kill the batch -- they're recorded in
+    ``BatchResult.failed`` and surfaced in the final summary.
+
+    ``force_refresh`` re-pulls EDGAR companyfacts via the underlying fetcher's
+    cache-busting flag. By default we let the per-fetcher disk cache do its
+    job; this batch is meant to run quarterly + on earnings-week deltas.
+    """
+    res = BatchResult()
+    t_start = time.time()
+
+    for i, ticker in enumerate(universe.tickers, 1):
+        try:
+            if force_refresh:
+                # Bust the per-ticker companyfacts cache; the rest is cheap.
+                cik = fetchers.get_cik(ticker)
+                fetchers.get_company_facts(cik, force_refresh=True)
+            log(f"  [{i:3d}/{len(universe.tickers)}] {ticker} -- building dossier...")
+            dossier = dossier_builder.build_dossier(ticker)
+            flags = _validate_dossier(dossier)
+            for f in flags:
+                res.warnings.append((ticker, f))
+                log(f"    WARN {ticker}: {f}")
+            res.succeeded.append(ticker)
+        except Exception as e:
+            err = f"{type(e).__name__}: {e}"
+            res.failed.append((ticker, err))
+            log(f"  FAIL {ticker}: {err}")
+
+    res.elapsed_s = time.time() - t_start
+    log(
+        f"batch_build_dossiers done in {res.elapsed_s:.1f}s -- "
+        f"{len(res.succeeded)} ok / {len(res.failed)} failed / "
+        f"{len(res.warnings)} warnings"
+    )
+    return res

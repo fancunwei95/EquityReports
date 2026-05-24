@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import importlib
 import json
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import pytest
@@ -186,3 +186,75 @@ def test_load_candidate_pool_dedupes():
     # Sanity: a few well-known mega-caps are in the snapshot.
     for must in ("AAPL", "MSFT", "JPM", "XOM"):
         assert must in pool
+
+
+# ---------------------------------------------------------------------------
+# Step 3.2: batch dossier generation
+# ---------------------------------------------------------------------------
+
+
+def _u(tickers: list[str]):
+    from datetime import datetime as _dt
+    from weekly_strategy.data.schemas import Universe, UniverseEntry
+    return Universe(
+        quarter="2026Q2",
+        constructed_at=_dt(2026, 5, 24),
+        entries=[
+            UniverseEntry(ticker=t, sector="Technology",
+                          market_cap=10e9, included_reason="cap_rank")
+            for t in tickers
+        ],
+    )
+
+
+def test_batch_build_isolates_per_ticker_failures(universe_mod, monkeypatch):
+    from weekly_strategy.data.schemas import Dossier
+    from weekly_strategy.dossier import builder as bb
+
+    def fake_build(ticker):
+        if ticker == "BAD":
+            raise RuntimeError("EDGAR ate it")
+        return Dossier(ticker=ticker, last_updated=datetime(2026, 5, 24))
+
+    monkeypatch.setattr(bb, "build_dossier", fake_build)
+    monkeypatch.setattr(universe_mod.dossier_builder, "build_dossier", fake_build)
+    res = universe_mod.batch_build_dossiers(
+        _u(["AAPL", "BAD", "JPM"]), log=lambda *_a, **_kw: None,
+    )
+    assert res.succeeded == ["AAPL", "JPM"]
+    assert res.failed == [("BAD", "RuntimeError: EDGAR ate it")]
+    assert res.n_total == 3
+
+
+def test_batch_build_records_warnings(universe_mod, monkeypatch):
+    from weekly_strategy.data.schemas import Dossier
+
+    def fake_build(ticker):
+        # ROIC > 100% is a known XBRL denominator issue and should warn.
+        return Dossier(ticker=ticker, last_updated=datetime(2026, 5, 24), roic=1.5)
+
+    monkeypatch.setattr(universe_mod.dossier_builder, "build_dossier", fake_build)
+    res = universe_mod.batch_build_dossiers(
+        _u(["AAPL"]), log=lambda *_a, **_kw: None,
+    )
+    assert res.succeeded == ["AAPL"]
+    assert any("ROIC > 100%" in w[1] for w in res.warnings)
+
+
+def test_validate_dossier_flags_negative_revenue(universe_mod):
+    from weekly_strategy.data.schemas import Dossier
+    d = Dossier(ticker="X", last_updated=datetime(2026, 5, 24),
+                revenue_latest_fy=-1_000_000_000)
+    flags = universe_mod._validate_dossier(d)
+    assert any("Negative revenue" in f for f in flags)
+
+
+def test_validate_dossier_clean_when_sensible(universe_mod):
+    from weekly_strategy.data.schemas import Dossier
+    d = Dossier(
+        ticker="AAPL", last_updated=datetime(2026, 5, 24),
+        roic=0.55, gross_margin_current=0.46,
+        operating_margin_current=0.31, revenue_latest_fy=400e9,
+        market_cap=4.5e12, current_price=308.0,
+    )
+    assert universe_mod._validate_dossier(d) == []
