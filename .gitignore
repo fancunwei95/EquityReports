@@ -16,12 +16,14 @@ env/
 .env
 *.key
 
-# Project caches and generated artifacts
+# Project caches and ephemeral artifacts (regeneratable)
 weekly_strategy/data_cache/
 weekly_strategy/reports/
 weekly_strategy/dossier/data/
-daily_reports/
 daily_loop_logs/
+
+# daily_reports/ is TRACKED so the HTML book shows up on the personal git.
+# Re-add to gitignore if you'd rather keep generated reports out of history.
 
 # Editor / OS
 .vscode/
