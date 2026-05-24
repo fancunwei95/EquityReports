@@ -6,7 +6,7 @@ Prices stay as ``pandas.DataFrame`` and dossiers/reports stay as ``dict`` —
 those don't pass through a row-oriented store, so they don't need a row schema.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -33,6 +33,63 @@ class RedditPost(BaseModel):
     num_comments: int = Field(default=0, ge=0)
     created_at: datetime | None = None
     url: str | None = None
+
+
+class Dossier(BaseModel):
+    """Per-ticker fundamental snapshot built from EDGAR + yfinance.
+
+    Many fields are ``| None`` because either the company doesn't disclose
+    them (e.g., banks have no gross profit), the concept tag is missing from
+    their XBRL filings, or the value requires consensus data we don't have
+    in v1 (forward PE, earnings surprises).
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    company_name: str | None = None
+    sector: str | None = None
+    industry: str | None = None
+
+    # Flag: financials report fundamentally differently (no GP/COGS, leverage
+    # is the business model, etc). Downstream scoring should branch on this.
+    is_financials: bool = False
+
+    # Quality block
+    revenue_latest_fy: float | None = None
+    revenue_3y_cagr: float | None = None
+    revenue_yoy_latest: float | None = None
+    revenue_qoq_latest: float | None = None
+    gross_margin_current: float | None = None
+    gross_margin_trend: list[float] = Field(default_factory=list)
+    operating_margin_current: float | None = None
+    fcf_margin_current: float | None = None
+    roic: float | None = None
+    roe: float | None = None
+    share_count_change_yoy: float | None = None
+    net_debt_to_ebitda: float | None = None
+    fcf_conversion: float | None = None
+
+    # Growth / momentum
+    next_earnings_date: date | None = None
+    last_4_surprises: list[dict] = Field(default_factory=list)  # TODO Step 1.x
+
+    # Valuation (computed against current price)
+    current_price: float | None = None
+    market_cap: float | None = None
+    pe_trailing: float | None = None
+    pe_forward: float | None = None  # requires consensus; v1: None
+    ps_ratio: float | None = None
+    fcf_yield: float | None = None
+    ev_to_ebitda: float | None = None
+
+    # Catalyst (free-form; populated later)
+    upcoming_events: list[str] = Field(default_factory=list)
+    recent_8k_summary: str | None = None
+
+    # Metadata
+    last_updated: datetime
+    last_filing_date: date | None = None
 
 
 class RedditSnapshot(BaseModel):
