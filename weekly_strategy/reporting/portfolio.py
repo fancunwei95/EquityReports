@@ -70,8 +70,13 @@ def render_portfolio_markdown(
 def save_portfolio_markdown(
     portfolio: Portfolio, markdown: str,
 ) -> Path:
-    settings.REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    path = settings.REPORTS_DIR / f"portfolio_{portfolio.week_ending.isoformat()}.md"
+    """Write to ``daily_reports/{YYYY-MM-DD}.md`` at the repo root.
+
+    One file per as-of date; re-running on the same date overwrites in
+    place (so daily reruns don't pile up duplicates).
+    """
+    settings.DAILY_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = settings.DAILY_REPORTS_DIR / f"{portfolio.week_ending.isoformat()}.md"
     path.write_text(markdown)
     return path
 

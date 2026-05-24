@@ -17,12 +17,13 @@ load_dotenv(REPO_ROOT / ".env")
 
 # --- Paths ---
 DATA_CACHE_DIR = PACKAGE_ROOT / "data_cache"
-REPORTS_DIR = PACKAGE_ROOT / "reports"
+REPORTS_DIR = PACKAGE_ROOT / "reports"           # per-ticker single-stock notes
+DAILY_REPORTS_DIR = REPO_ROOT / "daily_reports"  # portfolio report (one per day)
 DOSSIER_DIR = PACKAGE_ROOT / "dossier" / "data"
 TICKERS_FILE = PACKAGE_ROOT / "config" / "tickers.json"
 SQLITE_PATH = DATA_CACHE_DIR / "weekly.db"
 
-for _d in (DATA_CACHE_DIR, REPORTS_DIR, DOSSIER_DIR):
+for _d in (DATA_CACHE_DIR, REPORTS_DIR, DAILY_REPORTS_DIR, DOSSIER_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
 # --- API keys (all free tier) ---

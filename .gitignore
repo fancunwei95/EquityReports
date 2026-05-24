@@ -20,6 +20,7 @@ env/
 weekly_strategy/data_cache/
 weekly_strategy/reports/
 weekly_strategy/dossier/data/
+daily_reports/
 
 # Editor / OS
 .vscode/

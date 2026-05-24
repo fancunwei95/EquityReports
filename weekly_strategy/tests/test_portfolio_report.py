@@ -165,14 +165,15 @@ def test_renders_rejections_when_present():
     assert "`X1` (long): sector cap" in md
 
 
-def test_save_writes_to_reports_dir(tmp_path, monkeypatch):
+def test_save_writes_to_daily_reports_dir(tmp_path, monkeypatch):
     import importlib
     import weekly_strategy.config.settings as settings_mod
-    monkeypatch.setattr(settings_mod, "REPORTS_DIR", tmp_path / "reports")
+    monkeypatch.setattr(settings_mod, "DAILY_REPORTS_DIR", tmp_path / "daily_reports")
     import weekly_strategy.reporting.portfolio as mod
     mod = importlib.reload(mod)
     p = _portfolio()
     md = mod.render_portfolio_markdown(p)
     path = mod.save_portfolio_markdown(p, md)
     assert path.exists()
-    assert path.name == "portfolio_2026-05-24.md"
+    assert path.parent.name == "daily_reports"
+    assert path.name == "2026-05-24.md"
