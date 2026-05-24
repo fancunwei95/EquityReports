@@ -91,7 +91,7 @@ screen -S daily-loop
 # Inside the session: launch the daemon
 cd /mnt/thdcan01/data/cfan/projects/202605_equityReports
 .venv/bin/python -m weekly_strategy.scripts.daily_loop \
-    --time-utc 21:30 \
+    --time-et 08:30 \
     --mode cheap \
     --weekdays-only
 
@@ -100,8 +100,11 @@ cd /mnt/thdcan01/data/cfan/projects/202605_equityReports
 screen -r daily-loop
 ```
 
-The daemon sleeps until ``--time-utc`` each day (default 21:30 UTC =
-5:30 PM ET, after US close), then invokes ``run_stage3`` with the right
+The daemon sleeps until ``--time-et`` each day (default behavior when
+neither flag is set: 21:30 UTC = 5:30 PM ET DST / 4:30 PM ET standard).
+``--time-et 08:30`` runs at 8:30 AM US Eastern year-round; the UTC offset
+adjusts automatically across DST. Use ``--time-utc HH:MM`` instead if
+you'd rather pin to UTC. Then it invokes ``run_stage3`` with the right
 flag set for the chosen ``--mode``:
 
 * ``cheap``     -- ``--skip-news --skip-reddit --skip-conviction --skip-macro``.
