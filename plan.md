@@ -10,10 +10,12 @@ Capital plan: **paper trade first**, graduate to real capital only after backtes
 
 - Python 3.9 (system default on this host; no newer interpreter available) with `venv` and `pip` (no poetry/uv/conda). Use `from __future__ import annotations` in every module so we can write modern type hints (`list[str]`, `dict[str, X]`, `X | None`) without runtime errors.
 - SQLite for storage. Pydantic for schemas. `pandas` for tabular work.
-- LLM: Anthropic Claude — use the **latest** model family:
-  - `claude-haiku-4-5-20251001` for high-volume batch classification (per-article news sentiment).
+- LLM: **Claude Code in headless mode**, billed against the user's Pro/Max subscription — *not* the Anthropic API. We do not hold an API key. All calls go through `claude --bare -p "<prompt>" --output-format json --model <id>` from a Python subprocess; `weekly_strategy/llm/client.py` is the only place that knows this. Use the latest model family:
+  - `claude-haiku-4-5-20251001` for high-volume batch classification (news sentiment).
   - `claude-sonnet-4-6` for the weekly thesis writer and conviction check.
   - `claude-opus-4-7` reserved for monthly meta-review / hard cases only.
+- **Subscription cost envelope:** starting 2026-06-15, Anthropic provisions a dedicated monthly credit pool for Agent SDK + headless usage, separate from interactive limits — Pro $20/mo, Max-5x $100/mo, Max-20x $200/mo. Projected spend: Stage 1 ≈ $0.60/mo (well under Pro), Stage 3 ≈ $20/mo (Pro is tight, Max-5x is comfortable). Until 2026-06-15, headless draws from the interactive plan's quota.
+- **Auth invariant:** the subprocess wrapper must strip `ANTHROPIC_API_KEY` from the child env so subscription OAuth wins. If the key is set in the shell, billing silently switches to API.
 
 ## Known risk in build order
 
@@ -382,7 +384,9 @@ Respond in JSON with this schema:
 """
 ```
 
-Model choice: use **`claude-haiku-4-5-20251001`** here. Per-article classification is high-volume and structurally simple — Haiku is fast and ~5× cheaper than Sonnet, well-suited to this. Pass items in batches of up to 20 per call. Reserve Sonnet 4.6 for downstream synthesis (thesis writer in Step 1.8).
+Model choice: use **`claude-haiku-4-5-20251001`** here. Per-article classification is high-volume and structurally simple — Haiku is fast and ~5× cheaper than Sonnet, well-suited to this. Reserve Sonnet 4.6 for downstream synthesis (thesis writer in Step 1.8).
+
+**Batching strategy** (matters because we're on subscription, not the API Batch endpoint — see Tooling note). One `claude -p` call per ticker per week, passing *all* of that week's deduped news items (typically 50-200) in a single prompt and asking for an array of classifications back. This keeps headless calls per week at O(tickers), not O(articles): Stage 1 = ~3 calls/week, Stage 3 = ~100 calls/week. If a ticker has >200 items in a week, chunk into batches of 50 with chunk-level retry on JSON parse failure.
 
 Output stored in SQLite, used downstream in weekly report.
 

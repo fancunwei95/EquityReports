@@ -26,8 +26,12 @@ for _d in (DATA_CACHE_DIR, REPORTS_DIR, DOSSIER_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
 # --- API keys (all free tier) ---
-ANTHROPIC_API_KEY: str | None = os.getenv("ANTHROPIC_API_KEY")
 FRED_API_KEY: str | None = os.getenv("FRED_API_KEY")
+
+# LLM access: we use `claude` CLI in headless mode against the user's
+# subscription, not the Anthropic API. CLAUDE_BIN overrides the binary path;
+# default works as long as `claude` is on PATH.
+CLAUDE_BIN: str = os.getenv("CLAUDE_BIN", "claude")
 
 # SEC EDGAR requires a contact email in the User-Agent (no key, just identification).
 SEC_USER_AGENT: str = os.getenv(

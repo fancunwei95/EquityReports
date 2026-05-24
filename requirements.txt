@@ -17,8 +17,8 @@ pydantic>=2.7,<3
 eval_type_backport>=0.2.0
 python-dotenv>=1.0.1
 
-# LLM
-anthropic>=0.40,<1.0
+# LLM access is via `claude` CLI in headless mode (subscription auth);
+# no Python SDK dependency required.
 
 # Dev / tests
 pytest>=8.0
