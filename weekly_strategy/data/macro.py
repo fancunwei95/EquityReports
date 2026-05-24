@@ -12,11 +12,14 @@ clear error -- caller can choose to skip the macro layer entirely.
 
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from urllib.parse import quote_plus
 
+import feedparser
 import pandas as pd
 
 from weekly_strategy.config import settings
-from weekly_strategy.data.schemas import MacroSnapshot
+from weekly_strategy.data.schemas import FedPosture, MacroSnapshot, NewsItem
+from weekly_strategy.llm import client, prompts
 
 
 # ---------------------------------------------------------------------------
@@ -225,6 +228,97 @@ def get_macro_snapshot(*, week_ending: date | None = None) -> MacroSnapshot:
         ),
         recent_prints=_recent_prints(series),
     )
+
+
+# ---------------------------------------------------------------------------
+# Step 2.2 -- Fed communication tracker
+# ---------------------------------------------------------------------------
+
+FED_NEWS_QUERY = '"Powell" OR "FOMC" OR "Federal Reserve"'
+
+
+def fetch_fed_speak_news(*, days: int = 7) -> list[NewsItem]:
+    """Pull Fed-related headlines from Google News for the past ``days`` days.
+
+    Trusted-source filter and title dedup are inherited from the same machinery
+    used by per-ticker news. The ``ticker`` field on each NewsItem is the
+    sentinel "FED" so these don't pollute per-stock SQLite queries.
+    """
+    from weekly_strategy.data.fetchers import (
+        _is_trusted, _normalize_title, _source_name_and_host,
+    )
+
+    url = (
+        "https://news.google.com/rss/search?"
+        f"q={quote_plus(FED_NEWS_QUERY)}+when:{days}d&hl=en-US&gl=US&ceid=US:en"
+    )
+    feed = feedparser.parse(url)
+    seen: set[str] = set()
+    items: list[NewsItem] = []
+    for entry in feed.entries:
+        title = entry.get("title") or ""
+        norm = _normalize_title(title)
+        if not norm or norm in seen:
+            continue
+        seen.add(norm)
+        source_name, host = _source_name_and_host(entry)
+        if not _is_trusted(source_name, host):
+            continue
+        published = entry.get("published_parsed")
+        published_dt = datetime(*published[:6]) if published else None
+        items.append(
+            NewsItem(
+                ticker="FED",
+                title=title,
+                source=source_name or host or None,
+                url=entry.get("link") or "",
+                published_at=published_dt,
+                snippet=(entry.get("summary") or "")[:500] or None,
+            )
+        )
+    return items
+
+
+def classify_fed_posture(
+    items: list[NewsItem],
+    *,
+    week_ending: date,
+    model: str = client.MODEL_SONNET,
+) -> FedPosture:
+    """Single Sonnet call. Synthesises hawkish/dovish lean from the week's headlines."""
+    if not items:
+        return FedPosture(week_ending=week_ending, posture="NEUTRAL", n_items=0)
+
+    formatted = "\n".join(
+        f"{i}. [{(it.source or '?'):<18}] {it.title}"
+        for i, it in enumerate(items, 1)
+    )
+    user_prompt = prompts.FED_POSTURE_USER_TEMPLATE.format(
+        n=len(items), items=formatted,
+    )
+    try:
+        parsed, _resp = client.ask_json(
+            user_prompt, model=model, system_prompt=prompts.FED_POSTURE_SYSTEM,
+        )
+    except client.ClaudeCliError:
+        # Macro layer should never crash a weekly run.
+        return FedPosture(week_ending=week_ending, posture="NEUTRAL", n_items=len(items))
+
+    if isinstance(parsed, list) and parsed:
+        parsed = parsed[0]
+    if not isinstance(parsed, dict):
+        parsed = {}
+    return FedPosture.coerce(week_ending=week_ending, n_items=len(items), raw=parsed)
+
+
+def get_fed_posture(
+    *, week_ending: date | None = None, days: int = 7,
+    model: str = client.MODEL_SONNET,
+) -> FedPosture:
+    """Fetch + classify in one call. Convenience entry point for the orchestrator."""
+    we = week_ending or date.today()
+    items = fetch_fed_speak_news(days=days)
+    return classify_fed_posture(items, week_ending=we, model=model)
 
 
 def _recent_prints(series_map: dict[str, pd.Series | None]) -> list[dict]:

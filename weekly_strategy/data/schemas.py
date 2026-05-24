@@ -133,6 +133,46 @@ class RedditPost(BaseModel):
     url: str | None = None
 
 
+_FED_POSTURE_VALUES = (
+    "HAWKISH", "SLIGHTLY_HAWKISH", "NEUTRAL", "SLIGHTLY_DOVISH", "DOVISH",
+)
+
+
+class FedPosture(BaseModel):
+    """LLM read of Fed communication this week."""
+
+    model_config = ConfigDict(frozen=True)
+
+    week_ending: date
+    posture: str = "NEUTRAL"            # one of _FED_POSTURE_VALUES
+    summary: str | None = None
+    policy_hints: list[str] = Field(default_factory=list)
+    key_speakers: list[str] = Field(default_factory=list)
+    n_items: int = 0
+
+    @classmethod
+    def coerce(cls, *, week_ending: date, n_items: int, raw: dict) -> "FedPosture":
+        p = str(raw.get("posture", "")).upper().replace(" ", "_").replace("-", "_")
+        return cls(
+            week_ending=week_ending,
+            posture=p if p in _FED_POSTURE_VALUES else "NEUTRAL",
+            summary=(raw.get("summary") or None),
+            policy_hints=_string_list(raw.get("policy_hints")),
+            key_speakers=_string_list(raw.get("key_speakers")),
+            n_items=n_items,
+        )
+
+
+def _string_list(raw) -> list[str]:
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        return [raw]
+    if isinstance(raw, list):
+        return [str(x) for x in raw if x is not None][:8]
+    return [str(raw)]
+
+
 class MacroSnapshot(BaseModel):
     """Universe-level rates / credit / vol / inflation / FX snapshot.
 

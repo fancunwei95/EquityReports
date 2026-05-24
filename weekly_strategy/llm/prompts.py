@@ -7,6 +7,38 @@ single-file diff and so we can later run prompt-diff tests.
 """
 
 # ---------------------------------------------------------------------------
+# Step 2.2 -- Fed communication posture
+# ---------------------------------------------------------------------------
+
+FED_POSTURE_SYSTEM = (
+    "You read recent Fed-related news headlines (Powell, FOMC, regional Fed "
+    "speakers) and classify the aggregate posture this week. Return ONE JSON "
+    "object. No prose, no markdown fences."
+)
+
+
+FED_POSTURE_USER_TEMPLATE = """\
+The following {n} headlines mention Fed speakers or FOMC topics in the past week:
+
+{items}
+
+Return ONE JSON object:
+
+{{
+  "posture":       "HAWKISH" | "SLIGHTLY_HAWKISH" | "NEUTRAL" | "SLIGHTLY_DOVISH" | "DOVISH",
+  "summary":       "1-2 sentences synthesizing the week's posture",
+  "policy_hints":  ["specific hint 1", "specific hint 2", ...],
+  "key_speakers":  ["Powell", "Williams", ...]
+}}
+
+Examples of policy hints: "signaled openness to further cuts if labor weakens",
+"pushed back on near-term cuts citing sticky core inflation", "raised concern
+about balance-sheet runoff pace". Be specific. Use NEUTRAL only if there is
+genuinely no directional lean.
+"""
+
+
+# ---------------------------------------------------------------------------
 # Step 1.8 -- weekly thesis writer
 # ---------------------------------------------------------------------------
 
