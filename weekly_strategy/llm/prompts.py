@@ -7,6 +7,46 @@ single-file diff and so we can later run prompt-diff tests.
 """
 
 # ---------------------------------------------------------------------------
+# Step 2.5 -- cross-stock / sectoral implications
+# ---------------------------------------------------------------------------
+
+CROSS_STOCK_SYSTEM = (
+    "You are an equity strategist. For a single named stock, you read its "
+    "material news this week, the sector ETF's recent action, and the macro "
+    "regime, then articulate implications going BOTH directions: how this "
+    "stock's news affects its sector / peers, and how the sector + macro "
+    "context affects this stock. Return ONLY a JSON object. No prose, no "
+    "markdown fences."
+)
+
+
+CROSS_STOCK_USER_TEMPLATE = """\
+Stock: {ticker}{company_suffix}
+Sector ETF: {sector_etf}  ({sector_name})
+
+=== Sector context ===
+{sector_block}
+
+=== Macro regime ===
+{regime_block}
+
+=== Material news for {ticker} this week ===
+{news_block}
+
+Return ONE JSON object:
+
+{{
+  "summary": "1-2 sentence overall read on how this stock fits the sectoral / macro picture this week",
+  "implications_for_sector":  ["how {ticker}'s news likely affects the {sector_name} sector or specific peers"],
+  "implications_from_sector": ["how sector / macro context affects {ticker}'s near-term setup"],
+  "related_tickers": ["2-6 specific tickers (uppercase) that could be affected by {ticker}'s news or its sector dynamics"]
+}}
+
+Be specific: name peers (e.g., 'pressures GOOGL on Search', not 'pressures peers'), cite levels.
+"""
+
+
+# ---------------------------------------------------------------------------
 # Step 2.4 -- macro regime synthesis
 # ---------------------------------------------------------------------------
 

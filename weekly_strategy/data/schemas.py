@@ -143,6 +143,48 @@ _FIN_COND_VALUES = ("easing", "stable", "tightening", "unknown")
 _CYCLE_PHASE_VALUES = ("early", "mid", "late", "recession", "unknown")
 
 
+class CrossStockImplications(BaseModel):
+    """Step 2.5 (deferred Step 1.5 pass 3): cross-stock / sectoral read.
+
+    One LLM call ingests a ticker's material news + its sector context +
+    the macro regime, then articulates implications going both directions
+    (this stock's news -> sector implications, and sector context -> this
+    stock implications). Other tickers that could be affected get named.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    ticker: str
+    week_ending: date
+    sector_etf: str | None = None
+    implications_for_sector: list[str] = Field(default_factory=list)
+    implications_from_sector: list[str] = Field(default_factory=list)
+    related_tickers: list[str] = Field(default_factory=list)
+    summary: str | None = None
+
+    @classmethod
+    def coerce(
+        cls,
+        *,
+        ticker: str,
+        week_ending: date,
+        sector_etf: str | None,
+        raw: dict,
+    ) -> "CrossStockImplications":
+        return cls(
+            ticker=ticker.upper(),
+            week_ending=week_ending,
+            sector_etf=sector_etf,
+            implications_for_sector=_string_list(raw.get("implications_for_sector")),
+            implications_from_sector=_string_list(raw.get("implications_from_sector")),
+            related_tickers=[
+                str(t).upper()[:6] for t in (raw.get("related_tickers") or [])
+                if isinstance(t, str)
+            ][:8],
+            summary=(raw.get("summary") or None),
+        )
+
+
 class MacroRegime(BaseModel):
     """Stage 2 regime label.
 
