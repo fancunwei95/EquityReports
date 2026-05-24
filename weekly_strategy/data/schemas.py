@@ -437,6 +437,16 @@ class StockScoreBundle(BaseModel):
     sector_in_favor: bool = False              # regime fit >= 60
     composite_score: float | None = None       # weighted final 0-100
 
+    # Stage 3 additions -- cross-sectional z-scores vs the working universe.
+    # Populated by normalize_scores() in batch_scoring.py. None when running a
+    # single-ticker / Stage 1-2 pipeline.
+    z_quality: float | None = None
+    z_valuation: float | None = None
+    z_momentum: float | None = None
+    z_news_sentiment: float | None = None
+    z_sector: float | None = None
+    composite_z: float | None = None  # weighted z-composite for ranking
+
 
 class Dossier(BaseModel):
     """Per-ticker fundamental snapshot built from EDGAR + yfinance.
