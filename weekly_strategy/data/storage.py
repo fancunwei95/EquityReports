@@ -19,7 +19,12 @@ from typing import Iterable, Iterator
 import pandas as pd
 
 from weekly_strategy.config import settings
-from weekly_strategy.data.schemas import NewsClassification, NewsItem, RedditPost
+from weekly_strategy.data.schemas import (
+    FundamentalImpact,
+    NewsClassification,
+    NewsItem,
+    RedditPost,
+)
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -100,6 +105,7 @@ def init_db() -> None:
     with _conn() as conn:
         conn.executescript(_SCHEMA)
         _ensure_column(conn, "news_items", "classification_json", "TEXT")
+        _ensure_column(conn, "news_items", "fundamental_json", "TEXT")
 
 
 def _ensure_column(conn: sqlite3.Connection, table: str, column: str, decl: str) -> None:
@@ -166,7 +172,8 @@ def get_news(
     until: datetime | None = None,
 ) -> list[NewsItem]:
     sql = (
-        "SELECT ticker, title, source, url, published_at, snippet, classification_json "
+        "SELECT ticker, title, source, url, published_at, snippet, "
+        "classification_json, fundamental_json "
         "FROM news_items WHERE ticker = ?"
     )
     params: list[object] = [ticker.upper()]
@@ -192,6 +199,11 @@ def get_news(
                 if r["classification_json"]
                 else None
             ),
+            fundamental_impact=(
+                FundamentalImpact.coerce(json.loads(r["fundamental_json"]))
+                if r["fundamental_json"]
+                else None
+            ),
         )
         for r in rows
     ]
@@ -203,6 +215,17 @@ def update_news_classification(url: str, classification: NewsClassification) -> 
     with _conn() as conn:
         cur = conn.execute(
             "UPDATE news_items SET classification_json = ? WHERE url = ?",
+            (payload, url),
+        )
+        return cur.rowcount > 0
+
+
+def update_news_fundamental(url: str, impact: FundamentalImpact) -> bool:
+    """Attach a fundamental-impact analysis to the row keyed by URL."""
+    payload = impact.model_dump_json()
+    with _conn() as conn:
+        cur = conn.execute(
+            "UPDATE news_items SET fundamental_json = ? WHERE url = ?",
             (payload, url),
         )
         return cur.rowcount > 0

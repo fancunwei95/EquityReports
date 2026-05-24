@@ -55,6 +55,56 @@ class NewsClassification(BaseModel):
         return {"HIGH": 1.0, "MEDIUM": 0.5, "LOW": 0.2}[self.materiality]
 
 
+_AREA_VALUES = (
+    "revenue", "gross_margin", "operating_margin", "fcf_margin",
+    "operating_leverage", "working_capital", "leverage", "share_count",
+    "tax_rate", "other",
+)
+_DIRECTION_VALUES = ("POSITIVE", "NEGATIVE", "UNCLEAR")
+_MAGNITUDE_VALUES = ("small", "medium", "large")  # <1%, 1-5%, >5% of line item
+_HORIZON_VALUES = ("Q", "FY25", "FY26", "FY27", "multi-year")
+
+
+class FundamentalImpact(BaseModel):
+    """Second-pass LLM read of a news item: how does this hit the financials?
+
+    Only items already classified HIGH or MEDIUM materiality flow through
+    this agent (the cascade in signals/news_sentiment.py). The output feeds
+    the thesis writer in Step 1.8 so it can say *"FY26 revenue tailwind"*
+    instead of *"news was positive"*.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    areas: list[str] = Field(default_factory=list)  # subset of _AREA_VALUES
+    direction: str = "UNCLEAR"
+    magnitude: str = "small"
+    horizon: str = "Q"
+    implication: str | None = None
+
+    @classmethod
+    def coerce(cls, raw: dict) -> "FundamentalImpact":
+        raw_areas = raw.get("areas") or []
+        if isinstance(raw_areas, str):
+            raw_areas = [raw_areas]
+        areas = [a for a in (str(x).lower() for x in raw_areas) if a in _AREA_VALUES]
+        d = str(raw.get("direction", "")).upper()
+        m = str(raw.get("magnitude", "")).lower()
+        h = str(raw.get("horizon", "")).strip()
+        return cls(
+            areas=areas or ["other"],
+            direction=d if d in _DIRECTION_VALUES else "UNCLEAR",
+            magnitude=m if m in _MAGNITUDE_VALUES else "small",
+            horizon=h if h in _HORIZON_VALUES else "Q",
+            implication=raw.get("implication") or None,
+        )
+
+    @property
+    def magnitude_weight(self) -> float:
+        """Numeric scale for magnitude. Used by aggregator if surfaced later."""
+        return {"small": 0.2, "medium": 0.5, "large": 1.0}[self.magnitude]
+
+
 class NewsItem(BaseModel):
     model_config = ConfigDict(frozen=True)
 
@@ -64,8 +114,10 @@ class NewsItem(BaseModel):
     url: str
     published_at: datetime | None = None
     snippet: str | None = None
-    # Populated by Step 1.5; None for un-classified items.
+    # Populated by Step 1.5 pass 1; None for un-classified items.
     classification: NewsClassification | None = None
+    # Populated by Step 1.5 pass 2; only HIGH+MEDIUM items get one.
+    fundamental_impact: FundamentalImpact | None = None
 
 
 class RedditPost(BaseModel):

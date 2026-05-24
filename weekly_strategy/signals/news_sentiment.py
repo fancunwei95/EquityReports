@@ -1,23 +1,30 @@
 from __future__ import annotations
 
-"""LLM-based news sentiment scoring (Step 1.5).
+"""LLM-based news sentiment + fundamental scoring (Step 1.5).
 
-Flow:
+Two-agent cascade:
 
-* ``classify_batch(ticker, items)`` -- ONE ``claude -p`` call. Packs all
-  items into a numbered list; the model returns a JSON array. We validate
-  length, coerce each entry through ``NewsClassification.coerce``, and
-  return a list aligned with ``items``.
+* **Pass 1 - sentiment** (Haiku, every item). ``classify_batch`` packs
+  items into a numbered list; the model returns a JSON array of
+  ``NewsClassification`` records.
 
-* ``score_news(ticker, since, until=None)`` -- the public entry point.
-  Loads news from SQLite, classifies any items that don't already have a
-  ``classification`` (idempotent re-runs), persists classifications back
-  via ``storage.update_news_classification``, then aggregates.
+* **Pass 2 - fundamental impact** (Sonnet, HIGH+MEDIUM items only).
+  ``analyze_fundamental_batch`` re-reads the material items and returns a
+  ``FundamentalImpact`` per item: which line items move, in what
+  direction, by how much, over what horizon. This is the structured input
+  the thesis writer (Step 1.8) needs to write *"FY26 revenue tailwind"*
+  rather than *"news was positive"*.
 
-Aggregation is pure math: materiality-weighted sentiment, top themes by
-HIGH+MEDIUM count, top items by |contribution|, noise ratio. No LLM
-involved in the aggregator -- that's the project's "code does math, LLM
-does language" rule from plan.md.
+* **Pass 3 - sectoral / cross-stock** is deferred to Step 2.5 once we
+  have other tickers' dossiers and sector ETF context.
+
+``score_news(ticker, since, until=None)`` is the public entry point. It
+loads news from SQLite, runs whichever passes haven't already touched
+each item (idempotent), persists per-item judgments, then aggregates.
+
+Aggregation is pure math: materiality-weighted sentiment, top themes,
+top items by |contribution|, noise ratio. No LLM in the aggregator --
+that's the project's "code does math, LLM does language" rule.
 """
 
 import json
@@ -27,6 +34,7 @@ from typing import Iterable
 
 from weekly_strategy.data import storage
 from weekly_strategy.data.schemas import (
+    FundamentalImpact,
     NewsClassification,
     NewsItem,
     NewsScore,
@@ -37,8 +45,10 @@ from weekly_strategy.llm import client, prompts
 
 
 DEFAULT_BATCH_SIZE = 50  # 50 items / call keeps the prompt under ~10K tokens
+FUNDAMENTAL_BATCH_SIZE = 20  # fundamental analysis prompt is denser; smaller chunks
 TOP_THEME_K = 3
 TOP_ITEM_K = 5
+_MATERIAL_LEVELS = frozenset({"HIGH", "MEDIUM"})
 
 
 # ---------------------------------------------------------------------------
@@ -120,6 +130,66 @@ def _default_classification() -> NewsClassification:
 
 
 # ---------------------------------------------------------------------------
+# Pass 2 -- fundamental impact (Sonnet)
+# ---------------------------------------------------------------------------
+
+
+def analyze_fundamental_batch(
+    ticker: str,
+    items: list[NewsItem],
+    *,
+    model: str = client.MODEL_SONNET,
+    company_name: str | None = None,
+) -> list[FundamentalImpact]:
+    """Same alignment machinery as ``classify_batch``, different prompt + schema."""
+    if not items:
+        return []
+    user_prompt = prompts.format_fundamental_user_prompt(
+        ticker,
+        [_item_payload(it) for it in items],
+        company_name=company_name,
+    )
+    parsed, _resp = client.ask_json(
+        user_prompt,
+        model=model,
+        system_prompt=prompts.FUNDAMENTAL_IMPACT_SYSTEM,
+    )
+    return _align_fundamentals(parsed, expected=len(items))
+
+
+def _align_fundamentals(parsed, expected: int) -> list[FundamentalImpact]:
+    if isinstance(parsed, dict):
+        for key in ("items", "impacts", "data", "results"):
+            if isinstance(parsed.get(key), list):
+                parsed = parsed[key]
+                break
+    if not isinstance(parsed, list):
+        return [_default_fundamental() for _ in range(expected)]
+
+    by_index: dict[int, dict] = {}
+    for pos, entry in enumerate(parsed):
+        if not isinstance(entry, dict):
+            continue
+        i = entry.get("i")
+        if isinstance(i, int) and 0 <= i < expected:
+            by_index[i] = entry
+        elif pos < expected:
+            by_index.setdefault(pos, entry)
+
+    return [
+        FundamentalImpact.coerce(by_index[i]) if i in by_index else _default_fundamental()
+        for i in range(expected)
+    ]
+
+
+def _default_fundamental() -> FundamentalImpact:
+    return FundamentalImpact(
+        areas=["other"], direction="UNCLEAR", magnitude="small", horizon="Q",
+        implication="analyzer returned no entry for this item",
+    )
+
+
+# ---------------------------------------------------------------------------
 # Orchestrator
 # ---------------------------------------------------------------------------
 
@@ -129,26 +199,46 @@ def score_news(
     since: datetime,
     until: datetime | None = None,
     *,
-    model: str = client.MODEL_HAIKU,
+    sentiment_model: str = client.MODEL_HAIKU,
+    fundamental_model: str = client.MODEL_SONNET,
     company_name: str | None = None,
     batch_size: int = DEFAULT_BATCH_SIZE,
+    fundamental_batch_size: int = FUNDAMENTAL_BATCH_SIZE,
+    skip_fundamental: bool = False,
 ) -> NewsScore:
-    """Classify all unclassified news in the window, persist, aggregate."""
+    """Cascade: sentiment (all) -> fundamental (HIGH+MED only). Idempotent."""
     until = until or datetime.utcnow()
     items = storage.get_news(ticker, since=since, until=until)
     if not items:
         return _empty_score(ticker, since, until)
 
+    # Pass 1: sentiment for any unclassified items.
     unclassified = [it for it in items if it.classification is None]
     if unclassified:
         for chunk in _chunked(unclassified, batch_size):
             classifications = classify_batch(
-                ticker, chunk, model=model, company_name=company_name
+                ticker, chunk, model=sentiment_model, company_name=company_name
             )
             for item, cls in zip(chunk, classifications):
                 storage.update_news_classification(item.url, cls)
-        # Reload so the aggregator sees the freshly-attached classifications.
         items = storage.get_news(ticker, since=since, until=until)
+
+    # Pass 2: fundamental analysis on classified-as-material items only.
+    if not skip_fundamental:
+        needs_fundamental = [
+            it for it in items
+            if it.classification is not None
+            and it.classification.materiality in _MATERIAL_LEVELS
+            and it.fundamental_impact is None
+        ]
+        if needs_fundamental:
+            for chunk in _chunked(needs_fundamental, fundamental_batch_size):
+                impacts = analyze_fundamental_batch(
+                    ticker, chunk, model=fundamental_model, company_name=company_name
+                )
+                for item, impact in zip(chunk, impacts):
+                    storage.update_news_fundamental(item.url, impact)
+            items = storage.get_news(ticker, since=since, until=until)
 
     return aggregate(ticker, items, since, until)
 

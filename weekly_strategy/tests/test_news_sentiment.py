@@ -56,6 +56,25 @@ def _stub_classifier(monkeypatch, mod, response_payload: Any) -> dict:
     return captured
 
 
+def _stub_cascade(monkeypatch, mod, *, sentiment_payload, fundamental_payload):
+    """Replace ask_json with a router: sentiment system prompt -> pass 1,
+    fundamental system prompt -> pass 2. Records calls per pass."""
+    captured: dict = {"sentiment_calls": 0, "fundamental_calls": 0}
+
+    def fake_ask_json(prompt, model, system_prompt=None, timeout_s=120.0):
+        if system_prompt and "fundamental" in system_prompt.lower() or \
+           system_prompt and "line items" in system_prompt.lower():
+            captured["fundamental_calls"] += 1
+            captured["fundamental_prompt"] = prompt
+            return fundamental_payload, _FakeResp(text=json.dumps(fundamental_payload))
+        captured["sentiment_calls"] += 1
+        captured["sentiment_prompt"] = prompt
+        return sentiment_payload, _FakeResp(text=json.dumps(sentiment_payload))
+
+    monkeypatch.setattr(mod.client, "ask_json", fake_ask_json)
+    return captured
+
+
 # ---------------------------------------------------------------------------
 # Prompt formatting
 # ---------------------------------------------------------------------------
@@ -235,6 +254,7 @@ def test_score_news_idempotent_skips_already_classified(news_mod, monkeypatch):
     ])
     score1 = news_mod.score_news(
         "AAPL", since=datetime(2026, 5, 14), until=datetime(2026, 5, 22),
+        skip_fundamental=True,  # this test only exercises pass 1
     )
     assert score1.n_classified == 2
     assert captured["calls"] == 1
@@ -242,6 +262,107 @@ def test_score_news_idempotent_skips_already_classified(news_mod, monkeypatch):
     # Second run: no unclassified items remain, so no LLM call.
     score2 = news_mod.score_news(
         "AAPL", since=datetime(2026, 5, 14), until=datetime(2026, 5, 22),
+        skip_fundamental=True,
     )
     assert captured["calls"] == 1  # unchanged
     assert score2.sentiment_score == pytest.approx(score1.sentiment_score)
+
+
+# ---------------------------------------------------------------------------
+# Cascade: pass 1 sentiment -> pass 2 fundamental on HIGH+MED items only
+# ---------------------------------------------------------------------------
+
+
+def test_fundamental_batch_aligns_and_coerces(news_mod, monkeypatch):
+    """Pass-2 alignment mirrors pass-1: by 'i', missing slots filled, unknown enums coerced."""
+    from weekly_strategy.data.schemas import NewsItem
+    items = [
+        NewsItem(ticker="AAPL", title=t, url=f"u{i}", published_at=datetime(2026, 5, 20))
+        for i, t in enumerate(["a", "b"])
+    ]
+    _stub_classifier(monkeypatch, news_mod, [
+        # Out of order; second one has garbage values that should coerce.
+        {"i": 1, "areas": "pluto", "direction": "bullish",
+         "magnitude": "HUGE",  "horizon": "next-year",
+         "implication": "x"},
+        {"i": 0, "areas": ["revenue", "gross_margin"], "direction": "POSITIVE",
+         "magnitude": "large", "horizon": "FY26",
+         "implication": "iPhone cycle drives a few % revenue tailwind."},
+    ])
+    impacts = news_mod.analyze_fundamental_batch("AAPL", items)
+    assert impacts[0].areas == ["revenue", "gross_margin"]
+    assert impacts[0].direction == "POSITIVE"
+    assert impacts[0].magnitude == "large"
+    assert impacts[0].horizon == "FY26"
+    # Garbage -> safe defaults but areas always has at least "other".
+    assert impacts[1].areas == ["other"]
+    assert impacts[1].direction == "UNCLEAR"
+    assert impacts[1].magnitude == "small"
+    assert impacts[1].horizon == "Q"
+
+
+def test_cascade_runs_fundamental_only_on_material_items(news_mod, monkeypatch):
+    """Sentiment runs on all 3. Fundamental analyzer must see only the
+    HIGH and MEDIUM items -- never the LOW one."""
+    from weekly_strategy.data.schemas import NewsItem
+    from weekly_strategy.data import storage
+    storage.insert_news([
+        NewsItem(ticker="AAPL", title=t, url=f"https://x/{i}",
+                 source="reuters.com", published_at=datetime(2026, 5, 20))
+        for i, t in enumerate(["high_item", "low_item", "medium_item"])
+    ])
+    sentiment_payload = [
+        {"i": 0, "sentiment": "POSITIVE", "materiality": "HIGH",   "theme": "earnings"},
+        {"i": 1, "sentiment": "NEUTRAL",  "materiality": "LOW",    "theme": "other"},
+        {"i": 2, "sentiment": "NEGATIVE", "materiality": "MEDIUM", "theme": "competitive"},
+    ]
+    fundamental_payload = [
+        {"i": 0, "areas": ["revenue"], "direction": "POSITIVE",
+         "magnitude": "medium", "horizon": "Q", "implication": "..."},
+        {"i": 1, "areas": ["gross_margin"], "direction": "NEGATIVE",
+         "magnitude": "small", "horizon": "FY26", "implication": "..."},
+    ]
+    captured = _stub_cascade(
+        monkeypatch, news_mod,
+        sentiment_payload=sentiment_payload,
+        fundamental_payload=fundamental_payload,
+    )
+    news_mod.score_news(
+        "AAPL", since=datetime(2026, 5, 14), until=datetime(2026, 5, 22),
+    )
+    assert captured["sentiment_calls"] == 1
+    assert captured["fundamental_calls"] == 1
+    # The fundamental prompt must enumerate exactly the 2 material items.
+    fp = captured["fundamental_prompt"]
+    assert "high_item" in fp and "medium_item" in fp
+    assert "low_item" not in fp
+
+    # And the storage round-trip: HIGH+MED have fundamental_impact; LOW does not.
+    refreshed = {it.url: it for it in storage.get_news("AAPL")}
+    assert refreshed["https://x/0"].fundamental_impact is not None
+    assert refreshed["https://x/2"].fundamental_impact is not None
+    assert refreshed["https://x/1"].fundamental_impact is None
+
+
+def test_cascade_idempotent_on_rerun(news_mod, monkeypatch):
+    """A second call must not re-invoke either pass when nothing's new."""
+    from weekly_strategy.data.schemas import NewsItem
+    from weekly_strategy.data import storage
+    storage.insert_news([
+        NewsItem(ticker="AAPL", title="x", url="https://x/0",
+                 source="reuters.com", published_at=datetime(2026, 5, 20))
+    ])
+    captured = _stub_cascade(
+        monkeypatch, news_mod,
+        sentiment_payload=[
+            {"i": 0, "sentiment": "POSITIVE", "materiality": "HIGH", "theme": "earnings"}
+        ],
+        fundamental_payload=[
+            {"i": 0, "areas": ["revenue"], "direction": "POSITIVE",
+             "magnitude": "medium", "horizon": "Q", "implication": "..."}
+        ],
+    )
+    news_mod.score_news("AAPL", since=datetime(2026, 5, 14), until=datetime(2026, 5, 22))
+    news_mod.score_news("AAPL", since=datetime(2026, 5, 14), until=datetime(2026, 5, 22))
+    assert captured["sentiment_calls"] == 1
+    assert captured["fundamental_calls"] == 1

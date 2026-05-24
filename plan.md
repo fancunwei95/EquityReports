@@ -357,7 +357,15 @@ Cadence:
 - Stage 1: build once for AAPL, refresh manually as needed
 - Later: quarterly refresh, plus targeted refresh when 10-Q or 10-K filed
 
-### Step 1.5: News sentiment scoring (LLM-based)
+### Step 1.5: News sentiment + fundamental scoring (two-agent cascade)
+
+**Two-agent design**, with a third deferred:
+
+1. **Sentiment agent** (Haiku, every item): per-headline POSITIVE/NEGATIVE/NEUTRAL × HIGH/MEDIUM/LOW × theme enum. Cheap, fast, runs on all ~50-200 items per week.
+2. **Fundamental-impact agent** (Sonnet, only items classified HIGH or MEDIUM in pass 1): per-item structured judgment on *which line items move and by how much* — `areas[]` × direction × magnitude (small/medium/large) × horizon (Q/FY/multi-year) × 1-2 sentence implication. Feeds the thesis writer in Step 1.8 so it can write *"FY26 revenue tailwind"* rather than *"news was positive"*.
+3. **Sectoral / cross-stock agent** — deferred to **Step 2.5** (sectoral scoring), where we'll have cross-ticker context. Reasoning about *"AAPL's AI struggles → NVDA consolidating power"* needs other tickers' dossiers and sector ETF flows that don't exist in Stage 1.
+
+Why the cascade rather than running all three on every item: pass 2 is ~3× the per-token cost of pass 1 (Sonnet vs Haiku), but only ~30-40% of items pass the materiality filter, so total cost goes up ~2×, not 3×. LOW-materiality noise items don't deserve Sonnet attention.
 
 For a week's worth of news on AAPL, the LLM should output structured sentiment.
 
