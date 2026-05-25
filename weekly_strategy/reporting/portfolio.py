@@ -330,6 +330,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <title>{title}</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <style>
 * {{ box-sizing: border-box; }}
 body {{
