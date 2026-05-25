@@ -69,6 +69,9 @@ async function render() {
   // === Latest report link ===
   setLatestReport(perf.open_portfolios || [], perf.closed_portfolios || []);
 
+  // === All historical reports (grouped by year/month) ===
+  renderAllReports(perf.open_portfolios || [], perf.closed_portfolios || []);
+
   // === Footer timestamp ===
   document.getElementById("last-updated").textContent =
     perf.generated_at ? perf.generated_at.replace("T", " ") + " UTC" : "—";
@@ -199,6 +202,79 @@ function renderClosed(cum, closedDetail) {
         <td class="num ${classForReturn(p.ls_return)}">${fmtPct(p.ls_return)}</td>
         <td class="num ${classForReturn(p.cumulative_return)}">${fmtPct(p.cumulative_return)}</td>
       </tr>
+    `;
+  }).join("");
+}
+
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+function renderAllReports(open, closed) {
+  const target = document.getElementById("all-reports");
+  if (!target) return;
+
+  const dates = Array.from(new Set(
+    [...open, ...closed]
+      .map(p => p.entry_date)
+      .filter(d => typeof d === "string" && /^\d{4}-\d{2}-\d{2}/.test(d))
+      .map(d => d.slice(0, 10))
+  )).sort((a, b) => b.localeCompare(a));
+
+  if (dates.length === 0) {
+    target.innerHTML = `<p class="sub">No reports yet.</p>`;
+    return;
+  }
+
+  // Group: year -> month -> [date, ...] (already sorted desc within)
+  const byYear = new Map();
+  for (const d of dates) {
+    const [y, m] = d.split("-");
+    if (!byYear.has(y)) byYear.set(y, new Map());
+    const byMonth = byYear.get(y);
+    if (!byMonth.has(m)) byMonth.set(m, []);
+    byMonth.get(m).push(d);
+  }
+
+  const years = [...byYear.keys()]; // desc because dates were sorted desc
+  const latestYear = years[0];
+
+  const dateLink = (d) =>
+    `<li><a href="portfolio/${d}.html">${d}</a></li>`;
+
+  const monthBlock = (y, m, datesInMonth, isOpenDefault) => {
+    const label = `${MONTH_NAMES[parseInt(m, 10) - 1]} ${y}`;
+    return `
+      <details class="report-month"${isOpenDefault ? " open" : ""}>
+        <summary>${label} <span class="count">(${datesInMonth.length})</span></summary>
+        <ul class="report-list">${datesInMonth.map(dateLink).join("")}</ul>
+      </details>
+    `;
+  };
+
+  // If everything fits in one year, skip the year-level fold.
+  if (years.length === 1) {
+    const y = years[0];
+    const months = [...byYear.get(y).keys()]; // desc
+    target.innerHTML = months
+      .map((m, i) => monthBlock(y, m, byYear.get(y).get(m), i === 0))
+      .join("");
+    return;
+  }
+
+  target.innerHTML = years.map(y => {
+    const months = [...byYear.get(y).keys()];
+    const total = months.reduce((s, m) => s + byYear.get(y).get(m).length, 0);
+    const isLatestYear = y === latestYear;
+    const monthHtml = months
+      .map((m, i) => monthBlock(y, m, byYear.get(y).get(m), isLatestYear && i === 0))
+      .join("");
+    return `
+      <details class="report-year"${isLatestYear ? " open" : ""}>
+        <summary>${y} <span class="count">(${total})</span></summary>
+        <div class="report-year-body">${monthHtml}</div>
+      </details>
     `;
   }).join("");
 }
