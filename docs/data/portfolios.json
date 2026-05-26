@@ -202,5 +202,107 @@
     "current_long_return": 0.0,
     "current_short_return": 0.0,
     "current_ls_return": 0.0
+  },
+  {
+    "entry_date": "2026-05-26",
+    "status": "open",
+    "longs": [
+      {
+        "ticker": "ASML",
+        "sector": "Technology",
+        "composite_z": 72.20181376137782,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 1632.9000244140625,
+        "current_close": 1632.9000244140625,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "FTNT",
+        "sector": "Technology",
+        "composite_z": 70.37352063330937,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 133.92999267578125,
+        "current_close": 133.92999267578125,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "ANET",
+        "sector": "Technology",
+        "composite_z": 70.20129771650869,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 154.02999877929688,
+        "current_close": 154.02999877929688,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "EOG",
+        "sector": "Energy",
+        "composite_z": 69.42590927015422,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 141.22000122070312,
+        "current_close": 141.22000122070312,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "PSX",
+        "sector": "Energy",
+        "composite_z": 68.81958083120324,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 177.69000244140625,
+        "current_close": 177.69000244140625,
+        "current_return": 0.0
+      }
+    ],
+    "shorts": [
+      {
+        "ticker": "AES",
+        "sector": "Utilities",
+        "composite_z": 20.860175854994473,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 14.680000305175781,
+        "current_close": 14.680000305175781,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "XEL",
+        "sector": "Utilities",
+        "composite_z": 21.50060208633,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 81.08000183105469,
+        "current_close": 81.08000183105469,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "TLN",
+        "sector": "Utilities",
+        "composite_z": 25.30639402589592,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 372.45001220703125,
+        "current_close": 372.45001220703125,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "SMR",
+        "sector": "Industrials",
+        "composite_z": 25.968646663538912,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 11.399999618530273,
+        "current_close": 11.399999618530273,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "PEG",
+        "sector": "Utilities",
+        "composite_z": 27.021810384416252,
+        "entry_date_used": "2026-05-22",
+        "entry_close": 79.51000213623047,
+        "current_close": 79.51000213623047,
+        "current_return": -0.0
+      }
+    ],
+    "days_held": 0,
+    "current_long_return": 0.0,
+    "current_short_return": 0.0,
+    "current_ls_return": 0.0
   }
 ]
