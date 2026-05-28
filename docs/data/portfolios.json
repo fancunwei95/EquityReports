@@ -99,7 +99,7 @@
     "days_held": 1,
     "current_long_return": 0.009347500351069881,
     "current_short_return": -0.023805430255282412,
-    "current_ls_return": -0.01445792990421253
+    "current_ls_return": -0.0072289649521062645
   },
   {
     "entry_date": "2026-05-25",
@@ -201,7 +201,7 @@
     "days_held": 1,
     "current_long_return": 0.009347500351069881,
     "current_short_return": -0.023805430255282412,
-    "current_ls_return": -0.01445792990421253
+    "current_ls_return": -0.0072289649521062645
   },
   {
     "entry_date": "2026-05-26",
@@ -303,7 +303,7 @@
     "days_held": 0,
     "current_long_return": -0.0062917639947855705,
     "current_short_return": -0.023805430255282412,
-    "current_ls_return": -0.03009719425006798
+    "current_ls_return": -0.01504859712503399
   },
   {
     "entry_date": "2026-05-27",

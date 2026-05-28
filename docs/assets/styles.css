@@ -167,6 +167,13 @@ section h2 {
   font-weight: 600;
   margin-bottom: 0.2em;
 }
+.open-card .leg-label .leg-note {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: #8a96ab;
+  margin-left: 0.4em;
+}
 .open-card .leg .pos {
   display: flex;
   justify-content: space-between;

@@ -140,18 +140,28 @@ function renderOpen(open) {
   }
   target.innerHTML = open.map(p => {
     const ret = p.current_ls_return;
-    const longHtml = (p.longs || []).map(pos => `
-      <div class="pos">
+    const rawMove = pos => {
+      if (!pos.entry_close || pos.current_close === null || pos.current_close === undefined) return null;
+      return pos.current_close / pos.entry_close - 1;
+    };
+    const longHtml = (p.longs || []).map(pos => {
+      const raw = rawMove(pos);
+      const tip = raw === null ? "" : `stock move ${fmtPct(raw)} → long P&L ${fmtPct(pos.current_return)}`;
+      return `
+      <div class="pos" title="${tip}">
         <span>${pos.ticker}</span>
         <span class="ret ${classForReturn(pos.current_return)}">${fmtPct(pos.current_return)}</span>
-      </div>
-    `).join("");
-    const shortHtml = (p.shorts || []).map(pos => `
-      <div class="pos">
+      </div>`;
+    }).join("");
+    const shortHtml = (p.shorts || []).map(pos => {
+      const raw = rawMove(pos);
+      const tip = raw === null ? "" : `stock move ${fmtPct(raw)} → short P&L ${fmtPct(pos.current_return)} (sign-flipped)`;
+      return `
+      <div class="pos" title="${tip}">
         <span>${pos.ticker}</span>
         <span class="ret ${classForReturn(pos.current_return)}">${fmtPct(pos.current_return)}</span>
-      </div>
-    `).join("");
+      </div>`;
+    }).join("");
     return `
       <div class="open-card">
         <div class="head">
@@ -161,11 +171,11 @@ function renderOpen(open) {
         </div>
         <div class="legs">
           <div class="leg">
-            <div class="leg-label">Longs (${(p.longs || []).length})</div>
+            <div class="leg-label">Longs (${(p.longs || []).length}) <span class="leg-note">% = position P&L</span></div>
             ${longHtml || `<div class="sub">none</div>`}
           </div>
           <div class="leg">
-            <div class="leg-label">Shorts (${(p.shorts || []).length})</div>
+            <div class="leg-label">Shorts (${(p.shorts || []).length}) <span class="leg-note">% = position P&L (sign-flipped: stock&nbsp;↓&nbsp;=&nbsp;green)</span></div>
             ${shortHtml || `<div class="sub">none</div>`}
           </div>
         </div>

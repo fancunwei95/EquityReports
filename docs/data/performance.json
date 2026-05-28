@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-05-27T13:23:10",
+  "generated_at": "2026-05-28T03:06:07",
   "stats": {
     "n_closed": 0,
     "n_open": 4,
     "cumulative_return": 0.0,
-    "current_open_pnl": -0.05901305405849304
+    "current_open_pnl": -0.02950652702924652
   },
   "cumulative_series": [],
   "open_portfolios": [
@@ -210,7 +210,7 @@
       "days_held": 0,
       "current_long_return": -0.0062917639947855705,
       "current_short_return": -0.023805430255282412,
-      "current_ls_return": -0.03009719425006798
+      "current_ls_return": -0.01504859712503399
     },
     {
       "entry_date": "2026-05-25",
@@ -312,7 +312,7 @@
       "days_held": 1,
       "current_long_return": 0.009347500351069881,
       "current_short_return": -0.023805430255282412,
-      "current_ls_return": -0.01445792990421253
+      "current_ls_return": -0.0072289649521062645
     },
     {
       "entry_date": "2026-05-24",
@@ -414,7 +414,7 @@
       "days_held": 1,
       "current_long_return": 0.009347500351069881,
       "current_short_return": -0.023805430255282412,
-      "current_ls_return": -0.01445792990421253
+      "current_ls_return": -0.0072289649521062645
     }
   ],
   "closed_portfolios": []

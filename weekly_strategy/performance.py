@@ -17,8 +17,11 @@ On each daily run:
   portfolio table, top-level stats.
 
 Long return = (exit / entry - 1). Short return = -(exit / entry - 1).
-L/S return per portfolio = mean(long_returns) - mean(short_returns)
-                          (equal-weight in each basket).
+L/S return per portfolio = (sum(long_returns) + sum(short_returns_signed))
+                           / (N_long + N_short)
+                          = average of all 10 per-position P&L returns,
+                          i.e. dollar-neutral return on total deployed capital
+                          (equal-weight across the full 5+5 book).
 
 Cumulative L/S return = sum of per-portfolio L/S returns. (Simple sum
 rather than compounding: matches how people intuit weekly P&L over
@@ -222,9 +225,10 @@ def update_performance() -> dict:
                   if pos.get("current_return") is not None]
         p["current_long_return"] = sum(l_rets) / len(l_rets) if l_rets else None
         p["current_short_return"] = sum(s_rets) / len(s_rets) if s_rets else None
-        if p["current_long_return"] is not None and p["current_short_return"] is not None:
-            # current_short_return is already signed (+) when shorts dropped
-            p["current_ls_return"] = p["current_long_return"] + p["current_short_return"]
+        if l_rets and s_rets:
+            # Equal-weight all 5+5 positions: dollar-neutral return on
+            # total deployed capital (long capital + short capital).
+            p["current_ls_return"] = (sum(l_rets) + sum(s_rets)) / (len(l_rets) + len(s_rets))
         else:
             p["current_ls_return"] = None
 
@@ -243,8 +247,8 @@ def update_performance() -> dict:
             s_final = [pos["return"] for pos in p["shorts"] if pos.get("return") is not None]
             p["long_basket_return"] = sum(l_final) / len(l_final) if l_final else None
             p["short_basket_return"] = sum(s_final) / len(s_final) if s_final else None
-            if p["long_basket_return"] is not None and p["short_basket_return"] is not None:
-                p["ls_return"] = p["long_basket_return"] + p["short_basket_return"]
+            if l_final and s_final:
+                p["ls_return"] = (sum(l_final) + sum(s_final)) / (len(l_final) + len(s_final))
             else:
                 p["ls_return"] = None
             p["exit_date"] = today.isoformat()

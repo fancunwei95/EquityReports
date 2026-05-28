@@ -52,13 +52,17 @@
     <h2>Cumulative L/S return — closed portfolios</h2>
     <canvas id="cum-chart" height="120"></canvas>
     <p class="sub">Each point is a portfolio closed on its exit date (5 trading days after entry).
-       L/S return per book = mean(long returns) + mean(short returns flipped).
+       L/S return per book = average of all 10 per-position P&amp;L returns
+       (sign-flipped on the short side so positive&nbsp;=&nbsp;short profit), i.e.
+       <code>(sum(long_ret) + sum(short_ret_signed)) / 10</code>.
        Curve sums (not compounds) closed returns; treat as a running tally, not a NAV.</p>
   </section>
 
   <section class="open-block">
     <h2>Open portfolios (last 5)</h2>
-    <p class="sub">Marked to market using the latest close. Closes after 5 trading days from entry.</p>
+    <p class="sub">Marked to market using the latest close. Closes after 5 trading days from entry.
+       Per-row % is <b>position P&amp;L</b> (sign-adjusted): for shorts, a falling stock shows as <span class="positive">green/positive</span>.
+       Hover a short row to see the underlying raw stock move.</p>
     <div id="open-list"></div>
   </section>
 
