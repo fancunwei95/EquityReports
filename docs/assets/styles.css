@@ -116,6 +116,15 @@ section h2 {
 }
 .sub { color: #6c7a93; font-size: 0.85em; }
 
+/* Fixed-height wrapper so the responsive chart can't grow unbounded.
+   Chart.js with maintainAspectRatio:false sizes the canvas to its parent;
+   the parent must have an explicit height or the canvas grows on each resize. */
+.chart-wrap {
+  position: relative;
+  height: 340px;
+  margin-top: 0.4em;
+}
+
 /* === Open portfolios === */
 #open-list {
   display: grid;
