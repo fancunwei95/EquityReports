@@ -917,7 +917,7 @@
   },
   {
     "entry_date": "2026-06-02",
-    "status": "open",
+    "status": "closed",
     "longs": [
       {
         "ticker": "AMAT",
@@ -926,7 +926,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 458.1700134277344,
         "current_close": 492.1700134277344,
-        "current_return": 0.07420826113353374
+        "current_return": 0.07420826113353374,
+        "exit_close": 492.1700134277344,
+        "exit_date": "2026-06-10",
+        "return": 0.07420826113353374
       },
       {
         "ticker": "NTAP",
@@ -935,7 +938,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 179.6999969482422,
         "current_close": 170.30999755859375,
-        "current_return": -0.052253753751331344
+        "current_return": -0.052253753751331344,
+        "exit_close": 170.30999755859375,
+        "exit_date": "2026-06-10",
+        "return": -0.052253753751331344
       },
       {
         "ticker": "LRCX",
@@ -944,7 +950,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 317.1199951171875,
         "current_close": 324.45001220703125,
-        "current_return": 0.023114332753237488
+        "current_return": 0.023114332753237488,
+        "exit_close": 324.45001220703125,
+        "exit_date": "2026-06-10",
+        "return": 0.023114332753237488
       },
       {
         "ticker": "CSCO",
@@ -953,7 +962,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 121.33000183105469,
         "current_close": 124.1500015258789,
-        "current_return": 0.02324239390312477
+        "current_return": 0.02324239390312477,
+        "exit_close": 124.1500015258789,
+        "exit_date": "2026-06-10",
+        "return": 0.02324239390312477
       }
     ],
     "shorts": [
@@ -964,7 +976,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 265.70001220703125,
         "current_close": 250.6699981689453,
-        "current_return": 0.056567607631025196
+        "current_return": 0.056567607631025196,
+        "exit_close": 250.6699981689453,
+        "exit_date": "2026-06-10",
+        "return": 0.056567607631025196
       },
       {
         "ticker": "XEL",
@@ -973,7 +988,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 76.41000366210938,
         "current_close": 77.62000274658203,
-        "current_return": -0.01583561086874652
+        "current_return": -0.01583561086874652,
+        "exit_close": 77.62000274658203,
+        "exit_date": "2026-06-10",
+        "return": -0.01583561086874652
       },
       {
         "ticker": "PEG",
@@ -982,7 +1000,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 76.66999816894531,
         "current_close": 77.73999786376953,
-        "current_return": -0.013955911313137559
+        "current_return": -0.013955911313137559,
+        "exit_close": 77.73999786376953,
+        "exit_date": "2026-06-10",
+        "return": -0.013955911313137559
       },
       {
         "ticker": "SMR",
@@ -991,7 +1012,10 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 12.890000343322754,
         "current_close": 10.760000228881836,
-        "current_return": 0.16524437996189
+        "current_return": 0.16524437996189,
+        "exit_close": 10.760000228881836,
+        "exit_date": "2026-06-10",
+        "return": 0.16524437996189
       },
       {
         "ticker": "ETR",
@@ -1000,13 +1024,20 @@
         "entry_date_used": "2026-06-01",
         "entry_close": 104.97000122070312,
         "current_close": 108.11000061035156,
-        "current_return": -0.029913302401954667
+        "current_return": -0.029913302401954667,
+        "exit_close": 108.11000061035156,
+        "exit_date": "2026-06-10",
+        "return": -0.029913302401954667
       }
     ],
-    "days_held": 4,
+    "days_held": 5,
     "current_long_return": 0.017077808509641162,
     "current_short_return": 0.03242143260181529,
-    "current_ls_return": 0.025602044116404567
+    "current_ls_return": 0.025602044116404567,
+    "long_basket_return": 0.017077808509641162,
+    "short_basket_return": 0.03242143260181529,
+    "ls_return": 0.025602044116404567,
+    "exit_date": "2026-06-10"
   },
   {
     "entry_date": "2026-06-03",
@@ -1096,7 +1127,7 @@
         "current_return": 0.05507604223071649
       }
     ],
-    "days_held": 3,
+    "days_held": 4,
     "current_long_return": -0.021470479268761666,
     "current_short_return": 0.04001623447862605,
     "current_ls_return": 0.012688806146453735
@@ -1189,7 +1220,7 @@
         "current_return": 0.01027074288379537
       }
     ],
-    "days_held": 2,
+    "days_held": 3,
     "current_long_return": -0.03781565432543099,
     "current_short_return": 0.04151404617743291,
     "current_ls_return": 0.006256401509493396
@@ -1282,7 +1313,7 @@
         "current_return": 0.01185772737530233
       }
     ],
-    "days_held": 1,
+    "days_held": 2,
     "current_long_return": -0.03685080099582938,
     "current_short_return": 0.042676625888962746,
     "current_ls_return": 0.007331102829055136
@@ -1375,7 +1406,7 @@
         "current_return": 0.01098901098901095
       }
     ],
-    "days_held": 0,
+    "days_held": 1,
     "current_long_return": 0.04911459841808946,
     "current_short_return": 0.0019623269655763,
     "current_ls_return": 0.02291889205558215
@@ -1462,6 +1493,99 @@
         "ticker": "T",
         "sector": "Communication Services",
         "composite_z": 28.920965512263557,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 22.5,
+        "current_close": 22.5,
+        "current_return": -0.0
+      }
+    ],
+    "days_held": 0,
+    "current_long_return": 0.0,
+    "current_short_return": 0.0,
+    "current_ls_return": 0.0
+  },
+  {
+    "entry_date": "2026-06-10",
+    "status": "open",
+    "longs": [
+      {
+        "ticker": "LRCX",
+        "sector": "Technology",
+        "composite_z": 71.25623127805966,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 324.45001220703125,
+        "current_close": 324.45001220703125,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "ASML",
+        "sector": "Technology",
+        "composite_z": 70.58535761435205,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 1749.0400390625,
+        "current_close": 1749.0400390625,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "CSCO",
+        "sector": "Technology",
+        "composite_z": 68.6307780464552,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 124.1500015258789,
+        "current_close": 124.1500015258789,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "NTAP",
+        "sector": "Technology",
+        "composite_z": 68.3167015438256,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 170.30999755859375,
+        "current_close": 170.30999755859375,
+        "current_return": 0.0
+      }
+    ],
+    "shorts": [
+      {
+        "ticker": "OKLO",
+        "sector": "Utilities",
+        "composite_z": 21.56707137264521,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 58.939998626708984,
+        "current_close": 58.939998626708984,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "PEG",
+        "sector": "Utilities",
+        "composite_z": 22.253517369729416,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 77.73999786376953,
+        "current_close": 77.73999786376953,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "SMR",
+        "sector": "Industrials",
+        "composite_z": 24.226794058659028,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 10.760000228881836,
+        "current_close": 10.760000228881836,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "CHTR",
+        "sector": "Communication Services",
+        "composite_z": 26.470365958983027,
+        "entry_date_used": "2026-06-08",
+        "entry_close": 132.1999969482422,
+        "current_close": 132.1999969482422,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "T",
+        "sector": "Communication Services",
+        "composite_z": 28.87297130204603,
         "entry_date_used": "2026-06-08",
         "entry_close": 22.5,
         "current_close": 22.5,
