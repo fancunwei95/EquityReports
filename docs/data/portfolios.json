@@ -2476,5 +2476,98 @@
     "current_long_return": 0.0,
     "current_short_return": 0.0,
     "current_ls_return": 0.0
+  },
+  {
+    "entry_date": "2026-06-22",
+    "status": "open",
+    "longs": [
+      {
+        "ticker": "AMAT",
+        "sector": "Technology",
+        "composite_z": 67.29614193359386,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 617.1099853515625,
+        "current_close": 617.1099853515625,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "LRCX",
+        "sector": "Technology",
+        "composite_z": 66.97828055654588,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 389.0400085449219,
+        "current_close": 389.0400085449219,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "ANET",
+        "sector": "Technology",
+        "composite_z": 66.3379127049278,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 169.6699981689453,
+        "current_close": 169.6699981689453,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "NTAP",
+        "sector": "Technology",
+        "composite_z": 64.48920621816319,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 159.7100067138672,
+        "current_close": 159.7100067138672,
+        "current_return": 0.0
+      }
+    ],
+    "shorts": [
+      {
+        "ticker": "OKLO",
+        "sector": "Utilities",
+        "composite_z": 23.68725049770683,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 61.16999816894531,
+        "current_close": 61.16999816894531,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "CEG",
+        "sector": "Utilities",
+        "composite_z": 28.65009142536316,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 274.05999755859375,
+        "current_close": 274.05999755859375,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "VST",
+        "sector": "Utilities",
+        "composite_z": 29.89213120776394,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 163.75,
+        "current_close": 163.75,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "AES",
+        "sector": "Utilities",
+        "composite_z": 30.64134243963912,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 14.619999885559082,
+        "current_close": 14.619999885559082,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "SMR",
+        "sector": "Industrials",
+        "composite_z": 33.050633951211125,
+        "entry_date_used": "2026-06-18",
+        "entry_close": 11.739999771118164,
+        "current_close": 11.739999771118164,
+        "current_return": -0.0
+      }
+    ],
+    "days_held": 0,
+    "current_long_return": 0.0,
+    "current_short_return": 0.0,
+    "current_ls_return": 0.0
   }
 ]

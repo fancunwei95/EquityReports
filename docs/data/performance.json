@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-19T13:13:05",
+  "generated_at": "2026-06-22T12:38:54",
   "stats": {
     "n_closed": 15,
-    "n_open": 6,
+    "n_open": 7,
     "cumulative_return": 0.3218315644773892,
     "current_open_pnl": 0.03934332755656094
   },
@@ -99,6 +99,99 @@
     }
   ],
   "open_portfolios": [
+    {
+      "entry_date": "2026-06-22",
+      "status": "open",
+      "longs": [
+        {
+          "ticker": "AMAT",
+          "sector": "Technology",
+          "composite_z": 67.29614193359386,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 617.1099853515625,
+          "current_close": 617.1099853515625,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "LRCX",
+          "sector": "Technology",
+          "composite_z": 66.97828055654588,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 389.0400085449219,
+          "current_close": 389.0400085449219,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "ANET",
+          "sector": "Technology",
+          "composite_z": 66.3379127049278,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 169.6699981689453,
+          "current_close": 169.6699981689453,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "NTAP",
+          "sector": "Technology",
+          "composite_z": 64.48920621816319,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 159.7100067138672,
+          "current_close": 159.7100067138672,
+          "current_return": 0.0
+        }
+      ],
+      "shorts": [
+        {
+          "ticker": "OKLO",
+          "sector": "Utilities",
+          "composite_z": 23.68725049770683,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 61.16999816894531,
+          "current_close": 61.16999816894531,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "CEG",
+          "sector": "Utilities",
+          "composite_z": 28.65009142536316,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 274.05999755859375,
+          "current_close": 274.05999755859375,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "VST",
+          "sector": "Utilities",
+          "composite_z": 29.89213120776394,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 163.75,
+          "current_close": 163.75,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "AES",
+          "sector": "Utilities",
+          "composite_z": 30.64134243963912,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 14.619999885559082,
+          "current_close": 14.619999885559082,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "SMR",
+          "sector": "Industrials",
+          "composite_z": 33.050633951211125,
+          "entry_date_used": "2026-06-18",
+          "entry_close": 11.739999771118164,
+          "current_close": 11.739999771118164,
+          "current_return": -0.0
+        }
+      ],
+      "days_held": 0,
+      "current_long_return": 0.0,
+      "current_short_return": 0.0,
+      "current_ls_return": 0.0
+    },
     {
       "entry_date": "2026-06-19",
       "status": "open",
@@ -470,99 +563,6 @@
       "current_long_return": 0.034723073358874756,
       "current_short_return": -0.012764890001581786,
       "current_ls_return": 0.008340871491954456
-    },
-    {
-      "entry_date": "2026-06-15",
-      "status": "open",
-      "longs": [
-        {
-          "ticker": "AMAT",
-          "sector": "Technology",
-          "composite_z": 75.32420356520716,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 567.25,
-          "current_close": 617.1099853515625,
-          "current_return": 0.0878977264901939
-        },
-        {
-          "ticker": "LRCX",
-          "sector": "Technology",
-          "composite_z": 71.06315618052993,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 366.80999755859375,
-          "current_close": 389.0400085449219,
-          "current_return": 0.06060361259040414
-        },
-        {
-          "ticker": "NTAP",
-          "sector": "Technology",
-          "composite_z": 74.05732039189701,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 161.61000061035156,
-          "current_close": 159.7100067138672,
-          "current_return": -0.011756660412775677
-        },
-        {
-          "ticker": "ANET",
-          "sector": "Technology",
-          "composite_z": 72.50087798818569,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 163.24000549316406,
-          "current_close": 169.6699981689453,
-          "current_return": 0.03938980923429658
-        }
-      ],
-      "shorts": [
-        {
-          "ticker": "OKLO",
-          "sector": "Utilities",
-          "composite_z": 25.349432268323664,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 57.4900016784668,
-          "current_close": 61.16999816894531,
-          "current_return": -0.06401106945621948
-        },
-        {
-          "ticker": "AI",
-          "sector": "Technology",
-          "composite_z": 27.070233661726526,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 10.899999618530273,
-          "current_close": 10.300000190734863,
-          "current_return": 0.055045820990249905
-        },
-        {
-          "ticker": "CEG",
-          "sector": "Utilities",
-          "composite_z": 28.313219872097882,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 253.75999450683594,
-          "current_close": 274.05999755859375,
-          "current_return": -0.07999686117273686
-        },
-        {
-          "ticker": "XEL",
-          "sector": "Utilities",
-          "composite_z": 28.674383627931032,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 79.22000122070312,
-          "current_close": 77.41000366210938,
-          "current_return": 0.02284773454561284
-        },
-        {
-          "ticker": "T",
-          "sector": "Communication Services",
-          "composite_z": 29.18975818926775,
-          "entry_date_used": "2026-06-12",
-          "entry_close": 23.579999923706055,
-          "current_close": 22.010000228881836,
-          "current_return": 0.06658183629787995
-        }
-      ],
-      "days_held": 3,
-      "current_long_return": 0.044033621975529735,
-      "current_short_return": 9.349224095727138e-05,
-      "current_ls_return": 0.019622438789656145
     }
   ],
   "closed_portfolios": [
