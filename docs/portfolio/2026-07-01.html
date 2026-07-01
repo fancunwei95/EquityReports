@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Portfolio — 2026-07-01</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  max-width: 980px;
+  margin: 2em auto;
+  padding: 0 1em 4em;
+  color: #1c1c1c;
+  line-height: 1.55;
+  background: #f6f7f9;
+}
+h1 {
+  color: #0f1e3a;
+  border-bottom: 3px solid #2a5fa0;
+  padding-bottom: 0.4em;
+  margin-bottom: 0.6em;
+  font-size: 1.9em;
+}
+h2 {
+  color: #1a2540;
+  border-bottom: 1px solid #c8d2e0;
+  padding-bottom: 0.25em;
+  margin-top: 2em;
+  font-size: 1.4em;
+}
+h3 { margin-top: 1.2em; color: #1a2540; }
+table {
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  font-size: 0.95em;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+th, td { border: 1px solid #e0e4ea; padding: 0.4em 0.8em; text-align: left; }
+th { background: #eef1f6; color: #2a3b5c; }
+code {
+  background: #eef1f6;
+  padding: 0.05em 0.35em;
+  border-radius: 3px;
+  font-size: 0.92em;
+  color: #2a3b5c;
+}
+blockquote {
+  border-left: 4px solid #2a5fa0;
+  margin: 0.6em 0;
+  padding: 0.4em 1em;
+  color: #2a3b5c;
+  background: #eef3fa;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+}
+hr { border: 0; border-top: 1px solid #c8d2e0; margin: 2em 0; }
+ul, ol { padding-left: 1.4em; }
+a { color: #2a5fa0; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* === Position cards === */
+.position {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1em 1.2em 0.8em;
+  margin: 0.9em 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-left: 5px solid #888;
+}
+.position.long  { border-left-color: #1f8a5c; }
+.position.short { border-left-color: #c14242; }
+
+.position-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6em;
+  margin-bottom: 0.3em;
+}
+.side-badge {
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 0.1em 0.55em;
+  border-radius: 3px;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+.side-badge.long  { background: #1f8a5c; }
+.side-badge.short { background: #c14242; }
+.position-head .rank {
+  color: #6c7a93;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+.position-head .ticker {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #0f1e3a;
+  letter-spacing: 0.02em;
+}
+.position-head .meta {
+  color: #6c7a93;
+  font-size: 0.9em;
+}
+.position-headline {
+  color: #2a3b5c;
+  font-size: 0.98em;
+  margin-bottom: 0.6em;
+  padding-bottom: 0.55em;
+  border-bottom: 1px dashed #d6dce5;
+}
+
+.position-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  margin: 0.5em 0 0.8em;
+  font-size: 0.86em;
+}
+.position-stats .stat {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.position-stats .lbl {
+  color: #6c7a93;
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.position-stats .val {
+  color: #1a2540;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.conviction-high   { color: #1f8a5c; }
+.conviction-medium { color: #b87800; }
+.conviction-low    { color: #c14242; }
+
+.reasoning-block {
+  margin: 0.55em 0;
+  padding: 0.45em 0;
+}
+.reasoning-block .label {
+  font-size: 0.76em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c7a93;
+  margin-bottom: 0.25em;
+  font-weight: 600;
+}
+.reasoning-block ul { margin: 0.2em 0; padding-left: 1.2em; }
+.reasoning-block li { margin: 0.18em 0; color: #2a3b5c; }
+.reasoning-block.llm { background: #f4f7fb; padding: 0.6em 0.8em; border-radius: 4px; }
+.reasoning-block .sub-label {
+  font-size: 0.82em;
+  font-weight: 600;
+  color: #1a2540;
+  margin-top: 0.4em;
+}
+.reasoning-block .sub-label.flags { color: #c14242; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.4em; }
+.chip {
+  background: #eef1f6;
+  border: 1px solid #d6dce5;
+  border-radius: 12px;
+  padding: 0.15em 0.7em;
+  font-size: 0.82em;
+  color: #2a3b5c;
+  font-variant-numeric: tabular-nums;
+}
+
+.news-aggregate {
+  font-size: 0.88em;
+  color: #2a3b5c;
+  margin-bottom: 0.45em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px dashed #d6dce5;
+}
+.news-item {
+  font-size: 0.88em;
+  line-height: 1.5;
+  margin: 0.4em 0;
+  padding: 0.35em 0;
+  border-top: 1px dotted #e0e4ea;
+}
+.news-item:first-child { border-top: 0; }
+.news-item .fi {
+  margin: 0.25em 0 0 1.4em;
+  font-size: 0.92em;
+  color: #4a5775;
+}
+.news-item .fi-impl {
+  display: block;
+  margin-top: 0.2em;
+  font-style: italic;
+  color: #6c7a93;
+}
+.news-list { font-size: 0.88em; line-height: 1.6; }
+.reddit-summary { font-size: 0.88em; color: #2a3b5c; }
+.reddit-flag {
+  color: #c14242;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+.chips.inline { display: inline-flex; }
+
+/* === Folded "Others" section === */
+details.position-fold {
+  background: #fff;
+  border: 1px solid #d6dce5;
+  border-radius: 6px;
+  margin: 1em 0;
+  padding: 0.55em 0.9em;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+details.position-fold summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #2a5fa0;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+details.position-fold summary::before {
+  content: "▶";
+  font-size: 0.7em;
+  color: #6c7a93;
+  transition: transform 0.15s ease;
+  display: inline-block;
+}
+details.position-fold[open] summary::before {
+  transform: rotate(90deg);
+}
+details.position-fold[open] summary {
+  border-bottom: 1px solid #e0e4ea;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.6em;
+}
+details.position-fold.long summary { color: #1f8a5c; }
+details.position-fold.short summary { color: #c14242; }
+.fold-body { padding-top: 0.25em; }
+.fold-body .position {
+  margin: 0.6em 0;
+  padding: 0.7em 1em 0.55em;
+  border-left-width: 4px;
+}
+.fold-body .position-headline {
+  font-size: 0.92em;
+  padding-bottom: 0.4em;
+  margin-bottom: 0.4em;
+}
+.fold-body .position-head .ticker { font-size: 1.15em; }
+.fold-body .position-stats { margin: 0.3em 0 0.55em; }
+.news-tag {
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  vertical-align: middle;
+}
+.news-tag.positive { background: #1f8a5c; }
+.news-tag.negative { background: #c14242; }
+.news-tag.neutral  { background: #888; }
+.news-mat {
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  font-weight: 700;
+  background: #eef1f6;
+  color: #2a3b5c;
+  vertical-align: middle;
+}
+.news-theme {
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  background: #fff8e6;
+  border: 1px solid #ecd99b;
+  color: #6c5410;
+  vertical-align: middle;
+}
+</style>
+</head>
+<body>
+<h1>Weekly Portfolio Report</h1>
+<p>Week ending <strong>2026-07-01</strong><br />
+Longs: <strong>5</strong> · Shorts: <strong>10</strong><br />
+Net beta: <strong>+0.00</strong></p>
+<h2>Longs (5)</h2>
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#1</span><span class='ticker'>VRT</span><span class='meta'>Industrials · β +2.10 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 74.5/100 (weighted z +0.98σ) — VRT ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>74.53</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>sector</b> (+3.07σ), <b>momentum</b> (+0.77σ), <b>quality</b> (+0.62σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +21.6%</span><span class='chip'>op margin 17.9%</span><span class='chip'>FCF margin 18.5%</span><span class='chip'>ROE 31.4%</span><span class='chip'>netDebt/EBITDA 0.36x</span><span class='chip'>shareCt YoY +1.1%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +6.1% · 3m +43.0% · 6m +99.8%.</li>
+<li>Sector <b>XLI</b> (Industrials): rank 1/11, 1m vs SPY +8.27%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>5</strong> material items this week · aggregate sentiment <span class='news-tag neutral'>+0.14</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMiowFBVV95cUxQWWdRT09wc2N4TTgzSWFCY2xzN1llZzJicnpKQS01Mk1sUVcwZlZvTlRhanpXVmZJaVdVYXkycGFaTVNFdUVOYkw5MGxkcE1mUW5NV0FXaFpVTk9fdmNvM25nc1FJcG1wQUxMNnFVT1R3dXNVOWlINXMxeDFiVWxYa2lWdFB6VG1WVzZmd0EzMHhHTzBGbUEzNnZXNUlyUEVsc0Rj?oc=5'>Here Is What to Expect From Vertiv Holdings (VRT) Following Two Major Acquisitions? - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>UNCLEAR</b> · large · multi-year on revenue, operating_margin, leverage, working_capital<br><span class='fi-impl'>Two major acquisitions should add inorganic revenue meaningfully, but near-term integration costs and acquisition-related debt will pressure operating margins and elevate leverage ratios. Net fundamental impact depends o</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>earnings</span> <a href='https://news.google.com/rss/articles/CBMimgFBVV95cUxNU0xvWThBNF91VFFnbmp5N0FReGRtRkJsV0x6ODlRMGN3VTBhZm42VVVMRUlqMjBtYkRZN3FqNVE4UERsM2x6eksxVm1wQmpTMkNIdWd3U0VETnVLUUJ5R0cybEg2elJ4UmJkRFpqU3FQdnNpbnBacEVDc2FQMlluVGt0WlNfS3kxMmx3aVRCenJidTJVMU9MZ093?oc=5'>Vertiv Holdings: When Even A Great Quarter Isn't Enough - Seeking Alpha</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · Q on revenue, gross_margin, operating_margin<br><span class='fi-impl'>A 'great quarter' implies top-line beat and margin outperformance versus consensus, affirming that Vertiv's data-center power infrastructure demand is translating into solid execution. The headline framing ('not enough')</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>earnings</span> <a href='https://news.google.com/rss/articles/CBMipgFBVV95cUxQbmRFUm9GUV82clBtZEMwMEJabGN1NW1fdzcyTEswekpVRFNybGFTYm81YnlJTUU0ZmN3VVR0MWRST19oVkdOajZoYlAzRlBTODMyZC1Pck1HV1hNUXRaMXJHamhlVlNKZGNodVZKTjJvblU1c0pRU0Q4VGk1dC0yM2t4Z05ZTTZFWExHRl96OVpWdWhaaW4wRkZodUtFQlZCdmFBYjN3?oc=5'>Vertiv Stock: Selling The Bottleneck, Billing At The Pace Of The Build (NYSE:VRT) - Seeking Alpha</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, working_capital, operating_leverage<br><span class='fi-impl'>The 'billing at the pace of the build' framing suggests VRT's revenue recognition is tightly coupled to data-center construction cadence, implying accelerating backlog conversion and improving receivables quality as hype</span></div></div><div class='news-item'><span class='news-tag neutral'>NEUTRAL</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMivgFBVV95cUxQV2lLTXFIWk9HdlRXaTNlQkJwM2phZmZ4TFJGdTVVNk1zM1FKSU0wS2tVWUpsbW45MnpCekNBSkZnSTRTY0EtM0Rha0Q0VlpxNlBFSGlLRlRVVFJObXd3TW5vU2xDUVVCX3BlZWNYWGFyMGxvU1NrenZwZVBuWmJkWHJDc1BUTzlMcW1ndXBjaGQzRDFzZGI1cVhoY1JPUWdmWlhOay1OUmpTdV95djRwTHMwbWpxS3k1QjM1emp3?oc=5'>Vertiv Holdings: AI Pick And Shovel Status Proven - Growth Premium Already Baked-In - Seeking Alpha</a> <em>(contrib +0.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · multi-year on revenue, operating_margin, operating_leverage<br><span class='fi-impl'>Confirmation of VRT's 'AI pick-and-shovel' positioning supports a structurally higher revenue growth trajectory as hyperscaler capex compounds; operating leverage should amplify margin expansion over time as volumes scal</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#2</span><span class='ticker'>LRCX</span><span class='meta'>Technology · β +1.82 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 70.9/100 (weighted z +0.83σ) — LRCX ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>70.86</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>news sentiment</b> (+1.50σ), <b>quality</b> (+1.36σ), <b>momentum</b> (+0.77σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +2.3%</span><span class='chip'>op margin 32.0%</span><span class='chip'>FCF margin 29.4%</span><span class='chip'>ROE 50.6%</span><span class='chip'>netDebt/EBITDA 0.07x</span><span class='chip'>shareCt YoY -2.3%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +36.2% · 3m +116.7% · 6m +143.3%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 7/11, 1m vs SPY +1.02%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>6</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+0.88</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMitgFBVV95cUxOb1ctY09xM25WTy03VENGQ2x1cjB1MWJpZHVnSUVvaXJPTXRzMnEzblMza3NFMG5yanlMWG02QUV4bXpkRVc3UE9tMVYxSFVtNWJHWGFlWGQ0QV9HaG1sSXhGYlBxVzE5Rl9ENFlFeEZLQ3NPMk4za3BlRDNmNVlNam01a3FiU3ZRZWoza09pbHZXUGJUbFRXSUtfZS1GQ3c3WlRrbGV1RF9kbGVXTHdqWFBsWUJqQQ?oc=5'>Chip equipment stocks in focus as Susquehanna ups equipment spending forecast (LRCX:NASDAQ) - Seeking Alpha</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, operating_margin, operating_leverage<br><span class='fi-impl'>Susquehanna raising its semiconductor equipment spending forecast directly lifts consensus WFE (wafer-fab equipment) TAM assumptions, supporting a 1-5% upward revision to Lam's revenue outlook; incremental revenue at hig</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMilAFBVV95cUxQRUNDNEFJQ2NIaE9GVFhtYzF2UjRmd1lycXJNeWJmTm1HZWsxT1FsSkRsZFV0NnNJY0txLTFiVWVXNlZJcm5xS0lmS2xrMGZ4cW5IcE1fWkxkWHBHeFdlQ2x4dnJnTXRpS1dhZjE5dmtPSnlHa3VQbWVwYzFTdlRDU1FQbkk1VjZISDFTanFZYUJMSzFi?oc=5'>Lam Research (LRCX): Citi Raises Target by $135 on a Multi-Year Chip Manufacturing Investment Boom - Yahoo Fin</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · multi-year on revenue, operating_leverage, fcf_margin<br><span class='fi-impl'>Citi's $135 PT lift explicitly cites a multi-year chip manufacturing investment boom, implying sustained WFE spend that would drive above-trend revenue growth for Lam's etch/deposition tools; higher utilization at scale </span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMimgFBVV95cUxOb056ZlBZWjJEWEh0a1ZUcnNNd1ZseFFtS3lPUmJMcEZJM2FzWm9Jc0p6U21UWHlldXloN2FEb0ZGOWZINEZwZlhUbG81Z1FSSnpQSGtzcFppT0V5YXF5blE5MXlITGxYYXhLQTZkSFZCU0hHSE5nZDBlWHUybG1YWVFvNnpBNnljeUY1VE1pRWdqMThZQlAzN1hn?oc=5'>Lam Research Stock, Chip Gear Peers Hit Record Highs - Investor's Business Daily</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · Q on other<br><span class='fi-impl'>Stock hitting record highs reflects market sentiment and valuation re-rating rather than a discrete change in any fundamental line item; no new revenue, margin, or capital-structure data is introduced by the price action</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMinAFBVV95cUxQNVllbnFRUG9vWUlGYy1SanJjUVByaG9LcXFnYlRfSURTX212anBXRk5ZeHZvV2RZZnRTNks3YTA3M1g3M09kYm1OTnhQdEtJMTRnLTVyeGhQV1JTWUtQVTBwVEh5MUMzbE80azItc3lpLVBWWV9XM2lZaUtudm5uMHVhYVZOV3hNelBnT3U0ZDNkT2h5cjRlSm55clY?oc=5'>Lam Research (LRCX) Joins The Russell Top 50 Index As Its Market Profile Grows - Yahoo Finance</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · small · Q on share_count<br><span class='fi-impl'>Russell Top 50 inclusion triggers mandatory passive-fund buying, creating technical demand for shares; over time this elevated liquidity profile can modestly reduce dilution cost and improve buyback efficiency, but the d</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#3</span><span class='ticker'>AMAT</span><span class='meta'>Technology · β +1.65 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 69.7/100 (weighted z +0.79σ) — AMAT ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>69.66</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>quality</b> (+1.42σ), <b>news sentiment</b> (+1.20σ), <b>momentum</b> (+0.77σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +3.2%</span><span class='chip'>op margin 29.2%</span><span class='chip'>FCF margin 20.1%</span><span class='chip'>ROE 29.3%</span><span class='chip'>netDebt/EBITDA 0.02x</span><span class='chip'>shareCt YoY -3.1%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +60.6% · 3m +123.8% · 6m +176.1%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 7/11, 1m vs SPY +1.02%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>23</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+0.71</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>guidance</span> <a href='https://news.google.com/rss/articles/CBMiqAFBVV95cUxQMWtlbG9YT2xoY0hFMEZKa25kaVN0WXppUUNyVjlDOWpCbWVrZkJZUjhmMkIyV2RlajY3VlR6Y19jb1JMeFBZUWVZOHJQcnZNN05FdEF3UXV0YmIxMFg1alVza1NoY3U2ckFuYlJEeXA5MENNaERDbnQ4RWtOakRQM3NPUm5SUUVFbFJ5WlJZckdVUnZkSF9fbDdROGkxbV9RWE5CMGgyNEg?oc=5'>Is Applied Materials (AMAT) Expensive After Raising Its Growth Outlook? - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, operating_margin, operating_leverage<br><span class='fi-impl'>A raised growth outlook directly lifts consensus revenue estimates and, given AMAT's high incremental margins on semiconductor equipment, flows through to operating margin expansion above prior expectations. Medium magni</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMimwFBVV95cUxNNjBxQ09oSXFUdnpMZW91SlpnTl9aTU5jVmtMN181dGsxQXdtZW1QYmJ2U2hCdV9jQzVyNWQ5QmozUEY4emxVU0daRE1uaGo3UE9uUFlEMXVnSkZJS2xrLXpBVDRaOExGR1U1alRrNlMyUGNsb0YtT09sTV91REtOekxudjdic1E5Z0hXUUJpZVVXSjVJeTllZ2NJVQ?oc=5'>Bank of America Just Gave Applied Materials Stock a New Street-High Price Target - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, gross_margin, operating_margin<br><span class='fi-impl'>BofA's new street-high price target signals the most constructive fundamental view on the sell side, implying meaningful upside to consensus revenue and margin estimates—likely tied to stronger-than-expected WFE spending</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMimwFBVV95cUxQOHBFZFE5c1Q3Wk5qV3BWRG5ibjJEc1dldXM0dVlWdUk4TjhIOF9zekFGN0Niem9TZjBZSTBDSUE5eDFoVjlkLVlDSl9WZ3cwZGtvSWRXTzNOWUk4WHhyMmdOZHc2WmRnNGstWVBGWkd1Y0g1Nm1lc1VMbm83bG5Ka2NkQnpwdmVIM3AydVpEZ3NIZ1V1Wm9yMTRfOA?oc=5'>Goldman Sachs Predicts 3 Stocks to Benefit Most From $757B AI’s Capex Supercycle - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · multi-year on revenue, operating_leverage<br><span class='fi-impl'>Goldman Sachs identifying AMAT as a top-3 beneficiary of a $757B AI capex supercycle implies sustained multi-year step-up in wafer-fabrication-equipment orders, which would drive double-digit revenue growth and meaningfu</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>product</span> <a href='https://news.google.com/rss/articles/CBMipgFBVV95cUxQVlZONjY4cWxQSUEtbHZQMmx1dUxZb0VrSmpjRHJENDFYTWZ6WTYybkQ1dmNpT1J2WGZMTVRSVk13ckNreTBrdkFZTE1oRDk0Y09XTkh5bVN1QmJYZ01MOEpIVklCeDltMlJ0NnNST2RBWEZiWlB5LVA4aVh2eDZndmdqY2ZJVkZIRkloVXd5QzB5R25nenZhT2VsNUhzcUJCTW95Ykl3?oc=5'>Applied Materials (AMAT) Launches New Chipmaking Systems, Soars to All-Time High - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · FY26 on revenue, gross_margin, operating_leverage<br><span class='fi-impl'>New chipmaking system launches expand AMAT's addressable equipment spend per wafer start, driving incremental tool revenue and mix-shift toward higher-ASP systems that typically carry above-corporate-average gross margin</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#4</span><span class='ticker'>FTNT</span><span class='meta'>Technology · β +0.92 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 67.1/100 (weighted z +0.68σ) — FTNT ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>67.11</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>quality</b> (+1.27σ), <b>news sentiment</b> (+0.84σ), <b>momentum</b> (+0.77σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +15.5%</span><span class='chip'>op margin 30.7%</span><span class='chip'>FCF margin 32.7%</span><span class='chip'>ROE 187.3%</span><span class='chip'>netDebt/EBITDA -0.77x</span><span class='chip'>shareCt YoY -0.9%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +11.3% · 3m +94.3% · 6m +88.4%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 7/11, 1m vs SPY +1.02%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>9</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+0.67</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxPV2M1ZWpRWVc4VU9jbjZoOGMtQnZYQTBsaTlySjBoUy1uRTJSYUUxZnltSXI5cHVsd2Vzalp0d2ZuUmJzY3BfU2ZTaE9MSXhmQVNsUlJkSzl6UlBDcE5ZZG93cU40SjdfVlRwTGJ5R2NkaV9kWXRhbDdlS2JiYnV3WlkzZjlLYVRYWVEyeldpTktzUVM5UHVz?oc=5'>Dow Jones Medical Giant J&J Breaks Out; PNC, Iron Mountain, Fortinet In Or Near Buy Zones - Investor's Busines</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · Q on other<br><span class='fi-impl'>IBD flagging FTNT in or near a buy zone is purely a technical/price-action observation with no direct read-through to any fundamental line item; it may attract incremental retail flow but does not alter earnings, margins</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>guidance</span> <a href='https://news.google.com/rss/articles/CBMimgFBVV95cUxPM29wLWF6UTFRNEl3WGpUSGxCMlFHSE1Samp5eHdZSzhnSDI0TWItbzFNLW5rRXRCRWlZN0pCSW9ma1NTUWdkSFpFNHFjaHdpbV9FVHlmbmdYWWZEeDF2UDNIQVhyMjVld09VbWtROHV2STlLQi1UZ0JETjI1WGFYaURYWHA3RjJBS1pNN3ZVRDJhSkpkb191YTF3?oc=5'>Fortinet (FTNT) Stock Could Be A Top Performer This Year Amid Cautious Guidance - Yahoo Finance</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, operating_margin<br><span class='fi-impl'>Cautious guidance typically creates a low bar for beats; analysts highlighting FTNT as a top performer despite conservative management commentary signals expected revenue and margin outperformance through FY26 as billing</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMi4gFBVV95cUxPQ0w0dE82clR6QUpWWUFTYzRXOGZNa2lpNVlHZzRwYjN6RDBTVE9mX1lrY0JMRFZxM1FYbjNVYklxWXN4SVpQMXNlTEZwY0NiZDdMUjJZSWs4YlZESGJjQTVlNWVlaTljMUY4RVdKN2VRbWwtclRTbElvQm1QYWN5NUNpWUdUWVQ3emtpa3dGdk4yQzlMS2l4UXkwYlB4YUx4cGxTTzhzaTZjSGFJdDhaUlhQUDhJQ2MxT3V5anowQnRmaTEtSGxhcXZUTkFCQm1NbmxRUkNIZWZLOWFjb1dXWDNR?oc=5'>Fortinet Inc. stock underperforms Monday when compared to competitors despite daily gains - MarketWatch</a> <em>(contrib -0.50)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · Q on other<br><span class='fi-impl'>A note that FTNT's daily gain lagged cybersecurity peers is a relative price-performance observation, not a fundamental data point; it signals potential near-term sentiment headwind versus the peer group but carries no d</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>product</span> <a href='https://news.google.com/rss/articles/CBMilAFBVV95cUxOS2dPZ3ZyQ0VoOG1paGx6Q1pXNGwwNGEtSUhvZGlkZlNfVFdwOElyRm0zSEkzZklqX3JjSUNDU3RoN00wU1JOdnhpRHFzM3JJYk1jeVB2QWlTc0tFWGgyNzdmUzdYWURSd2tnNnZTNURicVlXU3dlQmJHbEt0MkdKWk5RU1dSMzV5MldTWXYyRGg5dnZR?oc=5'>Is Fortinet Stock Attractive With FortiGate and Cloud Platform Growth? - Yahoo Finance Singapore</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · multi-year on revenue, gross_margin, operating_margin, operating_leverage<br><span class='fi-impl'>FortiGate firewall refresh momentum driven by AI-era network upgrades and accelerating cloud platform adoption should lift both product and higher-margin service/software revenue, improving gross margin mix and driving o</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#5</span><span class='ticker'>TER</span><span class='meta'>Technology · β +1.79 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 67.0/100 (weighted z +0.68σ) — TER ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>67.00</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>news sentiment</b> (+1.21σ), <b>quality</b> (+0.87σ), <b>momentum</b> (+0.77σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +0.4%</span><span class='chip'>op margin 20.4%</span><span class='chip'>FCF margin 14.1%</span><span class='chip'>ROE 17.6%</span><span class='chip'>netDebt/EBITDA -0.31x</span><span class='chip'>shareCt YoY -2.2%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +29.3% · 3m +75.1% · 6m +143.3%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 7/11, 1m vs SPY +1.02%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>8</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+0.83</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMinAFBVV95cUxQcnA0OXlYYzJleUxmTFo3NXlrLXpydGNFNjdyQUFOQzh1SVoyTE5xdTZjVXFYbTdpQVo2VVZ5Z2tZTzZHQ1lBWUJyMU1oMlhqN09GU3M2czV4Vk5qUGdPZmtra2FFOVplN1I3dEd6V181TWpWckJEVktVeVdkRjd3c0N3TzJrXzY3SGlyQzEwamQxWUZxcDBYNUdzRDc?oc=5'>Why Are Teradyne (TER) Shares Soaring Today - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, operating_margin<br><span class='fi-impl'>A sharp single-day share-price rally typically reflects a material positive catalyst—likely a demand signal from a key customer, raised guidance, or an AI/HBM test-equipment win—that would lift Teradyne's near-term reven</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMimgFBVV95cUxORG1EamtYclZKOXFLRnAzUXVHLVY2eGh4TjdJY3psMmx0SXpPNlZwMkFRV3NUekp5V2EwR2t1a05FTFFKbjhNcFFYdVBncllXaF9RdlF3UUNKaGhLUk5jTWoyNUxhd3BOX0l2YklMUVY3eFlySDVTMUEzNnFVT1VKWGNrbjl1R1FoWmxTa214RGhEZ3M5UFktMF9n?oc=5'>Teradyne (TER) Joins The NASDAQ 100 And Recasts Its Growth Investor Base - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · small · multi-year on other, share_count<br><span class='fi-impl'>NASDAQ 100 inclusion mandates passive-fund buying and attracts growth-oriented institutional capital, broadening TER's investor base and lowering cost of equity; this has no direct near-term impact on revenue or margins </span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>earnings</span> <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxQTmxTS0s1Vmd0QVctdUVyMFdnNGZUeEhja056WnRRMFl6UkV5RHFSOEpDQ1dua0JMaXNhY2FnWWp6WmE4WWdjNlRybEN3YzlvNHhTUENyR0JSLUxndWh4ZTNGYVJQOHVxUUZsOThhVk40TkwxZW5saDBmZXNyZVZ0WVBNaFdJR2pNZWFySF9yZ3g3Smw3WXk0?oc=5'>Teradyne (TER) Hits All-Time High as Major Customer Reports Stellar Earnings - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY25 on revenue, operating_leverage<br><span class='fi-impl'>A major customer's stellar earnings (likely a leading fabless chip or memory customer) signals stronger-than-expected semiconductor demand, which directly feeds into TER's equipment order pipeline and utilization rates, </span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMingFBVV95cUxPLUFNdlhpMXpLTHBoZnZxenpMSmpfNlNjOTkxWlFBaTctaEZkZV9VQ0FZamdxYjBWTUVpQ19QMmRLNjhCckVqZ05Ic2hKWlNySVcwblhkX3BVS1VCaFVHdDhyTzZaREpOaXhqQk5QTUlLdDl3MFdrQ1Vpd3hubVktZ3JSZVVnOGg5b2FaOTlwWFZ4UjNaRUpmdHN3UE4wZw?oc=5'>Here's Why Teradyne Shares Surged Higher Today (Hint: It's AI and Micron-Related) - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, gross_margin<br><span class='fi-impl'>Micron's strong results imply accelerating HBM/DRAM capex and tighter memory test capacity, a direct demand driver for TER's memory test systems; AI inference buildout compounds this by lifting SoC test attach rates, sup</span></div></div></div></div>
+</div>
+
+<h2>Shorts (top 5 of 10)</h2>
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#1</span><span class='ticker'>T</span><span class='meta'>Communication Services · β +0.42 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 24.0/100 (weighted z -1.04σ) — T ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>24.05</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>momentum</b> (-1.77σ), <b>sector</b> (-1.43σ), <b>news sentiment</b> (-1.25σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +1.3%</span><span class='chip'>op margin 19.2%</span><span class='chip'>FCF margin 15.5%</span><span class='chip'>ROE 17.5%</span><span class='chip'>netDebt/EBITDA 2.88x</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -16.5% · 3m -28.1% · 6m -16.0%.</li>
+<li>Sector <b>XLC</b> (Communication Services): rank 11/11, 1m vs SPY -6.12%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>22</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.48</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMiigFBVV95cUxOOHVSTm1uME5vY1M1YnE5VmZFcHZQUDdhdU5RNDlURjVLZ1JsdVhXYTdoLVYyRWhOZW1OX09XYnpPZ3g5bjQ5MzJaY3RRSHdDUjI5VU5xZjdNeGR0dXN4QlAtMFJ1cFdFWWFJUmxVbzdXN1U5YXJJbXhlZDkxRTNoTVEzeWotUVdMNXc?oc=5'>Why Did T, HTZ, GAP Stocks Plunge To 52-Week Lows Today? - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on fcf_margin, leverage, revenue<br><span class='fi-impl'>A 52-week-low print reflects a material downward revision in consensus on AT&T's ability to generate free cash flow sufficient to service debt and sustain the dividend, likely driven by accumulated concerns around compet</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMigAFBVV95cUxNX3prei1XZWtWTG5BVWg2eVY2N0w3aU02VEhJcWdOVmpkYzRLODRFaFdmSE1vUlNmdV9NZDVaLWJxM0NyczFJZUhYdzRJUVhpZlh3YlRXQ2VzblA1SE5HWE4xTXJGWVdXSmpEYjdET2ZMSDNzUHJhX2R6MW5kX0ljYg?oc=5'>Verizon (VZ), AT&T (T), and T-Mobile (TMUS) Stocks Slip on Starlink Mobile Threat - Barron's</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY27 on revenue, operating_margin, fcf_margin<br><span class='fi-impl'>Starlink's expanding mobile satellite coverage represents a credible long-run competitive threat to AT&T's wireless subscriber base and ARPU, particularly in rural and underserved geographies, with meaningful risk to pos</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMiogFBVV95cUxOSkxTZktYV1RCa1JpdUVZUjhvUjVCNkI3ZWhqU0F2RXhmUmZRdHF5eHludzlSODdkSHRSYVhDOFZVb0ZJTl9hVmx4QkR1Qm5WTmxXMHBjNEZlcHY3UjNQeVllYWtFZFVkeGZ4TkhsZTdWM2RBWWlzcFRrY2lqcTE2aDNwNTVFNHhTSEZnc0lCUldpRkhpX1Zmd1NNWnNvZ1BvR1E?oc=5'>Elon Musk's SpaceX Could Acquire T-Mobile In Wireless Push, Says Analyst - Investor's Business Daily</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · multi-year on revenue, operating_margin, fcf_margin<br><span class='fi-impl'>A SpaceX-backed T-Mobile would combine terrestrial and satellite coverage into a more formidable competitor, pressuring AT&T's wireless ARPU and subscriber growth. While speculative, the threat intensifies competitive pr</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMif0FVX3lxTE5ORmI4cWNvMTVmWWdjWTBDOG4xM184MUpiWnNDdFZPSjdQTE1LQzBiZnVtYS1YeXBPWEsxZkVSOEJTQTI1OFEzeVZLR3pQS2kzQVFtNUhsQ2hrQ3BicC11SzhRUVFEMDE0dFNldGk0ZDNTd0FCeWNjRzZZSEV4YW8?oc=5'>AT&T: SpaceX May Eat Its Lunch (NYSE:T) - Seeking Alpha</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · multi-year on revenue, operating_margin, fcf_margin<br><span class='fi-impl'>Starlink's expanding low-cost satellite broadband threatens AT&T's fixed wireless and postpaid wireless subscriber base, with potential churn eroding revenue by 1–5% and compressing margins as AT&T faces pricing pressure</span></div></div></div></div>
+</div>
+
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#2</span><span class='ticker'>VZ</span><span class='meta'>Communication Services · β +0.22 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 25.8/100 (weighted z -0.97σ) — VZ ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>25.77</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>news sentiment</b> (-2.40σ), <b>sector</b> (-1.43σ), <b>momentum</b> (-0.55σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +0.3%</span><span class='chip'>op margin 21.2%</span><span class='chip'>FCF margin 14.8%</span><span class='chip'>ROE 16.4%</span><span class='chip'>netDebt/EBITDA 2.37x</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -11.4% · 3m -15.8% · 6m +4.6%.</li>
+<li>Sector <b>XLC</b> (Communication Services): rank 11/11, 1m vs SPY -6.12%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>30</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.80</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMi0AFBVV95cUxPejR5UDl3RW5YWW55akR2eGxpdWt4R0JWam5jMmJZeExyZWhkNVphSGlzajNBbjJJVnFSN3U1RG1BY3FSTUdpbmh2OU5iWnpVNnlQUWVJSG12djB1d0E5bnliY3M4UFlQQ1BtREpOWTh0cC1VWXU1TENZS2xaRGtISWFDWk12a2s5ZUxGY1hhSnU5THJZNmdYQUdfSmd5cFRWV21zcXUzaWVVRkp3dEVRN1UzM0RaWDNzRmpTUXdjVWtuSUNRTFE5eXNuakh5Z0Fn?oc=5'>Stock Market Today, June 30: Verizon Falls as Investors Weigh Dow Removal and BT Venture Costs - The Motley Fo</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · multi-year on operating_margin, fcf_margin, leverage<br><span class='fi-impl'>BT joint venture launch costs introduce new operating expense and potential debt funding, pressuring margins and incrementally increasing leverage; Dow removal is a technical/index event with no direct fundamental impact</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMimAFBVV95cUxNQkhrRWtwUzIwSkg0UWR1TjRMbVVJbDY3V3hKOThVdHBJcHotTmxNZ0otR2lCZE44aTBkSEdaVzA4TmFlSzFmMTlnc3JKajV5LXhpaXlObVVOSWVsU0I0bEY0QkpMU0tKYUZMZEFiNXloTk16Y2xsdjlISWlFQjRzai1lcTc0VHJ3VW1KXzRHZnZ5ekkyZGhMRg?oc=5'>VZ Stock Alert: What to Know About Verizon's International Joint Venture - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>UNCLEAR</b> · medium · multi-year on revenue, operating_margin, fcf_margin, leverage<br><span class='fi-impl'>The international JV with BT creates near-term operating cost and potential debt headwinds, but could generate incremental revenue and scale benefits over the long term once the venture reaches commercial operation.</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMimAFBVV95cUxOdjRlekNObEZVVVFKTk9xcGtIcFBRcVdQQ1lGaDVycUNKQ2l5QjUydXNjMEtLOWhsMWU4T0RfaGxyeDZVUTlGNGdnR0Z4UWtBQU5qMzNndXVTc3F3QUcwWHhETUpGb3hjR2kwQ3hyS29WNWl2Q0NIZTJ4RmFwdjBxRUpjQ1doS1l3UWxaeFkyaHRldnllZ1FrUg?oc=5'>Verizon Gets Booted From the Dow Jones Industrial Average. Is the Stock in Trouble? - The Motley Fool</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · Q on other<br><span class='fi-impl'>Removal from the Dow Jones Industrial Average triggers forced passive-fund rebalancing outflows, a technical headwind to valuation and liquidity, but introduces no direct change to VZ's revenue, margin, or cash flow fund</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMilgFBVV95cUxONkJYVTNLWWY3Tm8xYmRkU0pzMVlEMEZwTk42OGw3OTlsemp0Y3BlNW1feUpPYXJkQUM3RUhFUnp1eXBIUmQxSGh1eG5lWkwwbzd1aVhCQ3N1RVN3bGRVbWxWMGJwWTEyeEtOOERNUmllUjFDQUM4TWx5dVJuYkFpanZQay1QWVFpc3otZzZyQVNxWlM2QWc?oc=5'>Alphabet Just Replaced Verizon in the Dow. Could Nike Be the Next Dow Stock to Be Deleted? - The Motley Fool</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · Q on other<br><span class='fi-impl'>DJIA removal triggers mechanical selling by index-tracking funds, pressuring VZ's share price and marginally elevating its cost of equity; however, Dow-tracking AUM is modest (~$30–50B) so the forced-liquidation impact o</span></div></div></div></div>
+</div>
+
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#3</span><span class='ticker'>AAPL</span><span class='meta'>Technology · β +1.06 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 27.3/100 (weighted z -0.91σ) — AAPL ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>27.31</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>valuation</b> (-7.62σ), <b>news sentiment</b> (-1.37σ), <b>sector</b> (+0.37σ).</li>
+<li>Counter-signal: <b>quality</b> +1.32σ acts as a lift.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +1.8%</span><span class='chip'>op margin 32.0%</span><span class='chip'>FCF margin 23.7%</span><span class='chip'>ROE 105.2%</span><span class='chip'>P/E 40.5x</span><span class='chip'>FCF yield 2.18%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -7.3% · 3m +17.3% · 6m +5.8%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 7/11, 1m vs SPY +1.02%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>23</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.35</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>regulation</span> <a href='https://news.google.com/rss/articles/CBMioAFBVV95cUxPckxlbGNibW1iUFlPM1B4RE5fZjdKUXg4WXV4MVNGLW5Wd3F3ZVFnd1ZoMnRWeHNvOXlPelJrbmhFWnkxM1lPa2t1Wk90SDV4TXd5THEydW9KRXZjVXpEY2xVd0c2Q09xYkV0dWQwazlDREVKZ1BVbzN6Q3dXaC1MRGFuVGN0aS1NTTZaZm9selBpUndWZzNLWGJZWHdLcC1X?oc=5'>Apple (AAPL) Seeks Blacklisted China Chip Approval As Supplier Breach Raises Risk - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on gross_margin, operating_margin, revenue<br><span class='fi-impl'>Pursuing U.S. government approval for a blacklisted Chinese chip supplier indicates current qualified-supplier options may be more expensive or constrained; if approval is denied or the breach triggers sanctions, Apple f</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMijgFBVV95cUxNTjZ5X2lzX2w2MzhobGN0OVFpYlc3a3R1OUl1aGc0ckxVc1k1YUI2WGQ0U18tQm05bUZXNTczQXNNSEFuVk1LQmpicUFwS0Y5RWliOUFPUlJ0NFJDdnptV0lFbFVvTE5jY080bkszZW9JTmFxQkpzaGZWd1V4anBBMmxFM3BDOTRzYXNlMkF3?oc=5'>Apple (AAPL) Soars 3.1%: Is Further Upside Left in the Stock? - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · Q on other<br><span class='fi-impl'>A 3.1% single-session price move is a market-sentiment event, not a fundamental data point; no revenue, margin, or balance-sheet line item is directly altered by the stock's price action itself.</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMivwFBVV95cUxNS2hWQVkwMnhrVkc3NWxhVUFZWUw4ZVlGV0R0Tmc1T3JHZnhLcmQzY3pFdXMzcWFhcVhyRVhZWlR2WFo4WHR1TTB0WkZuQmFDWjkyam5NWEdVM0VGWUhqM3VuSDhfUTE2eHNsYVlhRVFOTHdNRXRRUkotLXJFSWI2alhoTV9ob2JTcTA1WGY5WGxNZW51a2NHVlpsV0dEeXVlTTU5NGhSMmQyUnNjcW1qcHN2NUdXdFNLNzB6ZUZNVQ?oc=5'>Apple to hit record market share in smartphones, laptops, tablets in 2026: Counterpoint - Seeking Alpha</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · FY26 on revenue, operating_leverage<br><span class='fi-impl'>Record market-share gains across iPhone, Mac, and iPad simultaneously imply broad-based unit volume growth, directly lifting product revenue and spreading fixed R&D/SG&A costs over a larger base to improve operating leve</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>earnings</span> <a href='https://news.google.com/rss/articles/CBMiiAFBVV95cUxPMERCQWlENTkwR3JMa2VGWDFWZFd4Zk1yRklDcFlpZC1CRlVkZjQxcWVEWm5WWTRYSzVKMFB1dmFMek0zRUFhVzNwQktwSmM0dm5ZbVVmRGdCTjNiQTRVaWZjVVVHNFFkeU8zSGQ0VGYzMlBOOE1lVGdBV2o2Nlp2LXZ4cXQwRzNY?oc=5'>Massive News for Apple Stock Investors! - The Motley Fool</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · multi-year on revenue, gross_margin, operating_margin<br><span class='fi-impl'>The 'Massive News' framing in late June 2026 most likely refers to a landmark Apple Intelligence / AI monetization development or a major regulatory/legal win that expands Apple's addressable revenue (services attach, ne</span></div></div></div></div>
+</div>
+
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#4</span><span class='ticker'>OXY</span><span class='meta'>Energy · β +0.17 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 28.8/100 (weighted z -0.85σ) — OXY ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>28.81</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>news sentiment</b> (-2.01σ), <b>sector</b> (-1.58σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR -7.7%</span><span class='chip'>FCF margin 19.0%</span><span class='chip'>ROE 12.1%</span><span class='chip'>shareCt YoY +3.4%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -14.2% · 3m -26.7% · 6m +21.9%.</li>
+<li>Sector <b>XLE</b> (Energy): rank 10/11, 1m vs SPY -4.37%; regime fit <b>unfavorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>7</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.60</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>management</span> <a href='https://news.google.com/rss/articles/CBMizAFBVV95cUxQVTNPa08xQWdoa25jbDgzQUZPbnlrZUJjeW5oRks5WWtLVnkzcTlVV3Jjcld1aGlwcXFkaGhnNnA1QzN2bE9XWURaTzhTbW45bldvMkJZUHdzT1VicGVaX1Z2VlpKb2xKMERidjQ5V1hnV0t2ZFg0T2Q5VmtGeDhheTlyMjFqY0JzbE9yUDBVWEJwYnFSNTBBSkJNU04wNDFIQVlBXzZpRHlFcGM5ZF80Y0hXNGpUTEx2R2ZyUjZyV2Uzb3d2b2tfbFZGVlY?oc=5'>Occidental's new CEO tested by debt, lagging stock price and big dividend payments to Berkshire - Reuters</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · multi-year on leverage, fcf_margin<br><span class='fi-impl'>Elevated debt load increases interest expense and constrains balance-sheet flexibility, while mandatory preferred dividend payments to Berkshire (~$800M/year) structurally reduce free cash flow available for debt paydown</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxQNmRjR2U1elBVb250czNiYUtOU1pQUW9yazhfb0RYWG8yYks5X01BNFRiNW1MYUdfTGd1V3NjcGlNR1RhRmk1dHFzMjBuOHdXOTRYMmZ1a2dzenVnNWJLQi0zXzdfTjFZUEJCcF9wTmNKdFhRVC00R1BBOXdLN19MRExOSElnVTNiTkNnRDNDNk5ydFlnaVJB?oc=5'>Is Occidental Petroleum Still a Buy Now that WTI's Down to $70 a Barrel? - The Motley Fool</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · large · FY26 on revenue, operating_margin, fcf_margin<br><span class='fi-impl'>WTI at $70/bbl represents a meaningful decline from prior-year realizations, directly compressing OXY's upstream revenue per BOE and squeezing operating and free-cash-flow margins given relatively fixed production costs </span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMilgFBVV95cUxOdlIyWFlCUGR0Z1FmdEEyTUljZWNuLUZVc2V4T2pVSWZtdlYyWHN4dEJKNndEMHRFdmZYU2FPUmQxNXpzNm5zLW5jYVRSU2h1TldrU2dUelZxMWVGY1p5R2cxNnUzNVZqZkwtZDZ2RjRxb0VQSDFnaHJaZ2N1YXAtbnJwTFN1NHVqd1JOajB4QzFXdlEzMUE?oc=5'>Is Occidental Petroleum Still a Buy Now that WTI's Down to $70 a Barrel? - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · large · FY26 on revenue, gross_margin, operating_margin, fcf_margin<br><span class='fi-impl'>WTI at $70/bbl is near OXY's full-cycle breakeven when including interest burden from Anadarko debt, compressing realized oil revenue by high-single-digit percentages versus prior-year price decks and squeezing operating</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMiowFBVV95cUxOcWdfeGViNDJ5b0xaSVNiNi1IcmF0bGhwRFltb2ZjejFMZzROTG9FVlhHdUxvV0ZEeXRqLUt5cjRjUjI1NGViV1VacnFLN093R2N1X1lYMXpVSEJGVUJWWW9zUW9Jc2QzcWxERDFWYVpvQnFPR0VNMnBvMXNlYjFabDRaZUtRUlVadzIyLTREenI2d3FLMzB3V1RTclhBWGhoeGk0?oc=5'>Occidental Petroleum (OXY) Stock Drops Despite Market Gains: Important Facts to Note - Yahoo Finance</a> <em>(contrib -0.50)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · Q on other<br><span class='fi-impl'>This is a daily price-action commentary piece noting OXY underperformed the broader market; no new fundamental data, guidance, or operational news is disclosed that would move any core line item.</span></div></div></div></div>
+</div>
+
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#5</span><span class='ticker'>AI</span><span class='meta'>Technology · β +1.99 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 29.9/100 (weighted z -0.80σ) — AI ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>29.89</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>quality</b> (-2.45σ), <b>news sentiment</b> (-1.45σ), <b>momentum</b> (-0.67σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +15.5%</span><span class='chip'>op margin -83.4%</span><span class='chip'>FCF margin -11.4%</span><span class='chip'>ROE -40.1%</span><span class='chip'>shareCt YoY +8.1%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -15.6% · 3m +16.7% · 6m -35.0%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 7/11, 1m vs SPY +1.02%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>78</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.36</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMikwFBVV95cUxOa2VuSUZpNWNNajRhb1dvUHlrWUdWU09aNEZiV1MydUpZQVZkd0lLcmVYWUlvOTQxSi01ejN5TEJkakxyRHZ5MWFfZWdxOWdVb0x4SXNpVWd4X1hqYWNoOTRVMzVWVFdQa2tUUDlJN0QwNDB0aVgwbENyWldGeFFaTTFRczR1cVJFZUxiU2RreDNxZXM?oc=5'>Why This AI Stock Plunged 24% and Took Peer Teleperformance With It - Barron's</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · large · Q on revenue, operating_margin<br><span class='fi-impl'>A 24% single-session plunge in the AI (C3.ai) ticker typically reflects a material revenue miss or deeply negative guidance revision, signaling that near-term subscription revenue and operating margin will fall well shor</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMipAFBVV95cUxNU0hvT25yYnNqTzIzOGxXMjA0cFV5VGpxTXV2UkZoaldOcEp1SkNZTUxUTVRvdXZrYWppN3lULXpfRTYtWkdDUVVXenlacnd2aGNCYTdtNGdiWGpDOVVGOXJtNUNpZGk4QVV2SEZaeG9CR0lTRFBsd3U2ZWFFMGo2bVUyQW0zVFZUUnZmNGNLd0UzTWk4amlhTlRzSGt3YmQ3dVRrSA?oc=5'>This Artificial Intelligence (AI) Cloud Stock Has Crushed Amazon, Microsoft, and Google in 2026. It Can Contin</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · small · FY26 on revenue, other<br><span class='fi-impl'>Positive coverage of high-performing AI cloud stocks reinforces sector momentum and may attract attention to C3.ai's own growth story, supporting deal-making confidence with prospective customers.</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMiqwFBVV95cUxQb1RFMEVwRFhxS2VQTy1ZcEpaUVFHNTVpVlp5QXJJWHRuc0xrbi12Qnh5MEdGazg1QUN3TWFXaGgzTl9DRmRaWjVSM0J2anJIdHFmdmlBVHF0MkNNSGNwYU1xWlQ0c19DTUs4ZzE0SFZlLWlhMmxqVGljNlBxT3FZY1ktMi1OeEJRUnd2LXlWYUFzVXlZbE12a2tzaWctV2ppZjFiN2wzMUlSTmPSAbABQVVfeXFMTnNmTzZwTVdCNkZab1JOWEdTblVvT1BCaEZHUHM5cTFfVVdnMXBoV3JYa1RwbzlTcmVoRlNVTnNxTjVpakVZQ1ZmcFB2YTA3cExiejlfcGNJeVFoc1RHSzVnaFJ4OTR3b3dSd0NJcm5Tc0hwTHRNakR6NU5JUmtubmRqWkdTa3Z4bjZoMHMtMVZtcm1ZOEJxUHJhOE55TUI2YkxQcTM0aXNuSTVFUkZnRlQ?oc=5'>Oracle stock has worst week since 2001 dot-com bust as AI financing concerns escalate - CNBC</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on revenue, operating_margin<br><span class='fi-impl'>Oracle's worst week since 2001 on AI financing concerns highlights potential slowdown in large enterprise AI commitments—C3.ai's primary market—and could force increased sales spend or pricing concessions that pressure b</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMinAFBVV95cUxOaVhjMEVzZVdBUmJBSVdxajByMGZCMnF1Q3Rnd2hWYVRhRzFpMGtUckt0MXU4RG1QVng1NmIyQVllZjJxMnZFNlNXWi11QUxoQmctSGI1RjNTMjhodmRpT2o1Zl94YXdZX3QzUVdKRGFoanVQZl9VOWdwWTJjU3dHTEp4cWZQVkF1TDlyQWVmR245VFRDVk9SbzB5U2E?oc=5'>OpenAI Just Signaled It Might Delay Its IPO. AI Stocks Are Tumbling. Is the Bubble Bursting? - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · Q on other<br><span class='fi-impl'>'Bubble bursting' narrative triggered by OpenAI's IPO delay could compress C3.ai's valuation multiples and increase scrutiny of AI application revenue quality, slowing deal conversion near-term.</span></div></div></div></div>
+</div>
+
+<details class='position-fold short'><summary>Show 5 more short candidates (ranks 6-10)</summary>
+<div class='fold-body'>
+<div class='position short compact'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#6</span><span class='ticker'>ZS</span><span class='meta'>Technology · β +0.96 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 33.3/100 (weighted z -0.67σ) — ZS ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>33.35</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>momentum</b> (-1.87σ), <b>quality</b> (-1.26σ), <b>news sentiment</b> (-0.75σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +34.8%</span><span class='chip'>op margin -4.8%</span><span class='chip'>FCF margin 30.2%</span><span class='chip'>ROE -1.9%</span><span class='chip'>shareCt YoY +3.2%</span></div></div>
+</div>
+<div class='position short compact'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#7</span><span class='ticker'>COP</span><span class='meta'>Energy · β +0.15 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 33.8/100 (weighted z -0.65σ) — COP ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>33.80</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>sector</b> (-1.58σ), <b>quality</b> (-0.57σ), <b>momentum</b> (-0.53σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR -1.8%</span><span class='chip'>FCF margin 18.6%</span><span class='chip'>ROE 12.4%</span><span class='chip'>shareCt YoY +6.1%</span></div></div>
+</div>
+<div class='position short compact'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#8</span><span class='ticker'>CVX</span><span class='meta'>Energy · β +0.50 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 35.5/100 (weighted z -0.58σ) — CVX ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>35.46</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>sector</b> (-1.58σ), <b>quality</b> (-0.96σ), <b>momentum</b> (-0.63σ).</li>
+<li>Counter-signal: <b>news sentiment</b> +0.57σ acts as a lift.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR -3.1%</span><span class='chip'>FCF margin 9.0%</span><span class='chip'>ROE 6.7%</span><span class='chip'>shareCt YoY +2.1%</span></div></div>
+</div>
+<div class='position short compact'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#9</span><span class='ticker'>TMUS</span><span class='meta'>Communication Services · β +0.32 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 36.3/100 (weighted z -0.55σ) — TMUS ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>36.30</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>momentum</b> (-1.77σ), <b>sector</b> (-1.43σ).</li>
+<li>Counter-signal: <b>news sentiment</b> +0.51σ acts as a lift.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +3.5%</span><span class='chip'>op margin 20.7%</span><span class='chip'>FCF margin 20.4%</span><span class='chip'>ROE 19.7%</span><span class='chip'>netDebt/EBITDA 2.67x</span><span class='chip'>shareCt YoY -3.6%</span></div></div>
+</div>
+<div class='position short compact'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#10</span><span class='ticker'>CHTR</span><span class='meta'>Communication Services · β +0.76 · weight 25.3%</span></div>
+<div class='position-headline'>Composite 37.1/100 (weighted z -0.52σ) — CHTR ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>37.09</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>momentum</b> (-1.87σ), <b>sector</b> (-1.43σ).</li>
+<li>Counter-signal: <b>news sentiment</b> +0.54σ acts as a lift.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR -74.7%</span><span class='chip'>op margin 1452.0%</span><span class='chip'>FCF margin 497.0%</span><span class='chip'>ROE 30.4%</span><span class='chip'>netDebt/EBITDA 4.47x</span><span class='chip'>shareCt YoY -5.2%</span></div></div>
+</div>
+</div></details>
+
+<h2>Changes vs last week</h2>
+<p><strong>Longs added</strong>: <em>(none)</em>
+<strong>Longs dropped</strong>: <em>(none)</em>
+<strong>Longs held</strong>: <code>AMAT</code>, <code>FTNT</code>, <code>LRCX</code>, <code>TER</code>, <code>VRT</code></p>
+<p><strong>Shorts added</strong>: <code>CHTR</code>
+<strong>Shorts dropped</strong>: <code>ESTC</code>
+<strong>Shorts held</strong>: <code>AAPL</code>, <code>AI</code>, <code>COP</code>, <code>CVX</code>, <code>OXY</code>, <code>T</code>, <code>TMUS</code>, <code>VZ</code>, <code>ZS</code></p>
+<h2>Portfolio metrics</h2>
+<ul>
+<li>Long basket beta: +1.66</li>
+<li>Short basket beta: +1.66</li>
+<li>Net beta: +0.00</li>
+<li>Long sector exposure: Industrials (1), Technology (4)</li>
+<li>Short sector exposure: Communication Services (4), Energy (3), Technology (3)</li>
+<li>Gross exposure (sum of |weights|): long 100.0% / short 252.8%</li>
+</ul>
+<h2>Watch list (next-ranked by composite)</h2>
+<p><strong>Long bench</strong>: NTAP (z=+70.55), QCOM (z=+67.55), ANET (z=+66.33), ADI (z=+64.03), PANW (z=+64.02)</p>
+<p><strong>Outliers</strong> (extreme single-component scores):
+- ON: extreme news sentiment (z=-2.52)
+- VZ: extreme news sentiment (z=-2.40)
+- AI: extreme quality (z=-2.45)
+- OKLO: extreme quality (z=-2.45)
+- AAPL: extreme valuation (z=-7.62)
+- CHTR: extreme momentum (z=-1.87)
+- ZS: extreme momentum (z=-1.87)</p>
+<h2>Risk flags</h2>
+<p><em>(none flagged)</em></p>
+<h2>Rejections from initial focus list</h2>
+<ul>
+<li><code>NTAP</code> (long): sector cap (Technology)</li>
+<li><code>QCOM</code> (long): sector cap (Technology)</li>
+<li><code>ANET</code> (long): sector cap (Technology)</li>
+<li><code>ADI</code> (long): sector cap (Technology)</li>
+<li><code>PANW</code> (long): sector cap (Technology)</li>
+</ul>
+</body>
+</html>
