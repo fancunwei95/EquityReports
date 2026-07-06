@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-03T13:27:39",
+  "generated_at": "2026-07-06T13:36:45",
   "stats": {
     "n_closed": 25,
-    "n_open": 6,
+    "n_open": 7,
     "cumulative_return": 0.5963268143713492,
     "current_open_pnl": -0.24978428768838717
   },
@@ -159,6 +159,108 @@
     }
   ],
   "open_portfolios": [
+    {
+      "entry_date": "2026-07-06",
+      "status": "open",
+      "longs": [
+        {
+          "ticker": "VRT",
+          "sector": "Industrials",
+          "composite_z": 81.20144210480437,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 300.5299987792969,
+          "current_close": 300.5299987792969,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "NTAP",
+          "sector": "Technology",
+          "composite_z": 65.1181071974191,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 154.1699981689453,
+          "current_close": 154.1699981689453,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "PSX",
+          "sector": "Energy",
+          "composite_z": 64.6863573269066,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 176.4199981689453,
+          "current_close": 176.4199981689453,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "GOOGL",
+          "sector": "Communication Services",
+          "composite_z": 64.42858123695856,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 359.9100036621094,
+          "current_close": 359.9100036621094,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "ASML",
+          "sector": "Technology",
+          "composite_z": 62.91167219462093,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 1769.3199462890625,
+          "current_close": 1769.3199462890625,
+          "current_return": 0.0
+        }
+      ],
+      "shorts": [
+        {
+          "ticker": "AI",
+          "sector": "Technology",
+          "composite_z": 25.41018592644671,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 9.0600004196167,
+          "current_close": 9.0600004196167,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "AAPL",
+          "sector": "Technology",
+          "composite_z": 26.39086908060354,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 308.6300048828125,
+          "current_close": 308.6300048828125,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "HUBS",
+          "sector": "Technology",
+          "composite_z": 29.360268118358483,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 192.1199951171875,
+          "current_close": 192.1199951171875,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "INTU",
+          "sector": "Technology",
+          "composite_z": 30.2892473327408,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 275.3500061035156,
+          "current_close": 275.3500061035156,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "T",
+          "sector": "Communication Services",
+          "composite_z": 36.34795578380768,
+          "entry_date_used": "2026-07-02",
+          "entry_close": 20.579999923706055,
+          "current_close": 20.579999923706055,
+          "current_return": -0.0
+        }
+      ],
+      "days_held": 0,
+      "current_long_return": 0.0,
+      "current_short_return": 0.0,
+      "current_ls_return": 0.0
+    },
     {
       "entry_date": "2026-07-03",
       "status": "open",
@@ -566,108 +668,6 @@
       "current_long_return": -0.09909942538490871,
       "current_short_return": -0.008850736259416814,
       "current_ls_return": -0.053975080822162756
-    },
-    {
-      "entry_date": "2026-06-29",
-      "status": "open",
-      "longs": [
-        {
-          "ticker": "BWXT",
-          "sector": "Industrials",
-          "composite_z": 72.41521545088324,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 197.91000366210938,
-          "current_close": 191.05999755859375,
-          "current_return": -0.034611722382717924
-        },
-        {
-          "ticker": "VRT",
-          "sector": "Industrials",
-          "composite_z": 71.7005649238953,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 303.95001220703125,
-          "current_close": 300.5299987792969,
-          "current_return": -0.011251894358881853
-        },
-        {
-          "ticker": "AMAT",
-          "sector": "Technology",
-          "composite_z": 69.1652257758719,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 626.8400268554688,
-          "current_close": 603.0399780273438,
-          "current_return": -0.03796829782475364
-        },
-        {
-          "ticker": "LRCX",
-          "sector": "Technology",
-          "composite_z": 66.58891038942414,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 379.0899963378906,
-          "current_close": 351.4100036621094,
-          "current_return": -0.07301694305620643
-        },
-        {
-          "ticker": "FTNT",
-          "sector": "Technology",
-          "composite_z": 65.3452954869624,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 151.35000610351562,
-          "current_close": 156.25,
-          "current_return": 0.03237524743231934
-        }
-      ],
-      "shorts": [
-        {
-          "ticker": "AAPL",
-          "sector": "Technology",
-          "composite_z": 26.18018154185064,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 283.7799987792969,
-          "current_close": 308.6300048828125,
-          "current_return": -0.08756785612238338
-        },
-        {
-          "ticker": "ESTC",
-          "sector": "Technology",
-          "composite_z": 26.384750079359495,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 56.2400016784668,
-          "current_close": 58.040000915527344,
-          "current_return": -0.03200567537944665
-        },
-        {
-          "ticker": "T",
-          "sector": "Communication Services",
-          "composite_z": 27.665712977499375,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 22.719999313354492,
-          "current_close": 20.579999923706055,
-          "current_return": 0.09419011682762579
-        },
-        {
-          "ticker": "AI",
-          "sector": "Technology",
-          "composite_z": 27.83773639557273,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 8.899999618530273,
-          "current_close": 9.0600004196167,
-          "current_return": -0.017977618870150813
-        },
-        {
-          "ticker": "VZ",
-          "sector": "Communication Services",
-          "composite_z": 29.370488831221913,
-          "entry_date_used": "2026-06-26",
-          "entry_close": 46.540000915527344,
-          "current_close": 42.560001373291016,
-          "current_return": 0.08551782260297425
-        }
-      ],
-      "days_held": 3,
-      "current_long_return": -0.0248947220380481,
-      "current_short_return": 0.008431357811723838,
-      "current_ls_return": -0.008231682113162131
     }
   ],
   "closed_portfolios": [

@@ -3806,5 +3806,107 @@
     "current_long_return": 0.0,
     "current_short_return": 0.0,
     "current_ls_return": 0.0
+  },
+  {
+    "entry_date": "2026-07-06",
+    "status": "open",
+    "longs": [
+      {
+        "ticker": "VRT",
+        "sector": "Industrials",
+        "composite_z": 81.20144210480437,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 300.5299987792969,
+        "current_close": 300.5299987792969,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "NTAP",
+        "sector": "Technology",
+        "composite_z": 65.1181071974191,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 154.1699981689453,
+        "current_close": 154.1699981689453,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "PSX",
+        "sector": "Energy",
+        "composite_z": 64.6863573269066,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 176.4199981689453,
+        "current_close": 176.4199981689453,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "GOOGL",
+        "sector": "Communication Services",
+        "composite_z": 64.42858123695856,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 359.9100036621094,
+        "current_close": 359.9100036621094,
+        "current_return": 0.0
+      },
+      {
+        "ticker": "ASML",
+        "sector": "Technology",
+        "composite_z": 62.91167219462093,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 1769.3199462890625,
+        "current_close": 1769.3199462890625,
+        "current_return": 0.0
+      }
+    ],
+    "shorts": [
+      {
+        "ticker": "AI",
+        "sector": "Technology",
+        "composite_z": 25.41018592644671,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 9.0600004196167,
+        "current_close": 9.0600004196167,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "AAPL",
+        "sector": "Technology",
+        "composite_z": 26.39086908060354,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 308.6300048828125,
+        "current_close": 308.6300048828125,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "HUBS",
+        "sector": "Technology",
+        "composite_z": 29.360268118358483,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 192.1199951171875,
+        "current_close": 192.1199951171875,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "INTU",
+        "sector": "Technology",
+        "composite_z": 30.2892473327408,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 275.3500061035156,
+        "current_close": 275.3500061035156,
+        "current_return": -0.0
+      },
+      {
+        "ticker": "T",
+        "sector": "Communication Services",
+        "composite_z": 36.34795578380768,
+        "entry_date_used": "2026-07-02",
+        "entry_close": 20.579999923706055,
+        "current_close": 20.579999923706055,
+        "current_return": -0.0
+      }
+    ],
+    "days_held": 0,
+    "current_long_return": 0.0,
+    "current_short_return": 0.0,
+    "current_ls_return": 0.0
   }
 ]
