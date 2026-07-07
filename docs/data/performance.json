@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-07-06T13:36:45",
+  "generated_at": "2026-07-07T13:22:56",
   "stats": {
-    "n_closed": 25,
+    "n_closed": 26,
     "n_open": 7,
-    "cumulative_return": 0.5963268143713492,
-    "current_open_pnl": -0.24978428768838717
+    "cumulative_return": 0.5345891292011467,
+    "current_open_pnl": -0.12948083515561098
   },
   "cumulative_series": [
     {
@@ -156,9 +156,117 @@
       "entry_date": "2026-06-25",
       "ls_return": -1.4619158978013136e-05,
       "cumulative_return": 0.5963268143713492
+    },
+    {
+      "exit_date": "2026-07-07",
+      "entry_date": "2026-06-26",
+      "ls_return": -0.06173768517020247,
+      "cumulative_return": 0.5345891292011467
     }
   ],
   "open_portfolios": [
+    {
+      "entry_date": "2026-07-07",
+      "status": "open",
+      "longs": [
+        {
+          "ticker": "VRT",
+          "sector": "Industrials",
+          "composite_z": 84.06331175192167,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 318.4700012207031,
+          "current_close": 318.4700012207031,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "BWXT",
+          "sector": "Industrials",
+          "composite_z": 68.31059287498509,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 196.88999938964844,
+          "current_close": 196.88999938964844,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "NTAP",
+          "sector": "Technology",
+          "composite_z": 66.29491198088387,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 163.5500030517578,
+          "current_close": 163.5500030517578,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "ASML",
+          "sector": "Technology",
+          "composite_z": 64.83778430362831,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 1825.0699462890625,
+          "current_close": 1825.0699462890625,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "FTNT",
+          "sector": "Technology",
+          "composite_z": 63.77884700606809,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 162.35000610351562,
+          "current_close": 162.35000610351562,
+          "current_return": 0.0
+        }
+      ],
+      "shorts": [
+        {
+          "ticker": "AAPL",
+          "sector": "Technology",
+          "composite_z": 24.448669715649423,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 312.6600036621094,
+          "current_close": 312.6600036621094,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "AI",
+          "sector": "Technology",
+          "composite_z": 26.25235990809993,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 9.279999732971191,
+          "current_close": 9.279999732971191,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "HUBS",
+          "sector": "Technology",
+          "composite_z": 29.598741530949667,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 193.83999633789062,
+          "current_close": 193.83999633789062,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "INTU",
+          "sector": "Technology",
+          "composite_z": 29.85331851114319,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 272.1400146484375,
+          "current_close": 272.1400146484375,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "CCJ",
+          "sector": "Energy",
+          "composite_z": 31.69201780978557,
+          "entry_date_used": "2026-07-06",
+          "entry_close": 97.5,
+          "current_close": 97.5,
+          "current_return": -0.0
+        }
+      ],
+      "days_held": 0,
+      "current_long_return": 0.0,
+      "current_short_return": 0.0,
+      "current_ls_return": 0.0
+    },
     {
       "entry_date": "2026-07-06",
       "status": "open",
@@ -169,8 +277,8 @@
           "composite_z": 81.20144210480437,
           "entry_date_used": "2026-07-02",
           "entry_close": 300.5299987792969,
-          "current_close": 300.5299987792969,
-          "current_return": 0.0
+          "current_close": 318.4700012207031,
+          "current_return": 0.05969454801276264
         },
         {
           "ticker": "NTAP",
@@ -178,8 +286,8 @@
           "composite_z": 65.1181071974191,
           "entry_date_used": "2026-07-02",
           "entry_close": 154.1699981689453,
-          "current_close": 154.1699981689453,
-          "current_return": 0.0
+          "current_close": 163.5500030517578,
+          "current_return": 0.06084196013632659
         },
         {
           "ticker": "PSX",
@@ -187,8 +295,8 @@
           "composite_z": 64.6863573269066,
           "entry_date_used": "2026-07-02",
           "entry_close": 176.4199981689453,
-          "current_close": 176.4199981689453,
-          "current_return": 0.0
+          "current_close": 177.3300018310547,
+          "current_return": 0.0051581661464361606
         },
         {
           "ticker": "GOOGL",
@@ -196,8 +304,8 @@
           "composite_z": 64.42858123695856,
           "entry_date_used": "2026-07-02",
           "entry_close": 359.9100036621094,
-          "current_close": 359.9100036621094,
-          "current_return": 0.0
+          "current_close": 366.4599914550781,
+          "current_return": 0.018198960090917593
         },
         {
           "ticker": "ASML",
@@ -205,8 +313,8 @@
           "composite_z": 62.91167219462093,
           "entry_date_used": "2026-07-02",
           "entry_close": 1769.3199462890625,
-          "current_close": 1769.3199462890625,
-          "current_return": 0.0
+          "current_close": 1825.0699462890625,
+          "current_return": 0.03150928135803199
         }
       ],
       "shorts": [
@@ -216,8 +324,8 @@
           "composite_z": 25.41018592644671,
           "entry_date_used": "2026-07-02",
           "entry_close": 9.0600004196167,
-          "current_close": 9.0600004196167,
-          "current_return": -0.0
+          "current_close": 9.279999732971191,
+          "current_return": -0.024282483793063525
         },
         {
           "ticker": "AAPL",
@@ -225,8 +333,8 @@
           "composite_z": 26.39086908060354,
           "entry_date_used": "2026-07-02",
           "entry_close": 308.6300048828125,
-          "current_close": 308.6300048828125,
-          "current_return": -0.0
+          "current_close": 312.6600036621094,
+          "current_return": -0.01305770247720095
         },
         {
           "ticker": "HUBS",
@@ -234,8 +342,8 @@
           "composite_z": 29.360268118358483,
           "entry_date_used": "2026-07-02",
           "entry_close": 192.1199951171875,
-          "current_close": 192.1199951171875,
-          "current_return": -0.0
+          "current_close": 193.83999633789062,
+          "current_return": -0.008952744453558648
         },
         {
           "ticker": "INTU",
@@ -243,8 +351,8 @@
           "composite_z": 30.2892473327408,
           "entry_date_used": "2026-07-02",
           "entry_close": 275.3500061035156,
-          "current_close": 275.3500061035156,
-          "current_return": -0.0
+          "current_close": 272.1400146484375,
+          "current_return": 0.011657858666875631
         },
         {
           "ticker": "T",
@@ -257,9 +365,9 @@
         }
       ],
       "days_held": 0,
-      "current_long_return": 0.0,
-      "current_short_return": 0.0,
-      "current_ls_return": 0.0
+      "current_long_return": 0.03508058314889499,
+      "current_short_return": -0.006927014411389498,
+      "current_ls_return": 0.014076784368752749
     },
     {
       "entry_date": "2026-07-03",
@@ -271,8 +379,8 @@
           "composite_z": 77.63775929583082,
           "entry_date_used": "2026-07-02",
           "entry_close": 300.5299987792969,
-          "current_close": 300.5299987792969,
-          "current_return": 0.0
+          "current_close": 318.4700012207031,
+          "current_return": 0.05969454801276264
         },
         {
           "ticker": "BWXT",
@@ -280,8 +388,8 @@
           "composite_z": 70.42270486147775,
           "entry_date_used": "2026-07-02",
           "entry_close": 191.05999755859375,
-          "current_close": 191.05999755859375,
-          "current_return": 0.0
+          "current_close": 196.88999938964844,
+          "current_return": 0.030513984641221237
         },
         {
           "ticker": "GOOGL",
@@ -289,8 +397,8 @@
           "composite_z": 65.75850592665154,
           "entry_date_used": "2026-07-02",
           "entry_close": 359.9100036621094,
-          "current_close": 359.9100036621094,
-          "current_return": 0.0
+          "current_close": 366.4599914550781,
+          "current_return": 0.018198960090917593
         },
         {
           "ticker": "LRCX",
@@ -298,8 +406,8 @@
           "composite_z": 63.30124656303376,
           "entry_date_used": "2026-07-02",
           "entry_close": 351.4100036621094,
-          "current_close": 351.4100036621094,
-          "current_return": 0.0
+          "current_close": 350.20001220703125,
+          "current_return": -0.003443247040404551
         },
         {
           "ticker": "FTNT",
@@ -307,8 +415,8 @@
           "composite_z": 63.14642743853423,
           "entry_date_used": "2026-07-02",
           "entry_close": 156.25,
-          "current_close": 156.25,
-          "current_return": 0.0
+          "current_close": 162.35000610351562,
+          "current_return": 0.03904003906250009
         }
       ],
       "shorts": [
@@ -318,8 +426,8 @@
           "composite_z": 25.038950764856995,
           "entry_date_used": "2026-07-02",
           "entry_close": 308.6300048828125,
-          "current_close": 308.6300048828125,
-          "current_return": -0.0
+          "current_close": 312.6600036621094,
+          "current_return": -0.01305770247720095
         },
         {
           "ticker": "HUBS",
@@ -327,8 +435,8 @@
           "composite_z": 30.960199270572467,
           "entry_date_used": "2026-07-02",
           "entry_close": 192.1199951171875,
-          "current_close": 192.1199951171875,
-          "current_return": -0.0
+          "current_close": 193.83999633789062,
+          "current_return": -0.008952744453558648
         },
         {
           "ticker": "INTU",
@@ -336,8 +444,8 @@
           "composite_z": 31.16035078654914,
           "entry_date_used": "2026-07-02",
           "entry_close": 275.3500061035156,
-          "current_close": 275.3500061035156,
-          "current_return": -0.0
+          "current_close": 272.1400146484375,
+          "current_return": 0.011657858666875631
         },
         {
           "ticker": "ZS",
@@ -345,8 +453,8 @@
           "composite_z": 32.21689638823982,
           "entry_date_used": "2026-07-02",
           "entry_close": 147.3300018310547,
-          "current_close": 147.3300018310547,
-          "current_return": -0.0
+          "current_close": 150.4199981689453,
+          "current_return": -0.02097330007118292
         },
         {
           "ticker": "T",
@@ -358,10 +466,10 @@
           "current_return": -0.0
         }
       ],
-      "days_held": 0,
-      "current_long_return": 0.0,
-      "current_short_return": 0.0,
-      "current_ls_return": 0.0
+      "days_held": 1,
+      "current_long_return": 0.0288008569533994,
+      "current_short_return": -0.006265177667013377,
+      "current_ls_return": 0.011267839643193011
     },
     {
       "entry_date": "2026-07-02",
@@ -373,8 +481,8 @@
           "composite_z": 78.14950157087912,
           "entry_date_used": "2026-07-01",
           "entry_close": 311.4200134277344,
-          "current_close": 300.5299987792969,
-          "current_return": -0.03496889788351565
+          "current_close": 318.4700012207031,
+          "current_return": 0.022638197575586272
         },
         {
           "ticker": "LRCX",
@@ -382,8 +490,8 @@
           "composite_z": 65.23247553637783,
           "entry_date_used": "2026-07-01",
           "entry_close": 391.260009765625,
-          "current_close": 351.4100036621094,
-          "current_return": -0.10185044499535445
+          "current_close": 350.20001220703125,
+          "current_return": -0.10494299579246491
         },
         {
           "ticker": "TER",
@@ -391,8 +499,8 @@
           "composite_z": 63.96728386893115,
           "entry_date_used": "2026-07-01",
           "entry_close": 427.3399963378906,
-          "current_close": 369.0899963378906,
-          "current_return": -0.13630832709125285
+          "current_close": 379.5199890136719,
+          "current_return": -0.11190154849537715
         },
         {
           "ticker": "FTNT",
@@ -400,8 +508,8 @@
           "composite_z": 63.82027270273633,
           "entry_date_used": "2026-07-01",
           "entry_close": 158.97999572753906,
-          "current_close": 156.25,
-          "current_return": -0.017171944904425196
+          "current_close": 162.35000610351562,
+          "current_return": 0.02119770075822691
         },
         {
           "ticker": "AMAT",
@@ -409,8 +517,8 @@
           "composite_z": 63.40290046996557,
           "entry_date_used": "2026-07-01",
           "entry_close": 650.9099731445312,
-          "current_close": 603.0399780273438,
-          "current_return": -0.07354318890818135
+          "current_close": 592.7899780273438,
+          "current_return": -0.08929037426852005
         }
       ],
       "shorts": [
@@ -420,8 +528,8 @@
           "composite_z": 23.156718669669544,
           "entry_date_used": "2026-07-01",
           "entry_close": 294.3800048828125,
-          "current_close": 308.6300048828125,
-          "current_return": -0.0484068203126522
+          "current_close": 312.6600036621094,
+          "current_return": -0.06209660464736322
         },
         {
           "ticker": "ESTC",
@@ -429,8 +537,8 @@
           "composite_z": 28.091798242935972,
           "entry_date_used": "2026-07-01",
           "entry_close": 58.45000076293945,
-          "current_close": 58.040000915527344,
-          "current_return": 0.007014539641752582
+          "current_close": 58.540000915527344,
+          "current_return": -0.0015397801781544818
         },
         {
           "ticker": "INTU",
@@ -438,8 +546,8 @@
           "composite_z": 31.651830840175162,
           "entry_date_used": "2026-07-01",
           "entry_close": 267.0799865722656,
-          "current_close": 275.3500061035156,
-          "current_return": -0.030964579702838613
+          "current_close": 272.1400146484375,
+          "current_return": -0.018945740342108053
         },
         {
           "ticker": "ZS",
@@ -447,8 +555,8 @@
           "composite_z": 32.04812294287457,
           "entry_date_used": "2026-07-01",
           "entry_close": 146.4499969482422,
-          "current_close": 147.3300018310547,
-          "current_return": -0.00600891021611627
+          "current_close": 150.4199981689453,
+          "current_return": -0.027108236964362487
         },
         {
           "ticker": "OXY",
@@ -456,14 +564,14 @@
           "composite_z": 32.24406742255559,
           "entry_date_used": "2026-07-01",
           "entry_close": 47.939998626708984,
-          "current_close": 48.90999984741211,
-          "current_return": -0.020233651407797648
+          "current_close": 48.810001373291016,
+          "current_return": -0.018147742417692125
         }
       ],
-      "days_held": 0,
-      "current_long_return": -0.07276856075654589,
-      "current_short_return": -0.01971988439953043,
-      "current_ls_return": -0.04624422257803816
+      "days_held": 1,
+      "current_long_return": -0.052459804044509784,
+      "current_short_return": -0.025567620909936074,
+      "current_ls_return": -0.03901371247722293
     },
     {
       "entry_date": "2026-07-01",
@@ -475,8 +583,8 @@
           "composite_z": 74.52992666234027,
           "entry_date_used": "2026-06-30",
           "entry_close": 334.82000732421875,
-          "current_close": 300.5299987792969,
-          "current_return": -0.10241326024378694
+          "current_close": 318.4700012207031,
+          "current_return": -0.04883222551179056
         },
         {
           "ticker": "LRCX",
@@ -484,8 +592,8 @@
           "composite_z": 70.85985182307962,
           "entry_date_used": "2026-06-30",
           "entry_close": 433.3299865722656,
-          "current_close": 351.4100036621094,
-          "current_return": -0.18904757447819642
+          "current_close": 350.20001220703125,
+          "current_return": -0.19183988401728336
         },
         {
           "ticker": "AMAT",
@@ -493,8 +601,8 @@
           "composite_z": 69.66341885840471,
           "entry_date_used": "2026-06-30",
           "entry_close": 723.0,
-          "current_close": 603.0399780273438,
-          "current_return": -0.16591980909081083
+          "current_close": 592.7899780273438,
+          "current_return": -0.18009684920146096
         },
         {
           "ticker": "FTNT",
@@ -502,8 +610,8 @@
           "composite_z": 67.11151411610335,
           "entry_date_used": "2026-06-30",
           "entry_close": 153.6199951171875,
-          "current_close": 156.25,
-          "current_return": 0.017120198974138967
+          "current_close": 162.35000610351562,
+          "current_return": 0.05682861127334715
         },
         {
           "ticker": "TER",
@@ -511,8 +619,8 @@
           "composite_z": 66.99990560364677,
           "entry_date_used": "2026-06-30",
           "entry_close": 483.8399963378906,
-          "current_close": 369.0899963378906,
-          "current_return": -0.2371651803664948
+          "current_close": 379.5199890136719,
+          "current_return": -0.21560848237806007
         }
       ],
       "shorts": [
@@ -531,8 +639,8 @@
           "composite_z": 25.76792318289162,
           "entry_date_used": "2026-06-30",
           "entry_close": 42.34000015258789,
-          "current_close": 42.560001373291016,
-          "current_return": -0.005196060933166491
+          "current_close": 42.06999969482422,
+          "current_return": 0.006376959300676055
         },
         {
           "ticker": "AAPL",
@@ -540,8 +648,8 @@
           "composite_z": 27.30508199519871,
           "entry_date_used": "2026-06-30",
           "entry_close": 289.3599853515625,
-          "current_close": 308.6300048828125,
-          "current_return": -0.06659531554730203
+          "current_close": 312.6600036621094,
+          "current_return": -0.08052259984129506
         },
         {
           "ticker": "OXY",
@@ -549,8 +657,8 @@
           "composite_z": 28.810340064630108,
           "entry_date_used": "2026-06-30",
           "entry_close": 48.56999969482422,
-          "current_close": 48.90999984741211,
-          "current_return": -0.007000209074000008
+          "current_close": 48.810001373291016,
+          "current_return": -0.004941356392315743
         },
         {
           "ticker": "AI",
@@ -558,119 +666,153 @@
           "composite_z": 29.88734545129632,
           "entry_date_used": "2026-06-30",
           "entry_close": 9.09000015258789,
-          "current_close": 9.0600004196167,
-          "current_return": 0.003300300601496775
+          "current_close": 9.279999732971191,
+          "current_return": -0.020902043695698813
         }
       ],
-      "days_held": 1,
-      "current_long_return": -0.13548512504103,
-      "current_short_return": -0.013938828634937051,
-      "current_ls_return": -0.07471197683798353
-    },
+      "days_held": 2,
+      "current_long_return": -0.11590976596704956,
+      "current_short_return": -0.018838379770069413,
+      "current_ls_return": -0.06737407286855948
+    }
+  ],
+  "closed_portfolios": [
     {
-      "entry_date": "2026-06-30",
-      "status": "open",
+      "entry_date": "2026-06-26",
+      "status": "closed",
       "longs": [
+        {
+          "ticker": "VRT",
+          "sector": "Industrials",
+          "composite_z": 79.91327995968963,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 325.57000732421875,
+          "current_close": 318.4700012207031,
+          "current_return": -0.021807924390421785,
+          "exit_close": 318.4700012207031,
+          "exit_date": "2026-07-07",
+          "return": -0.021807924390421785
+        },
+        {
+          "ticker": "BWXT",
+          "sector": "Industrials",
+          "composite_z": 78.02970261830035,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 204.77000427246094,
+          "current_close": 196.88999938964844,
+          "current_return": -0.038482222583379966,
+          "exit_close": 196.88999938964844,
+          "exit_date": "2026-07-07",
+          "return": -0.038482222583379966
+        },
         {
           "ticker": "AMAT",
           "sector": "Technology",
-          "composite_z": 69.7575691597825,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 694.6400146484375,
-          "current_close": 603.0399780273438,
-          "current_return": -0.1318669162291971
-        },
-        {
-          "ticker": "FTNT",
-          "sector": "Technology",
-          "composite_z": 68.25217728846572,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 155.4199981689453,
-          "current_close": 156.25,
-          "current_return": 0.005340379879251067
+          "composite_z": 68.16771912588761,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 668.0,
+          "current_close": 592.7899780273438,
+          "current_return": -0.11258985325247939,
+          "exit_close": 592.7899780273438,
+          "exit_date": "2026-07-07",
+          "return": -0.11258985325247939
         },
         {
           "ticker": "TER",
           "sector": "Technology",
-          "composite_z": 66.86515066388066,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 463.2099914550781,
-          "current_close": 369.0899963378906,
-          "current_return": -0.20319077060822688
+          "composite_z": 67.49910075349194,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 471.9599914550781,
+          "current_close": 379.5199890136719,
+          "current_return": -0.1958640649950194,
+          "exit_close": 379.5199890136719,
+          "exit_date": "2026-07-07",
+          "return": -0.1958640649950194
         },
         {
           "ticker": "LRCX",
           "sector": "Technology",
-          "composite_z": 66.40378556256968,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 410.9100036621094,
-          "current_close": 351.4100036621094,
-          "current_return": -0.14480056331003022
-        },
-        {
-          "ticker": "VRT",
-          "sector": "Industrials",
-          "composite_z": 65.49443707524433,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 306.9700012207031,
-          "current_close": 300.5299987792969,
-          "current_return": -0.020979256656340373
+          "composite_z": 66.5613690594084,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 401.82000732421875,
+          "current_close": 350.20001220703125,
+          "current_return": -0.1284654675632828,
+          "exit_close": 350.20001220703125,
+          "exit_date": "2026-07-07",
+          "return": -0.1284654675632828
         }
       ],
       "shorts": [
         {
-          "ticker": "T",
-          "sector": "Communication Services",
-          "composite_z": 27.297116861265692,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 21.81999969482422,
-          "current_close": 20.579999923706055,
-          "current_return": 0.05682858792212986
-        },
-        {
-          "ticker": "VZ",
-          "sector": "Communication Services",
-          "composite_z": 28.994343030840888,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 44.099998474121094,
-          "current_close": 42.560001373291016,
-          "current_return": 0.03492057038808705
-        },
-        {
-          "ticker": "AI",
+          "ticker": "ESTC",
           "sector": "Technology",
-          "composite_z": 29.69645510864106,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 8.869999885559082,
-          "current_close": 9.0600004196167,
-          "current_return": -0.02142057908782502
+          "composite_z": 25.09119453386487,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 53.599998474121094,
+          "current_close": 58.540000915527344,
+          "current_return": -0.09216422727682283,
+          "exit_close": 58.540000915527344,
+          "exit_date": "2026-07-07",
+          "return": -0.09216422727682283
         },
         {
           "ticker": "AAPL",
           "sector": "Technology",
-          "composite_z": 29.786756699249935,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 281.739990234375,
-          "current_close": 308.6300048828125,
-          "current_return": -0.09544266195958939
+          "composite_z": 26.61765586680891,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 275.1499938964844,
+          "current_close": 312.6600036621094,
+          "current_return": -0.1363256790757439,
+          "exit_close": 312.6600036621094,
+          "exit_date": "2026-07-07",
+          "return": -0.1363256790757439
         },
         {
-          "ticker": "ESTC",
+          "ticker": "T",
+          "sector": "Communication Services",
+          "composite_z": 30.639537116737287,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 22.420000076293945,
+          "current_close": 20.579999923706055,
+          "current_return": 0.08206958725809443,
+          "exit_close": 20.579999923706055,
+          "exit_date": "2026-07-07",
+          "return": 0.08206958725809443
+        },
+        {
+          "ticker": "AI",
           "sector": "Technology",
-          "composite_z": 29.98261880059238,
-          "entry_date_used": "2026-06-29",
-          "entry_close": 56.95000076293945,
-          "current_close": 58.040000915527344,
-          "current_return": -0.01913959855988656
+          "composite_z": 33.03808988817464,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 8.75,
+          "current_close": 9.279999732971191,
+          "current_return": -0.06057139805385048,
+          "exit_close": 9.279999732971191,
+          "exit_date": "2026-07-07",
+          "return": -0.06057139805385048
+        },
+        {
+          "ticker": "VZ",
+          "sector": "Communication Services",
+          "composite_z": 33.94718866954982,
+          "entry_date_used": "2026-06-25",
+          "entry_close": 46.06999969482422,
+          "current_close": 42.06999969482422,
+          "current_return": 0.0868243982308814,
+          "exit_close": 42.06999969482422,
+          "exit_date": "2026-07-07",
+          "return": 0.0868243982308814
         }
       ],
-      "days_held": 2,
-      "current_long_return": -0.09909942538490871,
-      "current_short_return": -0.008850736259416814,
-      "current_ls_return": -0.053975080822162756
-    }
-  ],
-  "closed_portfolios": [
+      "days_held": 5,
+      "current_long_return": -0.09944190655691668,
+      "current_short_return": -0.024033463783488272,
+      "current_ls_return": -0.06173768517020247,
+      "long_basket_return": -0.09944190655691668,
+      "short_basket_return": -0.024033463783488272,
+      "ls_return": -0.06173768517020247,
+      "exit_date": "2026-07-07"
+    },
     {
       "entry_date": "2026-06-25",
       "status": "closed",
