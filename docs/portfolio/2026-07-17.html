@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Portfolio — 2026-07-17</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  max-width: 980px;
+  margin: 2em auto;
+  padding: 0 1em 4em;
+  color: #1c1c1c;
+  line-height: 1.55;
+  background: #f6f7f9;
+}
+h1 {
+  color: #0f1e3a;
+  border-bottom: 3px solid #2a5fa0;
+  padding-bottom: 0.4em;
+  margin-bottom: 0.6em;
+  font-size: 1.9em;
+}
+h2 {
+  color: #1a2540;
+  border-bottom: 1px solid #c8d2e0;
+  padding-bottom: 0.25em;
+  margin-top: 2em;
+  font-size: 1.4em;
+}
+h3 { margin-top: 1.2em; color: #1a2540; }
+table {
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  font-size: 0.95em;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+th, td { border: 1px solid #e0e4ea; padding: 0.4em 0.8em; text-align: left; }
+th { background: #eef1f6; color: #2a3b5c; }
+code {
+  background: #eef1f6;
+  padding: 0.05em 0.35em;
+  border-radius: 3px;
+  font-size: 0.92em;
+  color: #2a3b5c;
+}
+blockquote {
+  border-left: 4px solid #2a5fa0;
+  margin: 0.6em 0;
+  padding: 0.4em 1em;
+  color: #2a3b5c;
+  background: #eef3fa;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+}
+hr { border: 0; border-top: 1px solid #c8d2e0; margin: 2em 0; }
+ul, ol { padding-left: 1.4em; }
+a { color: #2a5fa0; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* === Position cards === */
+.position {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1em 1.2em 0.8em;
+  margin: 0.9em 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-left: 5px solid #888;
+}
+.position.long  { border-left-color: #1f8a5c; }
+.position.short { border-left-color: #c14242; }
+
+.position-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6em;
+  margin-bottom: 0.3em;
+}
+.side-badge {
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 0.1em 0.55em;
+  border-radius: 3px;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+.side-badge.long  { background: #1f8a5c; }
+.side-badge.short { background: #c14242; }
+.position-head .rank {
+  color: #6c7a93;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+.position-head .ticker {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #0f1e3a;
+  letter-spacing: 0.02em;
+}
+.position-head .meta {
+  color: #6c7a93;
+  font-size: 0.9em;
+}
+.position-headline {
+  color: #2a3b5c;
+  font-size: 0.98em;
+  margin-bottom: 0.6em;
+  padding-bottom: 0.55em;
+  border-bottom: 1px dashed #d6dce5;
+}
+
+.position-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  margin: 0.5em 0 0.8em;
+  font-size: 0.86em;
+}
+.position-stats .stat {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.position-stats .lbl {
+  color: #6c7a93;
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.position-stats .val {
+  color: #1a2540;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.conviction-high   { color: #1f8a5c; }
+.conviction-medium { color: #b87800; }
+.conviction-low    { color: #c14242; }
+
+.reasoning-block {
+  margin: 0.55em 0;
+  padding: 0.45em 0;
+}
+.reasoning-block .label {
+  font-size: 0.76em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c7a93;
+  margin-bottom: 0.25em;
+  font-weight: 600;
+}
+.reasoning-block ul { margin: 0.2em 0; padding-left: 1.2em; }
+.reasoning-block li { margin: 0.18em 0; color: #2a3b5c; }
+.reasoning-block.llm { background: #f4f7fb; padding: 0.6em 0.8em; border-radius: 4px; }
+.reasoning-block .sub-label {
+  font-size: 0.82em;
+  font-weight: 600;
+  color: #1a2540;
+  margin-top: 0.4em;
+}
+.reasoning-block .sub-label.flags { color: #c14242; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.4em; }
+.chip {
+  background: #eef1f6;
+  border: 1px solid #d6dce5;
+  border-radius: 12px;
+  padding: 0.15em 0.7em;
+  font-size: 0.82em;
+  color: #2a3b5c;
+  font-variant-numeric: tabular-nums;
+}
+
+.news-aggregate {
+  font-size: 0.88em;
+  color: #2a3b5c;
+  margin-bottom: 0.45em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px dashed #d6dce5;
+}
+.news-item {
+  font-size: 0.88em;
+  line-height: 1.5;
+  margin: 0.4em 0;
+  padding: 0.35em 0;
+  border-top: 1px dotted #e0e4ea;
+}
+.news-item:first-child { border-top: 0; }
+.news-item .fi {
+  margin: 0.25em 0 0 1.4em;
+  font-size: 0.92em;
+  color: #4a5775;
+}
+.news-item .fi-impl {
+  display: block;
+  margin-top: 0.2em;
+  font-style: italic;
+  color: #6c7a93;
+}
+.news-list { font-size: 0.88em; line-height: 1.6; }
+.reddit-summary { font-size: 0.88em; color: #2a3b5c; }
+.reddit-flag {
+  color: #c14242;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+.chips.inline { display: inline-flex; }
+
+/* === Folded "Others" section === */
+details.position-fold {
+  background: #fff;
+  border: 1px solid #d6dce5;
+  border-radius: 6px;
+  margin: 1em 0;
+  padding: 0.55em 0.9em;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+details.position-fold summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #2a5fa0;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+details.position-fold summary::before {
+  content: "▶";
+  font-size: 0.7em;
+  color: #6c7a93;
+  transition: transform 0.15s ease;
+  display: inline-block;
+}
+details.position-fold[open] summary::before {
+  transform: rotate(90deg);
+}
+details.position-fold[open] summary {
+  border-bottom: 1px solid #e0e4ea;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.6em;
+}
+details.position-fold.long summary { color: #1f8a5c; }
+details.position-fold.short summary { color: #c14242; }
+.fold-body { padding-top: 0.25em; }
+.fold-body .position {
+  margin: 0.6em 0;
+  padding: 0.7em 1em 0.55em;
+  border-left-width: 4px;
+}
+.fold-body .position-headline {
+  font-size: 0.92em;
+  padding-bottom: 0.4em;
+  margin-bottom: 0.4em;
+}
+.fold-body .position-head .ticker { font-size: 1.15em; }
+.fold-body .position-stats { margin: 0.3em 0 0.55em; }
+.news-tag {
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  vertical-align: middle;
+}
+.news-tag.positive { background: #1f8a5c; }
+.news-tag.negative { background: #c14242; }
+.news-tag.neutral  { background: #888; }
+.news-mat {
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  font-weight: 700;
+  background: #eef1f6;
+  color: #2a3b5c;
+  vertical-align: middle;
+}
+.news-theme {
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 3px;
+  font-size: 0.72em;
+  background: #fff8e6;
+  border: 1px solid #ecd99b;
+  color: #6c5410;
+  vertical-align: middle;
+}
+</style>
+</head>
+<body>
+<h1>Weekly Portfolio Report</h1>
+<p>Week ending <strong>2026-07-17</strong><br />
+Longs: <strong>7</strong> · Shorts: <strong>4</strong><br />
+Net beta: <strong>+1.44</strong></p>
+<h2>Longs (top 5 of 7)</h2>
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#1</span><span class='ticker'>VRT</span><span class='meta'>Industrials · β +2.10 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 66.3/100 (weighted z +0.65σ) — VRT ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>66.31</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>sector</b> (+1.08σ), <b>momentum</b> (+0.92σ), <b>quality</b> (+0.67σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +21.6%</span><span class='chip'>op margin 17.9%</span><span class='chip'>FCF margin 18.5%</span><span class='chip'>ROE 31.4%</span><span class='chip'>netDebt/EBITDA 0.36x</span><span class='chip'>shareCt YoY +1.1%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -5.7% · 3m -2.3% · 6m +70.3%.</li>
+<li>Sector <b>XLI</b> (Industrials): rank 6/11, 1m vs SPY +1.37%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>9</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+0.20</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMikgFBVV95cUxPVjZ6YVpRTFdndGFmT1VHU0VldFZHRTI5Mmx1a3JUOS1yREdZaERSdW54aW85dVhqR3ZSUlFlMFdQT0d0QWo3S2FueGVTRjQ0cWF6QnAxYTBqV05iM2RxT0g4U2VEbDBGUU9CYWpjLXA4NW5BLTZabVEtTGlGTWJMVUNVOFN0aE55QTQyU29EWmkzdw?oc=5'>Vertiv (VRT) Stock May Be 14% Undervalued Despite AI Cooling Deal - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · multi-year on revenue, operating_margin<br><span class='fi-impl'>The cited AI cooling deal adds incremental contracted revenue to VRT's backlog, supporting top-line growth visibility; the 'despite' framing implies modest near-term margin drag (e.g., ramp costs or pricing concessions) </span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMirAFBVV95cUxOMGMzZjBPQ0RqWDZqTk9hQ0pMNFdoVnBOUWpsZnFvUG0zUlBmWWtPaF9pMzFPMGZpeTVMWGtzU2p3d1Z2ZERISWxVZ0YwMjhRTW5mbXZFdk92RG1XbGNBVWpsLUxtOGlkcXUtSC1WdVF5blJrd0toY2YzdjNCSzRHQUszOUFMTzdmRGN3QlpQdmtYWFRVMUdEWktZemZndlRJbGcxTE4tcDUxNzNB?oc=5'>Vertiv rated Outperform in new coverage at Baird on data center demand - Seeking Alpha</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · small · multi-year on revenue, operating_leverage<br><span class='fi-impl'>Baird's Outperform initiation citing data center demand validates the secular tailwind underpinning VRT's thermal and power infrastructure backlog, supporting above-consensus revenue growth expectations; sustained capaci</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMimAFBVV95cUxOMC1Bc2d1U1podHRwQTh1ZllTTjBDaXFfM1FGN1RmQ3Q5elhSUlhTY015VXNLZm15NWF2RnhQc3VJOUhadEt3WG41czVDUVk0Z2g1N3lORGpxamY0UlpVZy1ENm5aa2d3QzdzN3FkWEVkcHV0VnFZV3RWWVVtWkRfQmRXUGdWLUkxaFFGMHVIRlJlQ2lZZVdCUQ?oc=5'>Vertiv Holdings Co. (VRT) Falls More Steeply Than Broader Market: What Investors Need to Know - Yahoo Finance</a> <em>(contrib -0.50)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · Q on other<br><span class='fi-impl'>This is a market-commentary piece reporting VRT's relative price underperformance; it contains no new fundamental data but may reflect negative near-term EPS estimate revisions or sector rotation pressure that could marg</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxOZDBTVjVnTlVUcmpmdExWdzlHSmZDM2xKVXNZT01MSExLVHVjeTN6YW5JVXc4TFZPOTBid2g5bnFQOGtrR3ZoWWNLbUFxMWl3M3N2OS1mZUxabHFhM2xwSjhHRi03Ti12VkJ5eTlmeFg0WXhuZjZuS3MxOHN2Y1BYcDFzNFNEYVNqeldXTEZvRXN6VzVoTVRr?oc=5'>EXLS or VRT: Which Is the Better Value Stock Right Now? - Yahoo Finance</a> <em>(contrib -0.50)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · FY25 on other<br><span class='fi-impl'>A comparative value-screen article (EXLS vs. VRT) uses existing reported metrics—P/E, P/B, earnings-growth estimates—and introduces no new fundamental information for VRT; any indirect effect is limited to incremental re</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#2</span><span class='ticker'>WMB</span><span class='meta'>Energy · β +0.63 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 76.5/100 (weighted z +1.06σ) — WMB ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>76.53</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>news sentiment</b> (+1.75σ), <b>sector</b> (+1.69σ), <b>momentum</b> (+0.70σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +12.4%</span><span class='chip'>op margin 28.2%</span><span class='chip'>FCF margin 6.7%</span><span class='chip'>ROE 20.2%</span><span class='chip'>netDebt/EBITDA -0.14x</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +4.5% · 3m +5.6% · 6m +23.5%.</li>
+<li>Sector <b>XLE</b> (Energy): rank 3/11, 1m vs SPY +3.19%; regime fit <b>unfavorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>9</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+0.81</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMie0FVX3lxTE5aNURZUlFlMTRSTWFsRGk3T280R1ZsZFZhTkQ2a2N5blFXVE5Ha1lNSk1uZ05xRVBrWklVYUlGTFc2VlRNdVRQZ3ZaRzRfV2RDLVRvNVVvaV9LRUVpOHcyVzJmYTY1NjdjdXV4S3p6TW1adjk3Q19wQjVYWQ?oc=5'>Williams Is No AI Pipe Dream. The Stock Is a Winner. - Barron's</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · small · multi-year on revenue, fcf_margin<br><span class='fi-impl'>Barron's endorsing WMB as a 'winner' with real, contracted fee-based natural gas pipeline demand (not speculative AI hype) reinforces the durability of its revenue backlog and high-margin, take-or-pay cash flow profile, </span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMisAFBVV95cUxNSERlTDd2QktpU1M3UkpOUzFDRXppTDhZYUtQcm50VVdNRElJcC1nRHdyOHZ5cmotdjh3UVJ6OXdkdlpJLXR1X2hJMzQ1ZmNHMHh6cFBwSlBSOWdnSU92Qi1aZXRyYWRjOFFORHhfS1NDQVJvdXR2QkdsUzd2bmxzLTZzaW1taTN4U0lhbDhsLWRoVzFuV3dQME5qOW5EYkttZjEwTGtZWXh0TU9KX0dfaQ?oc=5'>Pipeline operator Williams draws $5.34 billion from Blackstone-led group for power push - Reuters</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · multi-year on revenue, fcf_margin, leverage<br><span class='fi-impl'>The $5.34B Blackstone-led equity infusion funds WMB's power-infrastructure push, adding contracted power-project revenues while dramatically reducing WMB's own capital outlay, thereby improving free-cash-flow conversion </span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMikgFBVV95cUxQSjJVWl9SdkVYN2t1bXA1SHp0Qk5uRkZWODJIN0FJTWhIVWEtd25VZng2U3VOZkd2NDRoTzNmcEVmeE93eFNTY2Q1alZ2SGtiREdhaTVSWmxCMEczX1pwbF92NXM1SlBWZVl3OGMyS25USnoyd216LU51V0NKd0NzMFVuMTFiZFljWWlFdzBZSkVLUQ?oc=5'>Williams Shares Gain After Securing $5.34 Billion Blackstone-Led Investment for Power Projects (WMB) - Yahoo F</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · multi-year on revenue, fcf_margin, leverage<br><span class='fi-impl'>Securing $5.34B in outside equity capital for power projects offloads a large portion of WMB's growth capex burden, supporting stronger FCF margins and keeping net debt/EBITDA in check, while share-price gains reflect ma</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMirwFBVV95cUxQeXNEUE13Z0FxYjQ3Z0tLZnBTWjVnWHBUaWwwVjhqNFFob1BJVGdac2xIYXdwWFFvX0Z0SFJCUTkzd1Q2emVTUWduVlpoZjA5R0NQSDAtUlhzdHhCR2dWbTlmazF2Y3RKRVBwUWpTMHp3UzRxNm5qdXk2QTczcEV0amIwTVdNSWx6VFBtM1NrN0JBcUIwSTk3VDByYWR0dVgzOFBGZFJRd0dEdXpjb3M4?oc=5'>Williams Gets $5.34 Billion Investment from Blackstone-led Group - WSJ</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · multi-year on fcf_margin, leverage, revenue<br><span class='fi-impl'>The $5.34B third-party investment functions as capital recycling: WMB books a large cash inflow that de-levers the balance sheet relative to a wholly-funded scenario, preserving financial flexibility, while majority owne</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#3</span><span class='ticker'>VLO</span><span class='meta'>Energy · β +0.57 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 74.1/100 (weighted z +0.96σ) — VLO ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>74.08</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>news sentiment</b> (+2.07σ), <b>sector</b> (+1.69σ), <b>momentum</b> (+0.92σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR -11.4%</span><span class='chip'>op margin 2.6%</span><span class='chip'>FCF margin 3.1%</span><span class='chip'>ROE 9.8%</span><span class='chip'>netDebt/EBITDA 1.10x</span><span class='chip'>shareCt YoY -4.0%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +21.5% · 3m +27.8% · 6m +65.2%.</li>
+<li>Sector <b>XLE</b> (Energy): rank 3/11, 1m vs SPY +3.19%; regime fit <b>unfavorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>7</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+1.00</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMimgFBVV95cUxNTTM1dGp2dUcyZjN2WVkzWGpESGZUMWZkNklrdVVwUTlkejFxRXdXZUVjaVdsWTlYX1hYbVJSNTJpWEdGVXFYZ2FleVB4UHlIZ0E5RkNxV0loSVhrZ2pfTWpweXFiYmhGSWhtOWhTSGNWdHBtUmlaMU9zSTZqbXJRVXVoUkktNnpwTE5uN3BHa0R0VEVRWGFPT0NR?oc=5'>Renewed Middle East Tensions Threaten Supply: 3 Energy Stocks to Watch - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>UNCLEAR</b> · medium · Q on gross_margin, operating_margin, revenue<br><span class='fi-impl'>Middle East supply disruptions raise VLO's crude input costs, but simultaneously tend to widen crack spreads as product markets price in scarcity; the net margin impact is ambiguous and depends on how quickly product pri</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMilAFBVV95cUxQdnFCTElSd2MxWVpuM3gxbS01bzBxdXA0c2t1YlNUMlppSTdzaUpNbURKS05ZYXdGVUx4dEtQQ1FqYXpVSXZjdHAzVTdhSW1PeTlfSGtvMDRYcTJuZUdpb1ZoSlhDX2dNZkpZenpWWFo5S3J4NFJ1Skl4cWV3bHc3T0JpOHE5cS1ScUt1M004VXBoRWlT?oc=5'>Strong Fuel Demand & Elevated Crack Spreads Support Valero's Outlook - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · large · Q on revenue, gross_margin, operating_margin, fcf_margin<br><span class='fi-impl'>Elevated crack spreads are the primary driver of refining margin per barrel, directly expanding VLO's gross and operating margins; strong fuel demand reinforces throughput utilization, amplifying operating leverage on fi</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMiiwFBVV95cUxOYnpoT09ZUDJUa0xKS3dIZUdjVE81cDN5VEs3RzZoWWY2X05HV1BMRmhMMDYzTDJQdlgyVEZkcnpZRmpTVXIyRUdLdDFlQ3FIMUY4QmFPODJKQ2kwcWVFMnhuLVZEc2hWZmU5NXpSN3JRZVd1LUpVMF8tclBJMEVHdkZSdkZ1WWJ6RUow?oc=5'>Why Valero (VLO) Is Up 5.0% After Russell Reclassification And Refining Margin Tailwinds - Yahoo Finance</a> <em>(contrib +1.00)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · Q on gross_margin, operating_margin, share_count<br><span class='fi-impl'>Refining margin tailwinds directly expand VLO's crack spread realizations, lifting gross and operating margin in the near-term quarter; Russell reclassification triggers passive index-fund buying, compressing the float a</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>earnings</span> <a href='https://news.google.com/rss/articles/CBMigwFBVV95cUxQbGZ1VEhFSFJWclVHVGl3QlVRMGxRTDhqRlE3cWFaUDFaa2gtZ2p5dDNreHhNM0RKdk01Q1dIck1BZGstUzVMbmFEOVp0QlVneWZTRFVKQkxVRG9PcWxlSS11U1F1WjhLM3l0TVkzeVZpenQ4X3J0Q3Z0ZXV4djZKcEJxTQ?oc=5'>Can Valero Energy (VLO) Run Higher on Rising Earnings Estimates? - Yahoo Finance Singapore</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · small · FY26 on revenue, operating_margin<br><span class='fi-impl'>Rising sell-side earnings estimate revisions for VLO signal improving analyst expectations for refining margins and/or throughput volumes, implying modest upward pressure on consensus revenue and operating margin for the</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#4</span><span class='ticker'>SLB</span><span class='meta'>Energy · β +0.73 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 73.2/100 (weighted z +0.93σ) — SLB ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>73.20</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>news sentiment</b> (+2.19σ), <b>sector</b> (+1.69σ), <b>quality</b> (+0.38σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +8.3%</span><span class='chip'>op margin 18.3%</span><span class='chip'>FCF margin 13.4%</span><span class='chip'>ROE 12.9%</span><span class='chip'>netDebt/EBITDA 0.88x</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -12.3% · 3m -10.2% · 6m +2.6%.</li>
+<li>Sector <b>XLE</b> (Energy): rank 3/11, 1m vs SPY +3.19%; regime fit <b>unfavorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>7</strong> material items this week · aggregate sentiment <span class='news-tag positive'>+1.00</span></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>product</span> <a href='https://news.google.com/rss/articles/CBMikgFBVV95cUxPem1Eb21udU45YXJMclpCMnRXN1FNWGpxU2thRmpfazBOREtUZEM2NElHSjBNanlSREZKTXV5VGtyV2FmMW5Ec3RrbzdGSGVnWXJ6cEtKeEZwLVRLMWUzRVBWVlZ4RzhrR3hic052NEc3Rk9ybDZCZmxOMWE0dHlUSkppN2xid184ZGhmZU9jV1F0dw?oc=5'>SLB's Digital Revolution Is Just Getting Started (NYSE:SLB) - Seeking Alpha</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · multi-year on revenue, gross_margin, operating_margin, operating_leverage<br><span class='fi-impl'>Expansion of SLB's higher-margin digital/software segment (APS, cloud-based reservoir modeling, AI workflows) lifts blended gross and operating margins above traditional oilfield-services levels; incremental digital reve</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMilgFBVV95cUxPWUp3bU9TTGNZUS1YUi1nZWxMTVo3eEFyQ3NzbHhISEdaNHU3WHRYdWFKNDQwcExOVUxVc0h4WkplTFRqeVFIOWNEV19TRlZuUE1qQ01ycXFUdUFULXRuVDRlT1JMMjFsVVNsVnUwRmhYeVR1aXB1R25TdTAxTmdFOU1jbTJNV1kyS1B1ZkpUSHd0aENpMUE?oc=5'>SLB (SLB) Stock Still Trades At A Discount To Fair Value - Yahoo Finance</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · small · FY25 on other<br><span class='fi-impl'>A 'discount to fair value' valuation piece does not directly shift fundamental line items but may reinforce management's incentive to accelerate share buybacks, marginally reducing share count. The article is analytical </span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>other</span> <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxQUEl0RHRibWVGWFEwT2NOWXVfczNZeWpvRGJHX3F6M3FWX2dLRDJWRnlrdHlBd0dvNG5UMldEdDNJdjl0Z09UaVhGTWpqLVdwSkZIbnRzZVhqcS1kSUFWUGJiRW9MbXhfaExhaW1DTHZ6RDRKMnFFZGhRQTZ5LXNiZzlEcXJSVjJXTzNxMTFocmlBWEVtZWU4?oc=5'>SLB (SLB) Alliance News Keeps Its Fair Value Story In Focus - Yahoo Finance</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · multi-year on revenue, operating_leverage<br><span class='fi-impl'>Coverage tying the Liberty Energy data-center alliance to SLB's fair value narrative highlights incremental addressable market expansion beyond traditional oilfield services, supporting a higher revenue growth trajectory</span></div></div><div class='news-item'><span class='news-tag positive'>POSITIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>product</span> <a href='https://news.google.com/rss/articles/CBMimwFBVV95cUxQZDk2UEk4NG9IUU1sRUljcUx5UFVvd0dKWWVyX1NpdGkzZ195Zm9xdTVkS1oyUFFRUWl6aEVzOGd0SWxPRElpZ2U1X01BU1ZIZnNuMmxXTFVZaVZTQnVWMmpEdDFuT0dLc3ZJdHFuamVDMU9icUNJRlFDUDZ4aUZnVUgxbXJTbkJkUFYtUC1pQTNCZDZ6Q1k3T2FqWQ?oc=5'>Liberty Energy Shares Gain After Data Centre Infrastructure Partnership With SLB (LBRT) - Yahoo Finance</a> <em>(contrib +0.50)</em><div class='fi'>↳ <b>POSITIVE</b> · medium · multi-year on revenue, operating_margin<br><span class='fi-impl'>The data-center infrastructure partnership opens a structurally growing revenue stream for SLB's technology and digital capabilities outside the E&P spending cycle; data-center contracts tend to carry multi-year visibili</span></div></div></div></div>
+</div>
+
+<div class='position long'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#5</span><span class='ticker'>EOG</span><span class='meta'>Energy · β +0.28 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 69.5/100 (weighted z +0.78σ) — EOG ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>69.51</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>sector</b> (+1.69σ), <b>quality</b> (+1.11σ), <b>momentum</b> (+0.83σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR -4.2%</span><span class='chip'>op margin 28.2%</span><span class='chip'>ROE 16.1%</span><span class='chip'>netDebt/EBITDA 0.38x</span><span class='chip'>shareCt YoY -4.0%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +4.9% · 3m +4.6% · 6m +28.2%.</li>
+<li>Sector <b>XLE</b> (Energy): rank 3/11, 1m vs SPY +3.19%; regime fit <b>unfavorable</b>.</li>
+</ul></div>
+</div>
+
+<details class='position-fold long'><summary>Show 2 more long candidates (ranks 6-7)</summary>
+<div class='fold-body'>
+<div class='position long compact'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#6</span><span class='ticker'>QCOM</span><span class='meta'>Technology · β +1.49 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 63.5/100 (weighted z +0.54σ) — QCOM ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>63.48</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>news sentiment</b> (+1.54σ), <b>quality</b> (+1.10σ), <b>momentum</b> (+0.92σ).</li>
+<li>Counter-signal: <b>sector</b> -0.76σ acts as a drag.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +0.1%</span><span class='chip'>op margin 27.9%</span><span class='chip'>FCF margin 28.9%</span><span class='chip'>ROE 20.3%</span><span class='chip'>netDebt/EBITDA 0.70x</span><span class='chip'>shareCt YoY -2.2%</span></div></div>
+</div>
+<div class='position long compact'>
+<div class='position-head'><span class='side-badge long'>LONG</span><span class='rank'>#7</span><span class='ticker'>ASML</span><span class='meta'>Technology · β +1.37 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 63.4/100 (weighted z +0.54σ) — ASML ranks at the TOP of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>63.43</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main tailwinds: <b>news sentiment</b> (+1.39σ), <b>quality</b> (+1.24σ), <b>momentum</b> (+0.92σ).</li>
+<li>Counter-signal: <b>sector</b> -0.76σ acts as a drag.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +15.6%</span><span class='chip'>op margin 34.6%</span><span class='chip'>FCF margin 33.9%</span><span class='chip'>ROE 49.0%</span><span class='chip'>netDebt/EBITDA -0.69x</span><span class='chip'>shareCt YoY -1.2%</span></div></div>
+</div>
+</div></details>
+
+<h2>Shorts (4)</h2>
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#1</span><span class='ticker'>CRWV</span><span class='meta'>Technology · β n/a · weight 20.0%</span></div>
+<div class='position-headline'>Composite 22.7/100 (weighted z -1.09σ) — CRWV ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>22.65</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>quality</b> (-1.93σ), <b>news sentiment</b> (-1.37σ), <b>momentum</b> (-1.30σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>op margin -0.9%</span><span class='chip'>FCF margin -141.3%</span><span class='chip'>ROE -24.5%</span><span class='chip'>netDebt/EBITDA 12.53x</span><span class='chip'>shareCt YoY +100.0%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -31.7% · 3m -38.6% · 6m -16.7%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 11/11, 1m vs SPY -6.90%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>12</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.53</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMimwFBVV95cUxNMmFwSVdtTFdNMHBESGV6OGF0ZXFGNmdIVXU5VDdxb0c5eVVEUHpFRENFd29WNXFLYUl1Ty1zNWhyZmJhbzF4R1J6azAzQUlwY0ZRcEFMODU3aXRxd0JndXBqUEt5d2taR0JBeTZHRHU0MW1oV2wtd0pLRjZFeURaNVc0dkZDS3ROODlUczhidW52SmxUXzR2REJzRQ?oc=5'>CoreWeave: Zero Room For Error (NASDAQ:CRWV) - Seeking Alpha</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · large · multi-year on leverage, fcf_margin, operating_leverage, revenue<br><span class='fi-impl'>'Zero room for error' framing highlights that CoreWeave's debt-heavy balance sheet leaves no buffer for revenue shortfalls or margin slippage—any miss on GPU utilization rates or contract renewals would cascade into outs</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMimAFBVV95cUxOQkk3OUVtZ2tVMkt6UWktSlY3WnRyVkcwb0F6amF3TGVhNXc3LVFRMU8tVzF3OVBHQjY0Y3JBdGxsSDV0a1dEcGFyd0djQlhHT3VMN1R1ek0wODNvTE4tOXVXN3lJR2xMWmxSZDVfdWpSTFJJUWxQbVh1WGdmR0VkalRFVHNqTzNxUUNDdml0ang5RXFSYkpJNA?oc=5'>Should Nebius and CoreWeave Investors Be Scared by Meta's Latest Plans? - The Motley Fool</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · multi-year on revenue, operating_leverage<br><span class='fi-impl'>Meta's disclosed plans to massively scale proprietary AI compute infrastructure reduce the addressable hyperscaler market for CoreWeave's GPU-cloud offering, threatening future contract wins and revenue growth as large p</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMipwFBVV95cUxNenoyNTl0VEhaSkZFdndNYkZuUWhOYkV3VVV6TDhFNExMT3hveGxNNzB6TFlfMjUzNGFxaHBYaGtnUDNoekJLTkpRRE56VWcyc01oMW5iaHN3aVhHYjlpa1RVODUtZmRZNWxCU2lfSEdQZnk5aWxNWTE4VUhiZ3ZUdk5jbUV0SzlfX1RPYmp3WFlkbF91YTRPY3lHQVZRZENIRGZpamkyWQ?oc=5'>Should Nebius and CoreWeave Investors Be Scared by Meta's Latest Plans? - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · multi-year on revenue, operating_margin, operating_leverage<br><span class='fi-impl'>Meta accelerating its own AI compute buildout signals that hyperscalers may increasingly self-provision GPU capacity, shrinking the addressable market for CoreWeave's colocation/cloud GPU services and pressuring long-run</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>litigation</span> <a href='https://news.google.com/rss/articles/CBMijgJBVV95cUxPbndmVHhaNzc2UkZUMGRCVDRPS05QVkFEODlCY1dVYlJfTS0td3hHdHlWejU0UmxnUjJYUzgyQUoyTmtMRlhCM0lBeV9QU1h4Y2ZweFRtRUZmNGZ2ZFNEd3ZFd1ZLQWh3cEk5by1JZVVVYTdxUmRScEpuNC11Q0NaS3hNQVpPdldsTFdVajd0U1A0Z3lyQXpWOUxQTXdpZGIzbUZfWGZFUmpCY05TN095SDFlbnZWc0xwSzBDZjBVaEY5WTFwUmJoUkJZU1ZRb196Q1k4SHUzNEJwd0JWYnlEd0NRX0IzZG4wdHlET1pnVWhQRHEzYm1LVTNNbWQ1NnRqMzk4RHlTdFVVNXNDdFE?oc=5'>LONG TERM Investors in CoreWeave, Inc. (NASDAQ: CRWV) shares should contact the Shareholders Foundation in con</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · multi-year on other, operating_margin<br><span class='fi-impl'>A shareholders' securities class-action lawsuit introduces legal defense costs and potential settlement liability that flow through SG&A/other expenses, with management distraction as a secondary drag; magnitude is typic</span></div></div></div></div>
+</div>
+
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#2</span><span class='ticker'>AI</span><span class='meta'>Technology · β +1.99 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 23.7/100 (weighted z -1.05σ) — AI ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>23.69</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>quality</b> (-1.93σ), <b>news sentiment</b> (-1.25σ), <b>momentum</b> (-1.22σ).</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +15.5%</span><span class='chip'>op margin -83.4%</span><span class='chip'>FCF margin -11.4%</span><span class='chip'>ROE -40.1%</span><span class='chip'>shareCt YoY +8.1%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -19.2% · 3m -6.4% · 6m -34.3%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 11/11, 1m vs SPY -6.90%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>68</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.43</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMioAFBVV95cUxQNVl4TjNBVmc2UHpUcTU0Sk9jUzNlTnV3YjRwT2w5Ylc1dUNwbXFFT252dklFY05XZlZXcmwzWlhOZXhnOGsybk1XRnJIb2M3Y205N2Y1ZDlCZGFWNWtwWGJqRWsyMTVSdmtFcWs2cHlYVllwclhJRmsyZTNwUkFuSGtpRVp4aW9BZG5NbmR4WktDZ256bDdJcnBjaHllTXEx?oc=5'>Tech stocks live updates: Tech stocks fall as AI trade faces scrutiny, SK Hynix falls - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · Q on revenue, operating_margin<br><span class='fi-impl'>Heightened scrutiny of the AI trade could slow enterprise decision-making cycles, pushing deal closures into future quarters and compressing near-term revenue recognition for C3.ai.</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMimwFBVV95cUxNWVlTRXBpazdNZ0M1bWhlX1UtSTNNYU9hbmxiLUhtcHE2M3hLMHlrc2s4bkwwS1RqbkJaLWExWHQ3bVZzQ3REVXBfa2Q3MHJqYUdXZ2d1dHEwVEQ3UEhsSU5Gckk4YnR2bzRvOXEzRGFHY3NERjlLQ3VNTTgxNGN5c3NCbFRkX3Z0YklpYndWV0ZoV3JsQ0NyUTBRQQ?oc=5'>IBM warns AI boom squeezing software budgets; shares sink in sector rout - Reuters</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on revenue, gross_margin, operating_margin<br><span class='fi-impl'>IBM's direct warning that AI infrastructure spending is crowding out software budgets is a significant demand-side risk for C3.ai, as enterprise customers reallocating budgets toward AI infrastructure reduce discretionar</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMingFBVV95cUxPeXpEVm1MZGp2RUhYSC1nOTF2S05VM2JYel9RRXc3dERnRnFkaTRoeTA1cHh4ZGtFRkFRemFwLXJpWmFuQXdJX1NrYmt0UGF0UUFmZkg3VzEzeHhWWjB6bFZ0aXdpZ3RjelZGX090bHlheWlmT0RjTnE0ODZNLU1pQ1VzWDBNU3pmYWdXcU03LXZNekFFZ1h2MF8yaDhYZw?oc=5'>U.S. Stocks Fall as AI Selloff, Oil Jump Rattle Markets - WSJ</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · Q on other<br><span class='fi-impl'>A broad AI-sector selloff pressures C3.ai's stock price and sentiment but contains no company-specific fundamental information; secondary effect could be a higher cost of equity.</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>macro</span> <a href='https://news.google.com/rss/articles/CBMikgFBVV95cUxPcHZ0YWpGZjBZakNRRmRveklzX1hRUklIWUc2MzVoWE51Z1Bjc0JFU05vd2tGVWhaSVVVSmFvbHU3QWJZcEs0R2dkRjFxcG9WaGMtWFo2SmhqTTVjSDNFVFk5Zl8xcmdiaTFHUmM5cWU0RzNDeDU2TGM4RWJJMjg3Y2lYeEJBWkdqeXFWUjg0eWpNZw?oc=5'>Oil prices jump following the latest fighting in the Middle East, while AI stocks sink - AP News</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · Q on other<br><span class='fi-impl'>Sector-wide AI stock decline driven by macro (oil) and risk-off flows affects C3.ai's market valuation but has no direct read-through to its operating fundamentals.</span></div></div></div></div>
+</div>
+
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#3</span><span class='ticker'>AAPL</span><span class='meta'>Technology · β +1.06 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 26.9/100 (weighted z -0.92σ) — AAPL ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>26.90</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>turnover_dampening</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>valuation</b> (-7.62σ), <b>sector</b> (-0.76σ).</li>
+<li>Counter-signal: <b>quality</b> +1.27σ acts as a lift.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +1.8%</span><span class='chip'>op margin 32.0%</span><span class='chip'>FCF margin 23.7%</span><span class='chip'>ROE 105.2%</span><span class='chip'>P/E 40.5x</span><span class='chip'>FCF yield 2.18%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m +12.4% · 3m +25.1% · 6m +27.7%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 11/11, 1m vs SPY -6.90%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>26</strong> material items this week · aggregate sentiment <span class='news-tag neutral'>+0.03</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>litigation</span> <a href='https://news.google.com/rss/articles/CBMilAFBVV95cUxOdDB4aFh2dHUxdng3OEJBY0dlRV9nZVZFR2hDR01tWHZQNTZlM1UzWnVSd1lvVnJ4M0xYWndRYzdfUzF4WEtNTWNOOUdwb29USktWTUU3dWtJdVdyZnhtLWJjRGgyekZza0d4QUk3TFdQZ202M3c5TUptREpER09zOHRXb3JwZUMwY0pMUEVRN3N2UWN4?oc=5'>Apple (AAPL) Stock Could Be 29% Overvalued Following Its AI Lawsuit - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · large · multi-year on revenue, operating_margin, other<br><span class='fi-impl'>An AI-related lawsuit could force curtailment or redesign of Apple Intelligence features, curbing the Services and hardware-upgrade revenue that underpins bull-case valuations, while legal fees and potential injunctions </span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMiiAFBVV95cUxQcUtFaHZnUy1VZWxuRmNja0xmYTZhcW1rd2ZidTZTTS1GalF5M29kWDhQYTlneWk3d2F5NGNUdFJDSjNEOHFsQURxOW41ZFJSMXVVTGQ4VUVzeEJKSjJvTE5OYTU3eDU3QlE0RTdPLUMzWk9WcGc5UkN0cnVzc3RKMWJjTlNtXzhr?oc=5'>Apple Stock Downgraded To Sell. Here’s Why. - Investor's Business Daily</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on revenue, operating_margin<br><span class='fi-impl'>A formal sell downgrade implies the issuing analyst sees consensus revenue or EPS estimates as too high relative to near-term iPhone demand or Services growth, signaling 1–5% downside risk to operating-income estimates o</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMiwAFBVV95cUxOOW04YzFaUU9jbk1mOTRnYTI0TWc5ZElZcm1aNm9QckV1RzN4ek1PQTRqZlVja0RHd0wwZ0JTeFhHUG9QdjJjWjJQZU5uYlFLYTJoUkRZT0luWGZFUlVjNGpqejh2b1JwQXRVa0djdWlnejluVWZFWVpzMk1MYUNUOFV2dEQzNVhOQ183S0JJcHFCWlM2YThGWjlsTUNiSjU5N2phOWlOYnBxUm13T2Zud1dtOFpfaEtYMzZIenFyODE?oc=5'>Apple's China Headwinds And India Relief: The Rally Is Overextended (Rating Downgrade) - Seeking Alpha</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on revenue, gross_margin<br><span class='fi-impl'>China represents roughly 17% of Apple's revenue and faces structural headwinds from domestic Android competition, while India volumes are still too small to fully offset the shortfall; the net effect is negative pressure</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>analyst</span> <a href='https://news.google.com/rss/articles/CBMieEFVX3lxTFBRSWZqMFVjLWxYdVd5Ql9GTmt1c1hGOEtPeDVtd01CcWRyZDh4ekFMcDNtT21UNnhhOFNUUHdicFRhNFBoNFktSWNkNExBNFpULVJ1MndjQ1loUTNfNGtwZFFMZXZ5SHB1YlBlOElpRnRzUzhCX3dRbA?oc=5'>Apple Stock Downgraded—iPhone Weakness and 2 Other Reasons - Barron's</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on revenue, gross_margin<br><span class='fi-impl'>A downgrade citing iPhone weakness signals potential unit volume shortfall in AAPL's largest revenue segment (~50% of sales), which would compress both top-line growth and blended gross margin given iPhone's above-averag</span></div></div></div></div>
+</div>
+
+<div class='position short'>
+<div class='position-head'><span class='side-badge short'>SHORT</span><span class='rank'>#4</span><span class='ticker'>MDB</span><span class='meta'>Technology · β +1.49 · weight 20.0%</span></div>
+<div class='position-headline'>Composite 32.4/100 (weighted z -0.70σ) — MDB ranks at the BOTTOM of the universe on the regime-weighted ranking this run.</div>
+<div class='position-stats'><span class='stat'><span class='lbl'>composite</span><span class='val'>32.43</span></span><span class='stat'><span class='lbl'>selection</span><span class='val'>rank</span></span></div>
+<div class='reasoning-block'><div class='label'>Why this rank</div><ul>
+<li>Main headwinds: <b>news sentiment</b> (-2.16σ), <b>quality</b> (-1.07σ), <b>sector</b> (-0.76σ).</li>
+<li>Counter-signal: <b>momentum</b> +0.58σ acts as a lift.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>Fundamentals</div><div class='chips'><span class='chip'>rev 3y CAGR +24.3%</span><span class='chip'>op margin -5.6%</span><span class='chip'>FCF margin 20.3%</span><span class='chip'>ROE -2.4%</span><span class='chip'>shareCt YoY +9.0%</span></div></div>
+<div class='reasoning-block'><div class='label'>Context</div><ul>
+<li>Trailing returns: 1m -7.2% · 3m +34.6% · 6m -20.1%.</li>
+<li>Sector <b>XLK</b> (Technology): rank 11/11, 1m vs SPY -6.90%; regime fit <b>favorable</b>.</li>
+</ul></div>
+<div class='reasoning-block'><div class='label'>News &amp; fundamental impact</div><div class='news-list'><div class='news-aggregate'><strong>3</strong> material items this week · aggregate sentiment <span class='news-tag negative'>-0.75</span></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>HIGH</span> <span class='news-theme'>technical</span> <a href='https://news.google.com/rss/articles/CBMimwFBVV95cUxPSWNQSGlEY2loaUR2eVJZTWpXQXFsaVlaMXRUOWRkOGNaajlrNjA5NUZVV2ZjUy1ERWxGSGd0STVVLWN4NlhPQmVHMmIxdHVkVVVJUU1SZW5yVFVTcHF4WFNCM3ZKbjdHeGRMdFdHMTFmdGd2NF9kRWJoUVlOUEFHUVFJekI0S05mQTk3ZzI4WFNGbzc5SWV5eVlrTQ?oc=5'>MongoDB (MDB) Stock Sinks As Market Gains: Here's Why - Yahoo Finance</a> <em>(contrib -1.00)</em><div class='fi'>↳ <b>NEGATIVE</b> · medium · FY26 on revenue, operating_margin<br><span class='fi-impl'>A session in which MDB underperforms a rising broad market typically reflects incremental concern about company-specific fundamentals—likely competitive pressure from AI-native and cloud-vendor databases weighing on cons</span></div></div><div class='news-item'><span class='news-tag negative'>NEGATIVE</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMixwFBVV95cUxNMHpEZGQzNHdJM2tKUy1KanpZc1N4elNCSXQ1QWJVLV9leW5acTdhbV9vbnZremNPQm5ETE14NjJmbUFpd1lMUmg0VUVZbm9Ock96dHNMb1VYd0RxV0lIQWFjOG5jenU1WHRob2h1QmVDUHFzX1RMUnZNTWRKVklWdXFJNl84YURZUkItUjBVMUQwcmNCaXhLOFpmbklkbFFWRTZpUUktQnQ5UlhNeUlaM0hySUVObWVWSE5BaXh1bHBmT1N1Z0pV?oc=5'>Palantir, Microsoft, Figma emerge as key AI beneficiaries ahead of Q2 software earnings: Citi - Seeking Alpha</a> <em>(contrib -0.50)</em><div class='fi'>↳ <b>NEGATIVE</b> · small · FY26 on revenue, operating_leverage<br><span class='fi-impl'>Citi's pre-Q2 AI-beneficiary list names Palantir, Microsoft, and Figma but omits MongoDB, signaling analyst skepticism that Atlas Vector Search and AI workloads will materially lift MDB's consumption revenue in the near </span></div></div><div class='news-item'><span class='news-tag neutral'>NEUTRAL</span> <span class='news-mat'>MEDIUM</span> <span class='news-theme'>competitive</span> <a href='https://news.google.com/rss/articles/CBMimgFBVV95cUxOVElXQ2VGR3BkTm5kdWt3QmdiT29wOVV5RFVRX1JSSEh6b3JhODJKb2lkZy1xUTNwamd5M0d2VE1CQW11al9jUWFJQzlIMjR1ZjdIVjJhM1R6ZWNLS0EtYWhGQ2FINzVDaVMzb1VObmdWQVRQMW4tRU1iRWlLWlRWazA0RjVhZmJETmhqLTJWbVU5bkI4QnB4Ti1R?oc=5'>Data Storage Stocks Q1 In Review: Commvault (NASDAQ:CVLT) Vs Peers - Yahoo Finance</a> <em>(contrib +0.00)</em><div class='fi'>↳ <b>UNCLEAR</b> · small · Q on revenue, operating_margin<br><span class='fi-impl'>A backward-looking Q1 sector-comparison piece benchmarks MDB against data-storage peers (led by Commvault), which may highlight relative revenue growth or margin gaps but carries no direct forward-estimate revision. Any </span></div></div></div></div>
+</div>
+
+<h2>Changes vs last week</h2>
+<p><strong>Longs added</strong>: <code>ASML</code>, <code>EOG</code>, <code>QCOM</code>, <code>SLB</code>, <code>VLO</code>, <code>WMB</code>
+<strong>Longs dropped</strong>: <code>AMAT</code>, <code>ANET</code>, <code>BWXT</code>, <code>CSCO</code>, <code>GOOGL</code>, <code>MPWR</code>
+<strong>Longs held</strong>: <code>VRT</code></p>
+<p><strong>Shorts added</strong>: <code>MDB</code>
+<strong>Shorts dropped</strong>: <code>CCJ</code>, <code>COP</code>, <code>HUBS</code>, <code>OKLO</code>, <code>OXY</code>
+<strong>Shorts held</strong>: <code>AAPL</code>, <code>AI</code>, <code>CRWV</code></p>
+<h2>Portfolio metrics</h2>
+<ul>
+<li>Long basket beta: +1.44</li>
+<li>Short basket beta: n/a</li>
+<li>Net beta: +1.44</li>
+<li>Long sector exposure: Energy (4), Industrials (1), Technology (2)</li>
+<li>Short sector exposure: Technology (4)</li>
+<li>Gross exposure (sum of |weights|): long 140.0% / short 80.0%</li>
+</ul>
+<h2>Watch list (next-ranked by composite)</h2>
+<p><strong>Long bench</strong>: XOM (z=+67.55), MPC (z=+65.47), CVX (z=+64.52)
+<strong>Short bench</strong>: ESTC (z=+32.93), HUBS (z=+33.10), ZS (z=+33.31), WDAY (z=+33.41), ERIC (z=+35.53)</p>
+<p><strong>Outliers</strong> (extreme single-component scores):
+- AEP: extreme news sentiment (z=-2.37)
+- SLB: extreme news sentiment (z=+2.19)
+- CRWV: extreme quality (z=-1.93)
+- AI: extreme quality (z=-1.93)
+- AAPL: extreme valuation (z=-7.62)
+- ZS: extreme momentum (z=-1.57)
+- HUBS: extreme momentum (z=-1.57)</p>
+<h2>Risk flags</h2>
+<ul>
+<li>Net beta +1.44 outside target band (±0.30) -- consider rebalancing weights.</li>
+<li>Beta data incomplete on one or both baskets -- net-beta neutralization could not be enforced this week.</li>
+</ul>
+<h2>Rejections from initial focus list</h2>
+<ul>
+<li><code>XOM</code> (long): sector cap (Energy)</li>
+<li><code>MPC</code> (long): sector cap (Energy)</li>
+<li><code>CVX</code> (long): sector cap (Energy)</li>
+<li><code>ESTC</code> (short): sector cap (Technology)</li>
+<li><code>HUBS</code> (short): sector cap (Technology)</li>
+<li><code>ZS</code> (short): sector cap (Technology)</li>
+<li><code>WDAY</code> (short): sector cap (Technology)</li>
+<li><code>ERIC</code> (short): sector cap (Technology)</li>
+<li><code>ORCL</code> (short): sector cap (Technology)</li>
+</ul>
+</body>
+</html>
