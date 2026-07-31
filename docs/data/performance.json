@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-07-30T13:27:06",
+  "generated_at": "2026-07-31T13:28:34",
   "stats": {
-    "n_closed": 44,
+    "n_closed": 45,
     "n_open": 6,
-    "cumulative_return": 0.22846601679907386,
-    "current_open_pnl": -0.034465054194551904
+    "cumulative_return": 0.22361407684907955,
+    "current_open_pnl": -0.18782102701363945
   },
   "cumulative_series": [
     {
@@ -270,9 +270,117 @@
       "entry_date": "2026-07-22",
       "ls_return": -0.02984731487496195,
       "cumulative_return": 0.22846601679907386
+    },
+    {
+      "exit_date": "2026-07-31",
+      "entry_date": "2026-07-23",
+      "ls_return": -0.00485193994999431,
+      "cumulative_return": 0.22361407684907955
     }
   ],
   "open_portfolios": [
+    {
+      "entry_date": "2026-07-31",
+      "status": "open",
+      "longs": [
+        {
+          "ticker": "EOG",
+          "sector": "Energy",
+          "composite_z": 79.93086883446078,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 145.50999450683594,
+          "current_close": 145.50999450683594,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "VLO",
+          "sector": "Energy",
+          "composite_z": 70.94372759788196,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 311.7099914550781,
+          "current_close": 311.7099914550781,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "SLB",
+          "sector": "Energy",
+          "composite_z": 69.39095803661758,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 48.90999984741211,
+          "current_close": 48.90999984741211,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "VZ",
+          "sector": "Communication Services",
+          "composite_z": 63.02057114536355,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 46.11000061035156,
+          "current_close": 46.11000061035156,
+          "current_return": 0.0
+        },
+        {
+          "ticker": "XOM",
+          "sector": "Energy",
+          "composite_z": 62.86893869778925,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 156.97000122070312,
+          "current_close": 156.97000122070312,
+          "current_return": 0.0
+        }
+      ],
+      "shorts": [
+        {
+          "ticker": "AAPL",
+          "sector": "Technology",
+          "composite_z": 23.79834879449685,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 333.42999267578125,
+          "current_close": 333.42999267578125,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "CRWV",
+          "sector": "Technology",
+          "composite_z": 24.0122981736707,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 73.9000015258789,
+          "current_close": 73.9000015258789,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "AI",
+          "sector": "Technology",
+          "composite_z": 30.100825836551003,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 9.069999694824219,
+          "current_close": 9.069999694824219,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "OKLO",
+          "sector": "Utilities",
+          "composite_z": 31.40837580658185,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 41.09000015258789,
+          "current_close": 41.09000015258789,
+          "current_return": -0.0
+        },
+        {
+          "ticker": "HUBS",
+          "sector": "Technology",
+          "composite_z": 33.12878878001582,
+          "entry_date_used": "2026-07-30",
+          "entry_close": 233.10000610351562,
+          "current_close": 233.10000610351562,
+          "current_return": -0.0
+        }
+      ],
+      "days_held": 0,
+      "current_long_return": 0.0,
+      "current_short_return": 0.0,
+      "current_ls_return": 0.0
+    },
     {
       "entry_date": "2026-07-30",
       "status": "open",
@@ -283,8 +391,8 @@
           "composite_z": 86.11850425437342,
           "entry_date_used": "2026-07-29",
           "entry_close": 145.94000244140625,
-          "current_close": 145.94000244140625,
-          "current_return": 0.0
+          "current_close": 145.50999450683594,
+          "current_return": -0.0029464706549046094
         },
         {
           "ticker": "VLO",
@@ -292,8 +400,8 @@
           "composite_z": 68.28941361469793,
           "entry_date_used": "2026-07-29",
           "entry_close": 301.32000732421875,
-          "current_close": 301.32000732421875,
-          "current_return": 0.0
+          "current_close": 311.7099914550781,
+          "current_return": 0.03448156072716335
         },
         {
           "ticker": "XOM",
@@ -301,8 +409,8 @@
           "composite_z": 68.00313960339335,
           "entry_date_used": "2026-07-29",
           "entry_close": 156.75,
-          "current_close": 156.75,
-          "current_return": 0.0
+          "current_close": 156.97000122070312,
+          "current_return": 0.0014035165595096544
         },
         {
           "ticker": "SLB",
@@ -310,8 +418,8 @@
           "composite_z": 67.96712327436319,
           "entry_date_used": "2026-07-29",
           "entry_close": 48.959999084472656,
-          "current_close": 48.959999084472656,
-          "current_return": 0.0
+          "current_close": 48.90999984741211,
+          "current_return": -0.0010212262662481209
         },
         {
           "ticker": "VZ",
@@ -319,8 +427,8 @@
           "composite_z": 64.00352186031893,
           "entry_date_used": "2026-07-29",
           "entry_close": 47.220001220703125,
-          "current_close": 47.220001220703125,
-          "current_return": 0.0
+          "current_close": 46.11000061035156,
+          "current_return": -0.023507000882179052
         }
       ],
       "shorts": [
@@ -330,8 +438,8 @@
           "composite_z": 22.29517168201115,
           "entry_date_used": "2026-07-29",
           "entry_close": 60.81999969482422,
-          "current_close": 60.81999969482422,
-          "current_return": -0.0
+          "current_close": 73.9000015258789,
+          "current_return": -0.21506086643679811
         },
         {
           "ticker": "SMR",
@@ -339,8 +447,8 @@
           "composite_z": 29.074243590626835,
           "entry_date_used": "2026-07-29",
           "entry_close": 7.590000152587891,
-          "current_close": 7.590000152587891,
-          "current_return": -0.0
+          "current_close": 8.600000381469727,
+          "current_return": -0.13306985620250167
         },
         {
           "ticker": "AI",
@@ -348,8 +456,8 @@
           "composite_z": 29.541494898104613,
           "entry_date_used": "2026-07-29",
           "entry_close": 8.850000381469727,
-          "current_close": 8.850000381469727,
-          "current_return": -0.0
+          "current_close": 9.069999694824219,
+          "current_return": -0.02485867840357736
         },
         {
           "ticker": "AAPL",
@@ -357,8 +465,8 @@
           "composite_z": 30.31583033002778,
           "entry_date_used": "2026-07-29",
           "entry_close": 338.19000244140625,
-          "current_close": 338.19000244140625,
-          "current_return": -0.0
+          "current_close": 333.42999267578125,
+          "current_return": 0.014074957069287408
         },
         {
           "ticker": "SMCI",
@@ -366,14 +474,14 @@
           "composite_z": 32.93937025079342,
           "entry_date_used": "2026-07-29",
           "entry_close": 25.700000762939453,
-          "current_close": 25.700000762939453,
-          "current_return": -0.0
+          "current_close": 27.729999542236328,
+          "current_return": -0.07898827700519861
         }
       ],
       "days_held": 0,
-      "current_long_return": 0.0,
-      "current_short_return": 0.0,
-      "current_ls_return": 0.0
+      "current_long_return": 0.0016820758966682448,
+      "current_short_return": -0.08758054419575767,
+      "current_ls_return": -0.04294923414954471
     },
     {
       "entry_date": "2026-07-29",
@@ -385,8 +493,8 @@
           "composite_z": 84.36905618841816,
           "entry_date_used": "2026-07-28",
           "entry_close": 139.63999938964844,
-          "current_close": 145.94000244140625,
-          "current_return": 0.04511603465550307
+          "current_close": 145.50999450683594,
+          "current_return": 0.04203663092842036
         },
         {
           "ticker": "SLB",
@@ -394,8 +502,8 @@
           "composite_z": 68.92715166087524,
           "entry_date_used": "2026-07-28",
           "entry_close": 49.97999954223633,
-          "current_close": 48.959999084472656,
-          "current_return": -0.020408172611160347
+          "current_close": 48.90999984741211,
+          "current_return": -0.021408557515491755
         },
         {
           "ticker": "XOM",
@@ -403,8 +511,8 @@
           "composite_z": 68.49496031791544,
           "entry_date_used": "2026-07-28",
           "entry_close": 153.0399932861328,
-          "current_close": 156.75,
-          "current_return": 0.0242420731614299
+          "current_close": 156.97000122070312,
+          "current_return": 0.025679613872058527
         },
         {
           "ticker": "VLO",
@@ -412,8 +520,8 @@
           "composite_z": 67.63877004184297,
           "entry_date_used": "2026-07-28",
           "entry_close": 298.8800048828125,
-          "current_close": 301.32000732421875,
-          "current_return": 0.008163819598313138
+          "current_close": 311.7099914550781,
+          "current_return": 0.04292688156672142
         },
         {
           "ticker": "GOOGL",
@@ -421,8 +529,8 @@
           "composite_z": 64.32233060962841,
           "entry_date_used": "2026-07-28",
           "entry_close": 333.7099914550781,
-          "current_close": 336.7099914550781,
-          "current_return": 0.008989841709321045
+          "current_close": 333.6600036621094,
+          "current_return": -0.00014979411539584042
         }
       ],
       "shorts": [
@@ -432,8 +540,8 @@
           "composite_z": 28.814300078413808,
           "entry_date_used": "2026-07-28",
           "entry_close": 67.30000305175781,
-          "current_close": 60.81999969482422,
-          "current_return": 0.09628533526142746
+          "current_close": 73.9000015258789,
+          "current_return": -0.09806832354889039
         },
         {
           "ticker": "AI",
@@ -441,8 +549,8 @@
           "composite_z": 29.510653775038076,
           "entry_date_used": "2026-07-28",
           "entry_close": 8.899999618530273,
-          "current_close": 8.850000381469727,
-          "current_return": 0.0056178920453485715
+          "current_close": 9.069999694824219,
+          "current_return": -0.01910113298656735
         },
         {
           "ticker": "AAPL",
@@ -450,8 +558,8 @@
           "composite_z": 29.93638044585783,
           "entry_date_used": "2026-07-28",
           "entry_close": 340.0799865722656,
-          "current_close": 338.19000244140625,
-          "current_return": 0.005557469435084728
+          "current_close": 333.42999267578125,
+          "current_return": 0.019554205360659438
         },
         {
           "ticker": "SMR",
@@ -459,8 +567,8 @@
           "composite_z": 30.92612270708567,
           "entry_date_used": "2026-07-28",
           "entry_close": 8.220000267028809,
-          "current_close": 7.590000152587891,
-          "current_return": 0.07664234719892982
+          "current_close": 8.600000381469727,
+          "current_return": -0.04622872288278801
         },
         {
           "ticker": "ZS",
@@ -468,14 +576,14 @@
           "composite_z": 33.081625537549385,
           "entry_date_used": "2026-07-28",
           "entry_close": 151.6300048828125,
-          "current_close": 153.77000427246094,
-          "current_return": -0.014113297637247557
+          "current_close": 148.38999938964844,
+          "current_return": 0.021367838744502543
         }
       ],
-      "days_held": 0,
-      "current_long_return": 0.013220719302681361,
-      "current_short_return": 0.03399794926070861,
-      "current_ls_return": 0.023609334281694982
+      "days_held": 1,
+      "current_long_return": 0.017816954947262542,
+      "current_short_return": -0.024495227062616753,
+      "current_ls_return": -0.0033391360576771056
     },
     {
       "entry_date": "2026-07-28",
@@ -487,8 +595,8 @@
           "composite_z": 77.11802570674868,
           "entry_date_used": "2026-07-27",
           "entry_close": 140.30999755859375,
-          "current_close": 145.94000244140625,
-          "current_return": 0.04012547203175165
+          "current_close": 145.50999450683594,
+          "current_return": 0.0370607728509913
         },
         {
           "ticker": "XOM",
@@ -496,8 +604,8 @@
           "composite_z": 71.48099153882751,
           "entry_date_used": "2026-07-27",
           "entry_close": 154.77000427246094,
-          "current_close": 156.75,
-          "current_return": 0.012793149013897054
+          "current_close": 156.97000122070312,
+          "current_return": 0.014214620969895897
         },
         {
           "ticker": "SLB",
@@ -505,8 +613,8 @@
           "composite_z": 69.59578052140954,
           "entry_date_used": "2026-07-27",
           "entry_close": 51.529998779296875,
-          "current_close": 48.959999084472656,
-          "current_return": -0.04987385514662124
+          "current_close": 48.90999984741211,
+          "current_return": -0.050844148921994514
         },
         {
           "ticker": "VLO",
@@ -514,8 +622,8 @@
           "composite_z": 68.34445009360778,
           "entry_date_used": "2026-07-27",
           "entry_close": 304.92999267578125,
-          "current_close": 301.32000732421875,
-          "current_return": -0.01183873491710219
+          "current_close": 311.7099914550781,
+          "current_return": 0.02223460775308439
         },
         {
           "ticker": "VRT",
@@ -523,8 +631,8 @@
           "composite_z": 66.42341774320542,
           "entry_date_used": "2026-07-27",
           "entry_close": 287.6000061035156,
-          "current_close": 223.0399932861328,
-          "current_return": -0.22447848208370969
+          "current_close": 227.5,
+          "current_return": -0.2089708095551427
         }
       ],
       "shorts": [
@@ -534,8 +642,8 @@
           "composite_z": 28.187239774480354,
           "entry_date_used": "2026-07-27",
           "entry_close": 336.9100036621094,
-          "current_close": 338.19000244140625,
-          "current_return": -0.0037992305523246728
+          "current_close": 333.42999267578125,
+          "current_return": 0.010329200523883086
         },
         {
           "ticker": "ZS",
@@ -543,8 +651,8 @@
           "composite_z": 28.232875032654704,
           "entry_date_used": "2026-07-27",
           "entry_close": 147.3000030517578,
-          "current_close": 153.77000427246094,
-          "current_return": -0.04392397207506993
+          "current_close": 148.38999938964844,
+          "current_return": -0.007399839207794301
         },
         {
           "ticker": "AI",
@@ -552,8 +660,8 @@
           "composite_z": 29.71681835405324,
           "entry_date_used": "2026-07-27",
           "entry_close": 8.819999694824219,
-          "current_close": 8.850000381469727,
-          "current_return": -0.003401438512873556
+          "current_close": 9.069999694824219,
+          "current_return": -0.028344672182551767
         },
         {
           "ticker": "CRWV",
@@ -561,8 +669,8 @@
           "composite_z": 30.264075067386674,
           "entry_date_used": "2026-07-27",
           "entry_close": 70.79000091552734,
-          "current_close": 60.81999969482422,
-          "current_return": 0.1408391169905504
+          "current_close": 73.9000015258789,
+          "current_return": -0.043932766918066246
         },
         {
           "ticker": "SMR",
@@ -570,14 +678,14 @@
           "composite_z": 30.405402583632718,
           "entry_date_used": "2026-07-27",
           "entry_close": 8.539999961853027,
-          "current_close": 7.590000152587891,
-          "current_return": 0.11124119596120041
+          "current_close": 8.600000381469727,
+          "current_return": -0.007025810290949952
         }
       ],
-      "days_held": 1,
-      "current_long_return": -0.04665449022035688,
-      "current_short_return": 0.04019113436229653,
-      "current_ls_return": -0.0032316779290301745
+      "days_held": 2,
+      "current_long_return": -0.03726099138063312,
+      "current_short_return": -0.015274777615095835,
+      "current_ls_return": -0.02626788449786448
     },
     {
       "entry_date": "2026-07-27",
@@ -589,8 +697,8 @@
           "composite_z": 77.47707968166054,
           "entry_date_used": "2026-07-24",
           "entry_close": 146.38999938964844,
-          "current_close": 145.94000244140625,
-          "current_return": -0.0030739596291986526
+          "current_close": 145.50999450683594,
+          "current_return": -0.006011372952261396
         },
         {
           "ticker": "XOM",
@@ -598,8 +706,8 @@
           "composite_z": 74.4365238632824,
           "entry_date_used": "2026-07-24",
           "entry_close": 156.94000244140625,
-          "current_close": 156.75,
-          "current_return": -0.0012106692904965133
+          "current_close": 156.97000122070312,
+          "current_return": 0.00019114807461573236
         },
         {
           "ticker": "VRT",
@@ -607,8 +715,8 @@
           "composite_z": 70.39314634403246,
           "entry_date_used": "2026-07-24",
           "entry_close": 290.3599853515625,
-          "current_close": 223.0399932861328,
-          "current_return": -0.2318501014660126
+          "current_close": 227.5,
+          "current_return": -0.21648983511089792
         },
         {
           "ticker": "VLO",
@@ -616,8 +724,8 @@
           "composite_z": 69.98423749309482,
           "entry_date_used": "2026-07-24",
           "entry_close": 302.5,
-          "current_close": 301.32000732421875,
-          "current_return": -0.003900802233987588
+          "current_close": 311.7099914550781,
+          "current_return": 0.030446252744059876
         },
         {
           "ticker": "SLB",
@@ -625,8 +733,8 @@
           "composite_z": 69.50576738957024,
           "entry_date_used": "2026-07-24",
           "entry_close": 52.41999816894531,
-          "current_close": 48.959999084472656,
-          "current_return": -0.06600532631308698
+          "current_close": 48.90999984741211,
+          "current_return": -0.06695914620639187
         }
       ],
       "shorts": [
@@ -636,8 +744,8 @@
           "composite_z": 25.89444158161674,
           "entry_date_used": "2026-07-24",
           "entry_close": 333.0199890136719,
-          "current_close": 338.19000244140625,
-          "current_return": -0.015524633950793065
+          "current_close": 333.42999267578125,
+          "current_return": -0.001231168325131815
         },
         {
           "ticker": "CRWV",
@@ -645,8 +753,8 @@
           "composite_z": 25.936067499192532,
           "entry_date_used": "2026-07-24",
           "entry_close": 71.87999725341797,
-          "current_close": 60.81999969482422,
-          "current_return": 0.15386752895386113
+          "current_close": 73.9000015258789,
+          "current_return": -0.028102453389630355
         },
         {
           "ticker": "WDAY",
@@ -654,8 +762,8 @@
           "composite_z": 28.26967744762695,
           "entry_date_used": "2026-07-24",
           "entry_close": 135.33999633789062,
-          "current_close": 168.00999450683594,
-          "current_return": -0.24139204265516012
+          "current_close": 158.11000061035156,
+          "current_return": -0.16824297981812575
         },
         {
           "ticker": "AI",
@@ -663,8 +771,8 @@
           "composite_z": 29.502929173052006,
           "entry_date_used": "2026-07-24",
           "entry_close": 8.149999618530273,
-          "current_close": 8.850000381469727,
-          "current_return": -0.08588966818451049
+          "current_close": 9.069999694824219,
+          "current_return": -0.11288345022767654
         },
         {
           "ticker": "SMR",
@@ -672,119 +780,153 @@
           "composite_z": 30.550222305995817,
           "entry_date_used": "2026-07-24",
           "entry_close": 8.09000015258789,
-          "current_close": 7.590000152587891,
-          "current_return": 0.061804695991267256
+          "current_close": 8.600000381469727,
+          "current_return": -0.06304081820303709
         }
       ],
-      "days_held": 2,
-      "current_long_return": -0.061208171786556465,
-      "current_short_return": -0.025426823969067057,
-      "current_ls_return": -0.043317497877811764
-    },
+      "days_held": 3,
+      "current_long_return": -0.05176459069017512,
+      "current_short_return": -0.0747001739927203,
+      "current_ls_return": -0.06323238234144771
+    }
+  ],
+  "closed_portfolios": [
     {
-      "entry_date": "2026-07-24",
-      "status": "open",
+      "entry_date": "2026-07-23",
+      "status": "closed",
       "longs": [
         {
           "ticker": "EOG",
           "sector": "Energy",
-          "composite_z": 77.45394015361939,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 145.49000549316406,
-          "current_close": 145.94000244140625,
-          "current_return": 0.003092974989703512
+          "composite_z": 77.00187735297622,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 144.0,
+          "current_close": 145.50999450683594,
+          "current_return": 0.010486072964138504,
+          "exit_close": 145.50999450683594,
+          "exit_date": "2026-07-31",
+          "return": 0.010486072964138504
+        },
+        {
+          "ticker": "WMB",
+          "sector": "Energy",
+          "composite_z": 69.65176231616627,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 74.48999786376953,
+          "current_close": 70.91000366210938,
+          "current_return": -0.04806006583873723,
+          "exit_close": 70.91000366210938,
+          "exit_date": "2026-07-31",
+          "return": -0.04806006583873723
         },
         {
           "ticker": "VLO",
           "sector": "Energy",
-          "composite_z": 72.06710775406083,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 305.260009765625,
-          "current_close": 301.32000732421875,
-          "current_return": -0.01290703765760648
+          "composite_z": 64.98011830609671,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 310.9200134277344,
+          "current_close": 311.7099914550781,
+          "current_return": 0.0025407757404698472,
+          "exit_close": 311.7099914550781,
+          "exit_date": "2026-07-31",
+          "return": 0.0025407757404698472
         },
         {
           "ticker": "SLB",
           "sector": "Energy",
-          "composite_z": 64.92182996624668,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 47.220001220703125,
-          "current_close": 48.959999084472656,
-          "current_return": 0.036848746691828804
+          "composite_z": 61.63042281261615,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 47.66999816894531,
+          "current_close": 48.90999984741211,
+          "current_return": 0.026012203190613814,
+          "exit_close": 48.90999984741211,
+          "exit_date": "2026-07-31",
+          "return": 0.026012203190613814
         },
         {
-          "ticker": "XOM",
-          "sector": "Energy",
-          "composite_z": 76.36481289831436,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 156.88999938964844,
-          "current_close": 156.75,
-          "current_return": -0.000892341068220226
-        },
-        {
-          "ticker": "VRT",
-          "sector": "Industrials",
-          "composite_z": 73.47595767891677,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 304.0400085449219,
-          "current_close": 223.0399932861328,
-          "current_return": -0.2664123568685577
+          "ticker": "NTAP",
+          "sector": "Technology",
+          "composite_z": 61.40529002515947,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 166.5399932861328,
+          "current_close": 173.97999572753906,
+          "current_return": 0.04467396866423279,
+          "exit_close": 173.97999572753906,
+          "exit_date": "2026-07-31",
+          "return": 0.04467396866423279
         }
       ],
       "shorts": [
         {
-          "ticker": "WDAY",
+          "ticker": "AAPL",
           "sector": "Technology",
-          "composite_z": 26.91906441345875,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 127.87000274658203,
-          "current_close": 168.00999450683594,
-          "current_return": -0.3139124962701767
-        },
-        {
-          "ticker": "MDB",
-          "sector": "Technology",
-          "composite_z": 27.105115031889724,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 299.1400146484375,
-          "current_close": 321.1000061035156,
-          "current_return": -0.07341041111095237
-        },
-        {
-          "ticker": "CRWV",
-          "sector": "Technology",
-          "composite_z": 29.062355531317614,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 81.0999984741211,
-          "current_close": 60.81999969482422,
-          "current_return": 0.25006164193416347
+          "composite_z": 28.14775553257726,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 325.8900146484375,
+          "current_close": 333.42999267578125,
+          "current_return": -0.02313657273444747,
+          "exit_close": 333.42999267578125,
+          "exit_date": "2026-07-31",
+          "return": -0.02313657273444747
         },
         {
           "ticker": "AI",
           "sector": "Technology",
-          "composite_z": 29.372567374805612,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 8.149999618530273,
-          "current_close": 8.850000381469727,
-          "current_return": -0.08588966818451049
+          "composite_z": 29.395356164854572,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 8.1899995803833,
+          "current_close": 9.069999694824219,
+          "current_return": -0.10744812692648908,
+          "exit_close": 9.069999694824219,
+          "exit_date": "2026-07-31",
+          "return": -0.10744812692648908
         },
         {
           "ticker": "SMR",
           "sector": "Industrials",
-          "composite_z": 33.243021052093056,
-          "entry_date_used": "2026-07-23",
-          "entry_close": 8.8100004196167,
-          "current_close": 7.590000152587891,
-          "current_return": 0.13847902484911434
+          "composite_z": 31.21933580937826,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 8.680000305175781,
+          "current_close": 8.600000381469727,
+          "current_return": 0.009216580748084957,
+          "exit_close": 8.600000381469727,
+          "exit_date": "2026-07-31",
+          "return": 0.009216580748084957
+        },
+        {
+          "ticker": "CRWV",
+          "sector": "Technology",
+          "composite_z": 32.166395161993265,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 82.63999938964844,
+          "current_close": 73.9000015258789,
+          "current_return": 0.10575989748693426,
+          "exit_close": 73.9000015258789,
+          "exit_date": "2026-07-31",
+          "return": 0.10575989748693426
+        },
+        {
+          "ticker": "MDB",
+          "sector": "Technology",
+          "composite_z": 32.667443239757276,
+          "entry_date_used": "2026-07-22",
+          "entry_close": 304.9700012207031,
+          "current_close": 325.8800048828125,
+          "current_return": -0.0685641327947435,
+          "exit_close": 325.8800048828125,
+          "exit_date": "2026-07-31",
+          "return": -0.0685641327947435
         }
       ],
-      "days_held": 3,
-      "current_long_return": -0.04805400278257042,
-      "current_short_return": -0.01693438175647235,
-      "current_ls_return": -0.03249419226952138
-    }
-  ],
-  "closed_portfolios": [
+      "days_held": 5,
+      "current_long_return": 0.007130590944143545,
+      "current_short_return": -0.016834470844132164,
+      "current_ls_return": -0.00485193994999431,
+      "long_basket_return": 0.007130590944143545,
+      "short_basket_return": -0.016834470844132164,
+      "ls_return": -0.00485193994999431,
+      "exit_date": "2026-07-31"
+    },
     {
       "entry_date": "2026-07-22",
       "status": "closed",
